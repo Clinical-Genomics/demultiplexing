@@ -28,6 +28,8 @@ for PROJ in ${PROJs[@]};do
   echo [${NOW}] [${RUN}] mkdir -p ${OUT}${PROJ} >> ${PROJECTLOG}
   samples=$(ls ${UNALIGNBASE}Unaligned/${PROJ} | grep Sa)
   mkdir -p ${OUT}${PROJ}/${FC}
+  chmod g+w ${OUT}${PROJ}/${FC}
+  echo "[${NOW}] [${RUN}] chmod g+w ${OUT}${PROJ}/${FC}" >> ${PROJECTLOG}
   for vars in ${samples[@]};do
     NOW=$(date +"%Y%m%d%H%M%S")
     var=$(echo ${vars} | sed 's/Sample_//')
