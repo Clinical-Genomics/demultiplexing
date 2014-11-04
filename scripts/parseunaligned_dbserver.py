@@ -56,7 +56,9 @@ Flowcellpos = Flowcellpos.replace(fc+"/","")
 dirs = basedir.split("/")
 runname = dirs[len(dirs)-1]
 ###print Flowcellpos
+print runname
 
+exit
 
 print (basedir+"Unaligned/support.txt")
 print (sys.argv[2])
