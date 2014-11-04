@@ -177,7 +177,7 @@ else:
   print "Data source "+demultistats+" exists in DB with datasource_id: "+str(datasourceid)
 
 # ADD flowcell if not present in DB
-cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc, str(datasourceid), ))
+cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc, ))
 if not cursor.fetchone():
   print "Flowcell not yet added"
   try:
