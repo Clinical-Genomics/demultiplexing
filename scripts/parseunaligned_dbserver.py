@@ -60,9 +60,9 @@ name_ = runname.split("_")
 rundate = list(name_[0])
 rundate = "20"+rundate[0]+rundate[1]+"-"+rundate[2]+rundate[3]+"-"+rundate[4]+rundate[5]
 
-print runname, rundate
+#print runname, rundate
 
-sys.exit(0)
+#sys.exit(0)
 
 print (basedir+"Unaligned/support.txt")
 print (sys.argv[2])
