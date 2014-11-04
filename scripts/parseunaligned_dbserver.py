@@ -42,7 +42,7 @@ support.close()
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
-cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='clinstatsdb')
+cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
 soup = BeautifulSoup(open(demultistats))
 
@@ -53,6 +53,8 @@ fc = fcentry.replace("Flowcell: ","")
 baseparts = basedir.split("_")
 Flowcellpos = baseparts[len(baseparts)-1]
 Flowcellpos = Flowcellpos.replace(fc+"/","") 
+dirs = basedir.split("/")
+runname = dirs[len(dirs)-1]
 ###print Flowcellpos
 
 
@@ -121,7 +123,7 @@ cursor.execute(""" SELECT supportparams_id FROM supportparams WHERE document_pat
 if not cursor.fetchone():
   print "Support parameters not yet added"
   try:
-    cursor.execute("""INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, idstring, program, commandline, sampleconfig_path, sampleconfig) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, ))
+    cursor.execute("""INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, idstring, program, commandline, sampleconfig_path, sampleconfig, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
@@ -148,7 +150,7 @@ cursor.execute(""" SELECT datasource_id FROM datasource WHERE document_path = %s
 if not cursor.fetchone():
   print "Data source not yet added"
   try:
-    cursor.execute("""INSERT INTO `datasource` (document_path, supportparams_id, server) VALUES (%s, %s, %s) """, (demultistats, supportparamsid, servername, ))
+    cursor.execute("""INSERT INTO `datasource` (document_path, supportparams_id, server, time) VALUES (%s, %s, %s, %s) """, (demultistats, supportparamsid, servername, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
@@ -173,7 +175,7 @@ cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s AND 
 if not cursor.fetchone():
   print "Flowcell not yet added"
   try:
-    cursor.execute("""INSERT INTO `flowcell` (flowcellname, datasource_id, flowcell_pos, time_start, time_end, time) VALUES (%s, %s, %s, %s, %s, %s) """, (fc, str(datasourceid), Flowcellpos, now, now, now))
+    cursor.execute("""INSERT INTO `flowcell` (flowcellname, datasource_id, flowcell_pos, time) VALUES (%s, %s, %s, %s) """, (fc, str(datasourceid), Flowcellpos, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
