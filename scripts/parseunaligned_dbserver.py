@@ -54,7 +54,7 @@ baseparts = basedir.split("_")
 Flowcellpos = baseparts[len(baseparts)-1]
 Flowcellpos = Flowcellpos.replace(fc+"/","") 
 dirs = basedir.split("/")
-runname = dirs[len(dirs)-1]
+runname = dirs[len(dirs)-2]
 ###print Flowcellpos
 print runname, dirs, Flowcellpos
 
