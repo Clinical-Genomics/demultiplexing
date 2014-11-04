@@ -58,7 +58,7 @@ runname = dirs[len(dirs)-1]
 ###print Flowcellpos
 print runname
 
-exit
+sys.exit(0)
 
 print (basedir+"Unaligned/support.txt")
 print (sys.argv[2])
@@ -239,11 +239,11 @@ for row in rows:
   samplename = unicode(cols[1].string).encode('utf8')
   barcode = unicode(cols[3].string).encode('utf8')
   project = unicode(cols[6].string).encode('utf8')
-  cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s AND datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+  cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s """, (samplename, barcode, ))
   if not cursor.fetchone():
     print "Sample not yet added"
     try:
-      cursor.execute("""INSERT INTO `sample` (samplename, project_id, datasource_id, barcode) VALUES (%s, %s, %s, %s) """, (samplename, projects[project], str(datasourceid), barcode, ))
+      cursor.execute("""INSERT INTO `sample` (samplename, project_id, barcode, time) VALUES (%s, %s, %s, %s) """, (samplename, projects[project], barcode, now, ))
     except mysql.IntegrityError, e: 
       print "Error %d: %s" % (e.args[0],e.args[1])
       exit("DB error")
