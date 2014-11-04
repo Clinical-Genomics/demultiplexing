@@ -263,7 +263,7 @@ for row in rows:
     print "Sample "+samplename+" now added to DB with sample_id: "+str(cursor.lastrowid)
     samples[samplename] = cursor.lastrowid
   else:
-    cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s """, (samplename, barcode, )))
+    cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s """, (samplename, barcode, ))
     sampleid = cursor.fetchone()[0]
     print "Sample "+samplename+" exists in DB with sample_id: "+str(sampleid)
     samples[samplename] = sampleid
