@@ -56,8 +56,9 @@ Flowcellpos = Flowcellpos.replace(fc+"/","")
 dirs = basedir.split("/")
 runname = dirs[len(dirs)-2]
 ###print Flowcellpos
-print runname, dirs, Flowcellpos
-
+name_ = runname.split("_")
+rundate = name_[1]
+print runname, rundate
 sys.exit(0)
 
 print (basedir+"Unaligned/support.txt")
