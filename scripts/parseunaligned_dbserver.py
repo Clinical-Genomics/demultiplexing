@@ -181,7 +181,7 @@ cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """,
 if not cursor.fetchone():
   print "Flowcell not yet added"
   try:
-    cursor.execute("""INSERT INTO `flowcell` (flowcellname, flowcell_pos, time) VALUES (%s, %s, %s) """, (fc, Flowcellpos, now, ))
+    cursor.execute("""INSERT INTO `flowcell` (datasource_id, flowcellname, flowcell_pos, time) VALUES (%s, %s, %s, %s) """, (str(datasourceid), fc, Flowcellpos, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
