@@ -243,7 +243,7 @@ for row in rows:
   samplename = unicode(cols[1].string).encode('utf8')
   barcode = unicode(cols[3].string).encode('utf8')
   project = unicode(cols[6].string).encode('utf8')
-  cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+  cursor.execute(""" SELECT sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
   if not cursor.fetchone():
     print "Sample not yet added"
     try:
@@ -263,7 +263,7 @@ for row in rows:
     print "Sample "+samplename+" now added to DB with sample_id: "+str(cursor.lastrowid)
     samples[samplename] = cursor.lastrowid
   else:
-    cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+    cursor.execute(""" SELECT sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
     sampleid = cursor.fetchone()[0]
     print "Sample "+samplename+" exists in DB with sample_id: "+str(sampleid)
     samples[samplename] = sampleid
