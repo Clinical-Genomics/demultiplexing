@@ -60,11 +60,12 @@ else:
   sys.exit("Incorrect DB, version not found.")
 
 if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
-  print("""Correct database %s.%s.%s """, _MAJOR_, _MINOR_, _PATCH_)
+  print "Correct database "+_MAJOR_+"."+_MINOR_+"."_PATCH_
 else:
   exit("Incorrect DB, version not found %s.%s.%s", _MAJOR_, _MINOR_, _PATCH_)
 
 sys.exit("hejda")
+
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
