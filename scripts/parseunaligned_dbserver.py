@@ -16,7 +16,7 @@ import socket
 # this script is written for database version:
 _MAJOR_ = 1
 _MINOR_ = 0
-_PATCH_ = 0
+_PATCH_ = 2
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
