@@ -13,6 +13,11 @@ import glob
 import re
 import socket
 
+# this script is written for database version:
+_MAJOR_ = 1
+_MINOR_ = 0
+_PATCH_ = 0
+
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
@@ -45,6 +50,21 @@ now = time.strftime('%Y-%m-%d %H:%M:%S')
 cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
 soup = BeautifulSoup(open(demultistats))
+
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+  if not cursor.fetchone():
+    print "Incorrect DB, version not found."
+    sys.exit("Incorrect DB, version not found.")
+  else:
+    major = cursor.fetchone()[0]
+    minor = cursor.fetchone()[1]
+    patch = cursor.fetchone()[2]
+
+print "DB", major, minor, patch
+print "sc", _MAJOR_, _MINOR_, _PATCH_
+
+sys.exit("hejdå")
+
 
 h1fc = soup.find("h1")
 fcentry = unicode(h1fc.string).encode('utf8')
