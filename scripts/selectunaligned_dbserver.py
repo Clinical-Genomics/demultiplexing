@@ -34,7 +34,7 @@ with open(configfile, "r") as confs:
       params[pv[0]] = pv[1]
 
 # config file test
-sys.exit(configfile+ params['STATSDB'])
+#sys.exit(configfile+ params['STATSDB'])
 
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
