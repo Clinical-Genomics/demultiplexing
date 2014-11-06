@@ -50,10 +50,12 @@ cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPO
 cursor = cnx.cursor()
 
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
-if cursor.fetchone():
-  major = cursor.fetchone()[0]
-  minor = cursor.fetchone()[1]
-  patch = cursor.fetchone()[2]
+row = cursor.fetchone()
+while row is not None:
+  print(row)
+  major = row[0]
+  minor = row[1]
+  patch = row[2]
 else:
   print "Incorrect DB, version not found."
   sys.exit("Incorrect DB, version not found.")
