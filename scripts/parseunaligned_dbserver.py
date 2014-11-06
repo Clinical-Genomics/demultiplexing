@@ -43,27 +43,28 @@ support = open(basedir+"Unaligned/support.txt")
 support_lines = support.readlines()
 support.close()
 
-#Determine the name of the basecall stats file
-demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
-cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='csdb_test')
+cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
+                    passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
-soup = BeautifulSoup(open(demultistats))
 
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
-if not cursor.fetchone():
-  print "Incorrect DB, version not found."
-  sys.exit("Incorrect DB, version not found.")
-else:
+if cursor.fetchone():
   major = cursor.fetchone()[0]
   minor = cursor.fetchone()[1]
   patch = cursor.fetchone()[2]
+else:
+  print "Incorrect DB, version not found."
+  sys.exit("Incorrect DB, version not found.")
 
 print "DB", major, minor, patch
 print "sc", _MAJOR_, _MINOR_, _PATCH_
 
 sys.exit("hejda")
+#Determine the name of the basecall stats file
+demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
+soup = BeautifulSoup(open(demultistats))
 
 h1fc = soup.find("h1")
 fcentry = unicode(h1fc.string).encode('utf8')
