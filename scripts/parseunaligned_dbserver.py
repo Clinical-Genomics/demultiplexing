@@ -46,7 +46,7 @@ support.close()
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
 cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
-                    passwd=params['CLINICALDBPASSWD'], db='csdb_test')
+                    passwd=params['CLINICALDBPASSWD'], db=params['STATSDB'])
 cursor = cnx.cursor()
 
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
