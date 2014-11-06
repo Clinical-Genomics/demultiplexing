@@ -62,8 +62,6 @@ if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
 else:
   exit ("Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "+str(major)+"."+str(minor)+"."+str(patch))
 
-sys.exit("hejda")
-
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
