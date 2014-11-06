@@ -63,7 +63,7 @@ else:
 print "DB", major, minor, patch
 print "sc", _MAJOR_, _MINOR_, _PATCH_
 
-sys.exit("hejdå")
+sys.exit("hejda")
 
 h1fc = soup.find("h1")
 fcentry = unicode(h1fc.string).encode('utf8')
