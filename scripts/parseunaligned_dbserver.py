@@ -23,12 +23,12 @@ if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
   message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
-  exit(message, params['STATSDB'])
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
 if (len(sys.argv)>3):
   if os.path.isfile(sys.argv[3]):
     configfile = sys.argv[3]
+    
 params = {}
 with open(configfile, "r") as confs:
   for line in confs:
@@ -40,7 +40,7 @@ with open(configfile, "r") as confs:
 if not (basedir[-1:] == "/"):
   basedir = basedir+"/"
 
-sys.exit(configfile)
+exit(message, params['STATSDB'])
 
 unaligned = (basedir+"Unaligned/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)
