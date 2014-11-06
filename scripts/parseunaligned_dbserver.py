@@ -65,7 +65,6 @@ print "sc", _MAJOR_, _MINOR_, _PATCH_
 
 sys.exit("hejdå")
 
-
 h1fc = soup.find("h1")
 fcentry = unicode(h1fc.string).encode('utf8')
 fc = fcentry.replace("Flowcell: ","")
