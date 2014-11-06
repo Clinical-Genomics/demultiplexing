@@ -49,16 +49,14 @@ cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPO
                     passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
 
-cursor.execute(""" SELECT major, minor, patch FROM version where major = '23' ORDER BY time DESC LIMIT 1 """)
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
 row = cursor.fetchone()
 if row is not None:
   major = row[0]
   minor = row[1]
   patch = row[2]
 else:
-  print "Incorrect DB, version not found."
-  sys.exit("Incorrect DB, version not found wro.")
-
+  sys.exit("Incorrect DB, version not found.")
 if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
   print "Correct database "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)
 else:
