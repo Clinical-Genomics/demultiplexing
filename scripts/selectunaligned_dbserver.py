@@ -8,6 +8,11 @@ import time
 import glob
 import re
 
+# this script is written for database version:
+_MAJOR_ = 1
+_MINOR_ = 0
+_PATCH_ = 0
+
 params = {}
 with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
   for line in confs:
@@ -17,8 +22,22 @@ with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
       params[pv[0]] = pv[1]
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
-cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='csdb_test')
+cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
+                    passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
+
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+row = cursor.fetchone()
+if row is not None:
+  major = row[0]
+  minor = row[1]
+  patch = row[2]
+else:
+  sys.exit("Incorrect DB, version not found.")
+if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
+  print "Correct database "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)
+else:
+  exit ("Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "+str(major)+"."+str(minor)+"."+str(patch))
 
 # SELECT stats
 proje = sys.argv[1]
