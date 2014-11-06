@@ -41,7 +41,7 @@ with open(configfile, "r") as confs:
 if not (basedir[-1:] == "/"):
   basedir = basedir+"/"
 
-sys.exit(configfile, params['STATSDB'])
+sys.exit(configfile+ params['STATSDB'])
 
 unaligned = (basedir+"Unaligned/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)
