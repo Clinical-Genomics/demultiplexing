@@ -16,7 +16,7 @@ import socket
 # this script is written for database version:
 _MAJOR_ = 1
 _MINOR_ = 0
-_PATCH_ = 2
+_PATCH_ = 0
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
@@ -49,7 +49,7 @@ cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPO
                     passwd=params['CLINICALDBPASSWD'], db='csdb_test')
 cursor = cnx.cursor()
 
-cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+cursor.execute(""" SELECT majr, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
 row = cursor.fetchone()
 if row is not None:
   major = row[0]
