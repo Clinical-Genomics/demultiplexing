@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import time
 import glob
 import re
+import os
 
 # this script is written for database version:
 _MAJOR_ = 1
