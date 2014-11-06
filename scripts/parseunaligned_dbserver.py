@@ -52,13 +52,13 @@ cursor = cnx.cursor()
 soup = BeautifulSoup(open(demultistats))
 
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
-  if not cursor.fetchone():
-    print "Incorrect DB, version not found."
-    sys.exit("Incorrect DB, version not found.")
-  else:
-    major = cursor.fetchone()[0]
-    minor = cursor.fetchone()[1]
-    patch = cursor.fetchone()[2]
+if not cursor.fetchone():
+  print "Incorrect DB, version not found."
+  sys.exit("Incorrect DB, version not found.")
+else:
+  major = cursor.fetchone()[0]
+  minor = cursor.fetchone()[1]
+  patch = cursor.fetchone()[2]
 
 print "DB", major, minor, patch
 print "sc", _MAJOR_, _MINOR_, _PATCH_
