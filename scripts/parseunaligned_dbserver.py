@@ -23,7 +23,7 @@ if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
   message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
-  exit(message)
+  exit(message, params['STATSDB'])
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
 if (len(sys.argv)>3):
