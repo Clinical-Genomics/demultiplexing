@@ -26,7 +26,7 @@ else:
   exit(message)
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
-if (len(sys.argv)>2):
+if (len(sys.argv)>3):
   if os.path.isfile(sys.argv[3]):
     configfile = sys.argv[3]
 params = {}
