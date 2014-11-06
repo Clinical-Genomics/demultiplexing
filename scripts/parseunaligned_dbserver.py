@@ -12,6 +12,7 @@ import time
 import glob
 import re
 import socket
+import os
 
 # this script is written for database version:
 _MAJOR_ = 1
@@ -21,11 +22,14 @@ _PATCH_ = 0
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
-  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv>")
+  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
   exit(message)
 
+configfile = "/home/hiseq.clinical/.scilifelabrc"
+if os.path.isfile(sys.argv[3]):
+  configfile = sys.argv[3]
 params = {}
-with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
+with open(configfile, "r") as confs:
   for line in confs:
     if len(line) > 5 and not line[0] == "#":
       line = line.rstrip()
@@ -34,6 +38,8 @@ with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
 
 if not (basedir[-1:] == "/"):
   basedir = basedir+"/"
+
+sys.exit(configfile)
 
 unaligned = (basedir+"Unaligned/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)
