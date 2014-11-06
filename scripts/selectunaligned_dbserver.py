@@ -11,7 +11,7 @@ import re
 # this script is written for database version:
 _MAJOR_ = 1
 _MINOR_ = 0
-_PATCH_ = 0
+_PATCH_ = 1
 
 params = {}
 with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
