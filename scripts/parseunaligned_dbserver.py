@@ -62,7 +62,7 @@ else:
 if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
   print "Correct database "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)
 else:
-  exit "Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "+str(major)+"."+str(minor)+"."+str(patch)
+  exit ("Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "+str(major)+"."+str(minor)+"."+str(patch))
 
 sys.exit("hejda")
 
