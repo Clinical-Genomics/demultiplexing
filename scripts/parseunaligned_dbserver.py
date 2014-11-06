@@ -60,7 +60,7 @@ else:
   sys.exit("Incorrect DB, version not found.")
 
 if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
-  print "Correct database "+_MAJOR_+"."+_MINOR_+"."_PATCH_
+  print "Correct database "+_MAJOR_+"."+_MINOR_+"."+_PATCH_
 else:
   exit("Incorrect DB, version not found %s.%s.%s", _MAJOR_, _MINOR_, _PATCH_)
 
