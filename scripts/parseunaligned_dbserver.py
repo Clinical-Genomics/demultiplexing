@@ -26,8 +26,9 @@ else:
   exit(message)
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
-if os.path.isfile(sys.argv[3]):
-  configfile = sys.argv[3]
+if (len(sys.argv)>2):
+  if os.path.isfile(sys.argv[3]):
+    configfile = sys.argv[3]
 params = {}
 with open(configfile, "r") as confs:
   for line in confs:
