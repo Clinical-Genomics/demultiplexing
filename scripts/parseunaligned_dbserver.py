@@ -51,9 +51,8 @@ cursor = cnx.cursor()
 
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
 row = cursor.fetchone()
-while row is not None:
-  print(row)
-  major = row[0]
+if row is not None:
+  major = int(row[0])
   minor = row[1]
   patch = row[2]
 else:
