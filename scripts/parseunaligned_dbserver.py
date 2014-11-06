@@ -52,15 +52,17 @@ cursor = cnx.cursor()
 cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
 row = cursor.fetchone()
 if row is not None:
-  major = int(row[0])
+  major = row[0]
   minor = row[1]
   patch = row[2]
 else:
   print "Incorrect DB, version not found."
   sys.exit("Incorrect DB, version not found.")
 
-print "DB", major, minor, patch
-print "sc", _MAJOR_, _MINOR_, _PATCH_
+if (major == _MAJOR_ && minor == _MINOR_ && patch == _PATCH_):
+  print ("Correct database %s.%s.%s", _MAJOR_, _MINOR_, _PATCH_)
+else:
+  exit("Incorrect DB, version not found %s.%s.%s", _MAJOR_, _MINOR_, _PATCH_)
 
 sys.exit("hejda")
 #Determine the name of the basecall stats file
