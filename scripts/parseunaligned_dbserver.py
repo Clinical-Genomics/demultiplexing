@@ -12,15 +12,26 @@ import time
 import glob
 import re
 import socket
+import os
+
+# this script is written for database version:
+_MAJOR_ = 1
+_MINOR_ = 0
+_PATCH_ = 0
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
-  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv>")
-  exit(message)
+  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
+  sys.exit(message)
 
+configfile = "/home/hiseq.clinical/.scilifelabrc"
+if (len(sys.argv)>3):
+  if os.path.isfile(sys.argv[3]):
+    configfile = sys.argv[3]
+    
 params = {}
-with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
+with open(configfile, "r") as confs:
   for line in confs:
     if len(line) > 5 and not line[0] == "#":
       line = line.rstrip()
@@ -30,6 +41,9 @@ with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
 if not (basedir[-1:] == "/"):
   basedir = basedir+"/"
 
+# config file test
+#sys.exit(configfile+ params['STATSDB'])
+
 unaligned = (basedir+"Unaligned/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)
 
@@ -38,12 +52,27 @@ support = open(basedir+"Unaligned/support.txt")
 support_lines = support.readlines()
 support.close()
 
-#Determine the name of the basecall stats file
-demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
-cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='clinstatsdb')
+cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
+                    passwd=params['CLINICALDBPASSWD'], db=params['STATSDB'])
 cursor = cnx.cursor()
+
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+row = cursor.fetchone()
+if row is not None:
+  major = row[0]
+  minor = row[1]
+  patch = row[2]
+else:
+  sys.exit("Incorrect DB, version not found.")
+if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
+  print "Correct database "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)
+else:
+  exit ("Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "+str(major)+"."+str(minor)+"."+str(patch))
+
+#Determine the name of the basecall stats file
+demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
 
 h1fc = soup.find("h1")
@@ -53,8 +82,16 @@ fc = fcentry.replace("Flowcell: ","")
 baseparts = basedir.split("_")
 Flowcellpos = baseparts[len(baseparts)-1]
 Flowcellpos = Flowcellpos.replace(fc+"/","") 
+dirs = basedir.split("/")
+runname = dirs[len(dirs)-2]
 ###print Flowcellpos
+name_ = runname.split("_")
+rundate = list(name_[0])
+rundate = "20"+rundate[0]+rundate[1]+"-"+rundate[2]+rundate[3]+"-"+rundate[4]+rundate[5]
 
+#print runname, rundate
+
+#sys.exit(0)
 
 print (basedir+"Unaligned/support.txt")
 print (sys.argv[2])
@@ -121,7 +158,7 @@ cursor.execute(""" SELECT supportparams_id FROM supportparams WHERE document_pat
 if not cursor.fetchone():
   print "Support parameters not yet added"
   try:
-    cursor.execute("""INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, idstring, program, commandline, sampleconfig_path, sampleconfig) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, ))
+    cursor.execute("""INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, idstring, program, commandline, sampleconfig_path, sampleconfig, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
@@ -148,7 +185,7 @@ cursor.execute(""" SELECT datasource_id FROM datasource WHERE document_path = %s
 if not cursor.fetchone():
   print "Data source not yet added"
   try:
-    cursor.execute("""INSERT INTO `datasource` (document_path, supportparams_id, server) VALUES (%s, %s, %s) """, (demultistats, supportparamsid, servername, ))
+    cursor.execute("""INSERT INTO `datasource` (document_path, runname, rundate, supportparams_id, server, time) VALUES (%s, %s, %s, %s, %s, %s) """, (demultistats, runname, rundate, supportparamsid, servername, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
@@ -169,11 +206,11 @@ else:
   print "Data source "+demultistats+" exists in DB with datasource_id: "+str(datasourceid)
 
 # ADD flowcell if not present in DB
-cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s AND datasource_id = %s """, (fc, str(datasourceid), ))
+cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc, ))
 if not cursor.fetchone():
   print "Flowcell not yet added"
   try:
-    cursor.execute("""INSERT INTO `flowcell` (flowcellname, datasource_id, flowcell_pos, time_start, time_end, time) VALUES (%s, %s, %s, %s, %s, %s) """, (fc, str(datasourceid), Flowcellpos, now, now, now))
+    cursor.execute("""INSERT INTO `flowcell` (datasource_id, flowcellname, flowcell_pos, time) VALUES (%s, %s, %s, %s) """, (str(datasourceid), fc, Flowcellpos, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit("DB error")
@@ -235,11 +272,11 @@ for row in rows:
   samplename = unicode(cols[1].string).encode('utf8')
   barcode = unicode(cols[3].string).encode('utf8')
   project = unicode(cols[6].string).encode('utf8')
-  cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s AND datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+  cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
   if not cursor.fetchone():
     print "Sample not yet added"
     try:
-      cursor.execute("""INSERT INTO `sample` (samplename, project_id, datasource_id, barcode) VALUES (%s, %s, %s, %s) """, (samplename, projects[project], str(datasourceid), barcode, ))
+      cursor.execute("""INSERT INTO `sample` (samplename, project_id, barcode, time) VALUES (%s, %s, %s, %s) """, (samplename, projects[project], barcode, now, ))
     except mysql.IntegrityError, e: 
       print "Error %d: %s" % (e.args[0],e.args[1])
       exit("DB error")
@@ -255,7 +292,7 @@ for row in rows:
     print "Sample "+samplename+" now added to DB with sample_id: "+str(cursor.lastrowid)
     samples[samplename] = cursor.lastrowid
   else:
-    cursor.execute(""" SELECT sample_id FROM sample WHERE samplename = %s AND barcode = %s AND datasource_id = %s """, (samplename, barcode, str(datasourceid, )))
+    cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
     sampleid = cursor.fetchone()[0]
     print "Sample "+samplename+" exists in DB with sample_id: "+str(sampleid)
     samples[samplename] = sampleid
@@ -277,11 +314,11 @@ for row in rows:
   q30_bases_pct = unicode(cols[13].string).encode('utf8')
   mean_quality_score = unicode(cols[14].string).encode('utf8')
 
-  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND datasource_id = %s AND lane = %s """, (str(samples[samplename]), str(datasourceid), lane, ))
+  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, (str(samples[samplename]), lane, ))
   if not cursor.fetchone():
     print "UnalignedStats not yet added"
     try:
-      cursor.execute("""INSERT INTO `unaligned` (sample_id, flowcell_id, datasource_id, lane, yield_mb, passed_filter_pct, readcounts, raw_clusters_per_lane_pct, perfect_indexreads_pct, q30_bases_pct, mean_quality_score) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (samples[samplename], str(fcid), str(datasourceid), lane, yield_mb, passed_filter_pct, Readcounts, raw_clusters_per_lane_pct, perfect_indexreads_pct, q30_bases_pct, mean_quality_score, ))
+      cursor.execute("""INSERT INTO `unaligned` (sample_id, flowcell_id, lane, yield_mb, passed_filter_pct, readcounts, raw_clusters_per_lane_pct, perfect_indexreads_pct, q30_bases_pct, mean_quality_score, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """, (samples[samplename], str(fcid), lane, yield_mb, passed_filter_pct, Readcounts, raw_clusters_per_lane_pct, perfect_indexreads_pct, q30_bases_pct, mean_quality_score, now, ))
     except mysql.IntegrityError, e: 
       print "Error %d: %s" % (e.args[0],e.args[1])
       exit("DB error")
@@ -296,7 +333,7 @@ for row in rows:
     cnx.commit()
     print "Unaligned stats for sample "+samplename+" now added to DB with unaligned_id: "+str(cursor.lastrowid)
   else:
-    cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND datasource_id = %s AND lane = %s """, (str(samples[samplename]), str(datasourceid), lane, ))
+    cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, (str(samples[samplename]), lane, ))
     unalignedid = cursor.fetchone()[0]
     print "Unaligned stats for sample "+samplename+" exists in DB with unaligned_id: "+str(unalignedid)
 
