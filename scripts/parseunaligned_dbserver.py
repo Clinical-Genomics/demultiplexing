@@ -357,7 +357,7 @@ for row in rows:
     cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s """, 
                        (str(samples[samplename]), lane, str(fcid), ))
     unalignedid = cursor.fetchone()[0]
-    print "Unaligned stats for sample "+samplename+" exists in DB with unaligned_id: "+str(unalignedid)
+    print "Unaligned stats for sample "+samplename+" exists in DB with unaligned_id: "+str(unalignedid)+" sample_id: "+str(samples[samplename])
 
 cnx.commit()
 
