@@ -328,10 +328,10 @@ for row in rows:
   q30_bases_pct = unicode(cols[13].string).encode('utf8')
   mean_quality_score = unicode(cols[14].string).encode('utf8')
 
-  print "sample_id :"+str(samples[samplename])
+  print "FINAL USED sample_id :"+str(samples[samplename])
 
-  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, 
-                     (str(samples[samplename]), lane, ))
+  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s """, 
+                     (str(samples[samplename]), lane, str(fcid), ))
   if not cursor.fetchone():
     print "UnalignedStats not yet added"
     try:
@@ -354,8 +354,8 @@ for row in rows:
     cnx.commit()
     print "Unaligned stats for sample "+samplename+" now added to DB with unaligned_id: "+str(cursor.lastrowid)
   else:
-    cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, 
-                       (str(samples[samplename]), lane, ))
+    cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s """, 
+                       (str(samples[samplename]), lane, str(fcid), ))
     unalignedid = cursor.fetchone()[0]
     print "Unaligned stats for sample "+samplename+" exists in DB with unaligned_id: "+str(unalignedid)
 
