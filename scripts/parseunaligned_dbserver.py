@@ -14,9 +14,6 @@ import re
 import socket
 import os
 
-# this script is written for database version:
-_VERSION_ = "1.0.0"
-
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
@@ -52,6 +49,9 @@ support.close()
 
 
 now = time.strftime('%Y-%m-%d %H:%M:%S')
+# this script is written for database version:
+_VERSION_ = params['DBVERSION']
+
 cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
                     passwd=params['CLINICALDBPASSWD'], db=params['STATSDB'])
 cursor = cnx.cursor()
