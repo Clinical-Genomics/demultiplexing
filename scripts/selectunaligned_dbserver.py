@@ -53,7 +53,6 @@ if (str(major)+"."+str(minor)+"."+str(patch) == _VERSION_):
 else:
   exit ("Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "+str(major)+"."+str(minor)+"."+str(patch))
 
-exit(0)
 # SELECT stats
 proje = sys.argv[1]
 flowc = sys.argv[2]
