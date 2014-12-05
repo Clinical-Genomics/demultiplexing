@@ -176,8 +176,7 @@ if not cursor.fetchone():
     exit("MySQL warning")
 # handle warnings, if the cursor you're using raises them
   cnx.commit()
-  print "Support parameters from "+basedir+"Unaligned/support.txt"+" now added to DB with supportparams_id: "+
-         str(cursor.lastrowid)
+  print "Support parameters from "+basedir+"Unaligned/support.txt now added to DB with supportparams_id: "+str(cursor.lastrowid)
   supportparamsid = cursor.lastrowid
 else:
   cursor.execute(""" SELECT supportparams_id FROM supportparams WHERE document_path = %s """, 
