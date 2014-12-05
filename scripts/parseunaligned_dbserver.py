@@ -70,8 +70,6 @@ else:
   exit ("Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
 
-exit(0)
-
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
