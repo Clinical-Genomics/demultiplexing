@@ -15,9 +15,7 @@ import socket
 import os
 
 # this script is written for database version:
-_MAJOR_ = 1
-_MINOR_ = 0
-_PATCH_ = 0
+_VERSION_ = "1.0.0"
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
@@ -66,10 +64,10 @@ if row is not None:
   patch = row[2]
 else:
   sys.exit("Incorrect DB, version not found.")
-if (major == _MAJOR_ and minor == _MINOR_ and patch == _PATCH_):
-  print "Correct database version "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)
+if (str(major)+"."+str(minor)+"."+str(patch) == _VERSION_):
+  print "Correct database version "+str(_VERSION_)
 else:
-  exit ("Incorrect DB version. This script is made for "+str(_MAJOR_)+"."+str(_MINOR_)+"."+str(_PATCH_)+" not for "
+  exit ("Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
 
 #Determine the name of the basecall stats file
