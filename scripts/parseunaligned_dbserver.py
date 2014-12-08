@@ -87,8 +87,8 @@ runname = dirs[len(dirs)-2]
 name_ = runname.split("_")
 rundate = list(name_[0])
 rundate = "20"+rundate[0]+rundate[1]+"-"+rundate[2]+rundate[3]+"-"+rundate[4]+rundate[5]
-
-#print runname, rundate
+machine = name_[1]
+print runname, rundate, machine
 
 #sys.exit(0)
 
@@ -189,8 +189,8 @@ cursor.execute(""" SELECT datasource_id FROM datasource WHERE document_path = %s
 if not cursor.fetchone():
   print "Data source not yet added"
   try:
-    cursor.execute(""" INSERT INTO `datasource` (document_path, runname, rundate, supportparams_id, server, time) 
-                      VALUES (%s, %s, %s, %s, %s, %s) """, (demultistats, runname, rundate, supportparamsid, 
+    cursor.execute(""" INSERT INTO `datasource` (document_path, runname, rundate, machine, supportparams_id, server, time) 
+                      VALUES (%s, %s, %s, %s, %s, %s) """, (demultistats, runname, rundate, machine, supportparamsid, 
                       servername, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
