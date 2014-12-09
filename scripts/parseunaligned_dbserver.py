@@ -190,7 +190,7 @@ if not cursor.fetchone():
   print "Data source not yet added"
   try:
     cursor.execute(""" INSERT INTO `datasource` (document_path, runname, rundate, machine, supportparams_id, server, time) 
-                      VALUES (%s, %s, %s, %s, %s, %s) """, (demultistats, runname, rundate, machine, supportparamsid, 
+                      VALUES (%s, %s, %s, %s, %s, %s, %s) """, (demultistats, runname, rundate, machine, supportparamsid, 
                       servername, now, ))
   except mysql.IntegrityError, e: 
     print "Error %d: %s" % (e.args[0],e.args[1])
