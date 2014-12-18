@@ -326,8 +326,8 @@ for row in rows:
   q30_bases_pct = unicode(cols[13].string).encode('utf8')
   mean_quality_score = unicode(cols[14].string).encode('utf8')
 
-  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, 
-                    (str(samples[samplename]), lane, ))
+  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s """, 
+                    (str(samples[samplename]), lane, str(fcid), ))
   if not cursor.fetchone():
     print "UnalignedStats not yet added"
     try:
