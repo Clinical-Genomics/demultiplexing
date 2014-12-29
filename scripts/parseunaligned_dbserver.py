@@ -13,6 +13,7 @@ import glob
 import re
 import socket
 import os
+import select
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
@@ -69,6 +70,17 @@ if (str(major)+"."+str(minor)+"."+str(patch) == _VERSION_):
 else:
   exit (params['STATSDB'] + "Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
+         
+print "If this is correct press <enter>, else press any character"
+i, o, e = select.select( [sys.stdin], [], [], 10 )
+
+if (i):
+  print "You said", sys.stdin.readline().strip(), o, e
+  sys.exit("Will exit . . . due to manual intervention.")
+else:
+  print "You said nothing!"
+  
+exit(0)
 
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
