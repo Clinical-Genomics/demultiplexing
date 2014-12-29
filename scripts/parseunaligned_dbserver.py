@@ -13,6 +13,7 @@ import glob
 import re
 import socket
 import os
+import select
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
@@ -65,10 +66,19 @@ if row is not None:
 else:
   sys.exit("Incorrect DB, version not found.")
 if (str(major)+"."+str(minor)+"."+str(patch) == _VERSION_):
-  print "Correct database version "+str(_VERSION_)+"   DB "+params['STATSDB']
+  print params['STATSDB'] + " Correct database version "+str(_VERSION_)+"   DB "+params['STATSDB']
 else:
-  exit ("Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
+  exit (params['STATSDB'] + "Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
+         
+print "\n\t\tIf this is INCORRECT press <enter> else do nothing [will timeout in 10 sec]"
+i, o, e = select.select( [sys.stdin], [], [], 10 )
+
+if (i):
+  sys.exit("\nWill exit . . . due to manual intervention.")
+else:
+  print "\nWill continue after 10 sec delay!"
+  
 
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
@@ -279,9 +289,14 @@ for row in rows:
   samplename = unicode(cols[1].string).encode('utf8')
   barcode = unicode(cols[3].string).encode('utf8')
   project = unicode(cols[6].string).encode('utf8')
+<<<<<<< HEAD
+  cursor.execute(""" SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
+                          """, (samplename, barcode, ))
+=======
   cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s 
                      AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id 
                      AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+>>>>>>> master
   if not cursor.fetchone():
     print "Sample not yet added"
     try:
@@ -302,9 +317,14 @@ for row in rows:
     print "Sample "+samplename+" now added to DB with sample_id: "+str(cursor.lastrowid)
     samples[samplename] = cursor.lastrowid
   else:
+<<<<<<< HEAD
+    cursor.execute(""" SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
+                        """, (samplename, barcode, ))
+=======
     cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s 
                        AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id 
                        AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
+>>>>>>> master
     sampleid = cursor.fetchone()[0]
     print "Sample "+samplename+" exists in DB with sample_id: "+str(sampleid)
     samples[samplename] = sampleid
@@ -326,8 +346,13 @@ for row in rows:
   q30_bases_pct = unicode(cols[13].string).encode('utf8')
   mean_quality_score = unicode(cols[14].string).encode('utf8')
 
+<<<<<<< HEAD
+  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s""", 
+                    (str(samples[samplename]), lane, str(fcid), ))
+=======
   cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, 
                     (str(samples[samplename]), lane, ))
+>>>>>>> master
   if not cursor.fetchone():
     print "UnalignedStats not yet added"
     try:
@@ -361,5 +386,4 @@ cnx.commit()
 cursor.close()
 #Closes the connection to the database
 cnx.close()
-
 
