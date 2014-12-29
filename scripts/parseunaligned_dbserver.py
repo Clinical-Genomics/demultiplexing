@@ -317,14 +317,8 @@ for row in rows:
     print "Sample "+samplename+" now added to DB with sample_id: "+str(cursor.lastrowid)
     samples[samplename] = cursor.lastrowid
   else:
-<<<<<<< HEAD
     cursor.execute(""" SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
                         """, (samplename, barcode, ))
-=======
-    cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s 
-                       AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id 
-                       AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
->>>>>>> master
     sampleid = cursor.fetchone()[0]
     print "Sample "+samplename+" exists in DB with sample_id: "+str(sampleid)
     samples[samplename] = sampleid
@@ -346,13 +340,8 @@ for row in rows:
   q30_bases_pct = unicode(cols[13].string).encode('utf8')
   mean_quality_score = unicode(cols[14].string).encode('utf8')
 
-<<<<<<< HEAD
   cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s""", 
                     (str(samples[samplename]), lane, str(fcid), ))
-=======
-  cursor.execute(""" SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """, 
-                    (str(samples[samplename]), lane, ))
->>>>>>> master
   if not cursor.fetchone():
     print "UnalignedStats not yet added"
     try:
