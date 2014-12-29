@@ -289,14 +289,8 @@ for row in rows:
   samplename = unicode(cols[1].string).encode('utf8')
   barcode = unicode(cols[3].string).encode('utf8')
   project = unicode(cols[6].string).encode('utf8')
-<<<<<<< HEAD
   cursor.execute(""" SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
                           """, (samplename, barcode, ))
-=======
-  cursor.execute(""" SELECT sample.sample_id FROM sample, unaligned, flowcell WHERE samplename = %s AND barcode = %s 
-                     AND sample.sample_id = unaligned.sample_id AND unaligned.flowcell_id = flowcell.flowcell_id 
-                     AND flowcell.datasource_id = %s """, (samplename, barcode, str(datasourceid), ))
->>>>>>> master
   if not cursor.fetchone():
     print "Sample not yet added"
     try:
