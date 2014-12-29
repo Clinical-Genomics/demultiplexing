@@ -71,16 +71,14 @@ else:
   exit (params['STATSDB'] + "Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
          
-print "If this is correct press <enter>, else press any character"
+print "If this is INCORRECT press <enter> else do nothing [will timeout in 10 sec]"
 i, o, e = select.select( [sys.stdin], [], [], 10 )
 
 if (i):
-  print "You said", sys.stdin.readline().strip(), o, e
   sys.exit("Will exit . . . due to manual intervention.")
 else:
-  print "You said nothing!"
+  print "Will continue after 10 sec delay!"
   
-exit(0)
 
 #Determine the name of the basecall stats file
 demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
