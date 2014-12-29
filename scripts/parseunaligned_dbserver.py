@@ -71,13 +71,13 @@ else:
   exit (params['STATSDB'] + "Incorrect DB version. This script is made for "+str(_VERSION_)+" not for "
          +str(major)+"."+str(minor)+"."+str(patch))
          
-print "If this is INCORRECT press <enter> else do nothing [will timeout in 10 sec]"
+print "\n\t\tIf this is INCORRECT press <enter> else do nothing [will timeout in 10 sec]"
 i, o, e = select.select( [sys.stdin], [], [], 10 )
 
 if (i):
-  sys.exit("Will exit . . . due to manual intervention.")
+  sys.exit("\nWill exit . . . due to manual intervention.")
 else:
-  print "Will continue after 10 sec delay!"
+  print "\nWill continue after 10 sec delay!"
   
 
 #Determine the name of the basecall stats file
