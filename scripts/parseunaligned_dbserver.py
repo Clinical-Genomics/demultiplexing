@@ -104,14 +104,14 @@ print runname, rundate, machine
 
 print (basedir+"Unaligned/support.txt")
 print (sys.argv[2])
-exit
+
 #print support_lines[5], len(support_lines)
 system = ""
 command = ""
 idstring = ""
 program = ""
 samplesheet = (sys.argv[2])
-print samplesheet
+#print samplesheet
 for line in range(1, len(support_lines)):
   if re.match("^\$\_System", support_lines[line]):
     while not (re.match("};", support_lines[line])):
@@ -125,10 +125,11 @@ for line in range(1, len(support_lines)):
     while not (re.match("];", support_lines[line])):
       command += support_lines[line]
       line += 1
-      if re.match("  '--sample-sheet',", support_lines[line]):
-        samplesheet = support_lines[line+1]
-        samplesheet = samplesheet.replace("  '","")
-        samplesheet = samplesheet.replace("',\n","")
+      #  will take absolute address to samplesheet from Unaligned/support.txt if a match is found
+#      if re.match("  '--sample-sheet',", support_lines[line]):
+#        samplesheet = support_lines[line+1]
+#        samplesheet = samplesheet.replace("  '","")
+#        samplesheet = samplesheet.replace("',\n","")
 
 Idstring = idstring.replace("$_ID-string = '","")
 Idstring = Idstring.replace("';","")
