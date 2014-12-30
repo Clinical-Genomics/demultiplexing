@@ -110,7 +110,7 @@ system = ""
 command = ""
 idstring = ""
 program = ""
-samplesheet = (basedir + "Data/Intensities/BaseCalls/SampleSheet.csv")
+samplesheet = (sys.argv[2])
 print samplesheet
 for line in range(1, len(support_lines)):
   if re.match("^\$\_System", support_lines[line]):
