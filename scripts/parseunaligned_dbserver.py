@@ -111,6 +111,7 @@ command = ""
 idstring = ""
 program = ""
 samplesheet = (basedir + "Data/Intensities/BaseCalls/SampleSheet.csv")
+print samplesheet
 for line in range(1, len(support_lines)):
   if re.match("^\$\_System", support_lines[line]):
     while not (re.match("};", support_lines[line])):
