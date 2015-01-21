@@ -3,7 +3,8 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 #
-#   v5 [20140911]    adding project log
+#   v5 [20150121]	 added six2eight param
+#      [20140911]    adding project log
 #      [20140729]    changed clinstatsdb to the instance on hippocampus
 #      [20140311]    added dual index handler for 8 + 8 bases
 #      [20140310]    to handle _either_ I6n or I8, v3ic   for  index choice
@@ -22,6 +23,7 @@ UNALIGNEDBASE=/home/clinical/DEMUX/
 BACKUPDIR=/home/clinical/BACKUP/
 BASE=$(echo $1 | awk '{if (substr($0,length($0),1) != "/") {print $0"/"} else {print $0}}')
 RUN=$(echo ${BASE} | awk 'BEGIN {FS="/"} {print $(NF-1)}')
+SIX2EIGHT=$1
 mkdir -p ${UNALIGNEDBASE}${RUN}
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
@@ -62,8 +64,11 @@ else
   if [ "${indexread1count}" == 8 ]; then
     echo ${indexread1count} == 8
 #  not if first index equals 8 either
-#    USEBASEMASK=Y101,I6nn,Y101    # added to handle remaining sample after i8 run that only had 6 index bases
-    USEBASEMASK=Y101,I8,Y101
+    if [ -z "$SIX2EIGHT" ]; then
+      USEBASEMASK=Y101,I8,Y101
+    else
+      USEBASEMASK=Y101,I6nn,Y101    # added to handle remaining sample after i8 run that only had 6 index bases
+    fi
   else 
     echo ${indexread1count} == 8 NOT ix1
     USEBASEMASK=Y101,I6n,Y101
