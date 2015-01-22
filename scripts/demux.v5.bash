@@ -23,7 +23,7 @@ UNALIGNEDBASE=/home/clinical/DEMUX/
 BACKUPDIR=/home/clinical/BACKUP/
 BASE=$(echo $1 | awk '{if (substr($0,length($0),1) != "/") {print $0"/"} else {print $0}}')
 RUN=$(echo ${BASE} | awk 'BEGIN {FS="/"} {print $(NF-1)}')
-SIX2EIGHT=$1
+SIX2EIGHT=$2
 mkdir -p ${UNALIGNEDBASE}${RUN}
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
