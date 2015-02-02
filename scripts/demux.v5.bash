@@ -56,6 +56,8 @@ if [ $BASEMASKBYPASS ]; then
     USEBASEMASK=Y101,I6nn,Y101
   elif [ $BASEMASKBYPASS == '--6n' ]; then
     USEBASEMASK=Y101,I6n,Y101
+  elif [ $BASEMASKBYPASS == '--6nn8n' ]; then
+    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -63,6 +65,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--8 single 8 index"
     >&2 echo "--6nn single 6 listed as 8 index"
     >&2 echo "--6n single 6 index"
+    >&2 echo "--6nn8n single 6 index as dual 8 index"
   fi
 else
   
