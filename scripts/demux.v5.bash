@@ -49,27 +49,27 @@ echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 
 if [ $BASEMASKBYPASS ]; then
-  if [ $BASEMASKBYPASS == '--88' ]; then
+  if [ $BASEMASKBYPASS == '--d8' ]; then
     USEBASEMASK=Y101,I8,I8,Y101
-  elif [ $BASEMASKBYPASS == '--8' ]; then
+  elif [ $BASEMASKBYPASS == '--s8' ]; then
     USEBASEMASK=Y101,I8,Y101
-  elif [ $BASEMASKBYPASS == '--6nn' ]; then
+  elif [ $BASEMASKBYPASS == '--s6s8' ]; then
     USEBASEMASK=Y101,I6nn,Y101
-  elif [ $BASEMASKBYPASS == '--6n' ]; then
+  elif [ $BASEMASKBYPASS == '--s6' ]; then
     USEBASEMASK=Y101,I6n,Y101
-  elif [ $BASEMASKBYPASS == '--6nn8n' ]; then
+  elif [ $BASEMASKBYPASS == '--s6d8' ]; then
     USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
-  elif [ $BASEMASKBYPASS == '--88n' ]; then
+  elif [ $BASEMASKBYPASS == '--s8d8' ]; then
     USEBASEMASK=Y101,I8,nnnnnnnn,Y101
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
-    >&2 echo "--88 dual 8 index"
-    >&2 echo "--8 single 8 index"
-    >&2 echo "--6nn single 6 listed as 8 index"
-    >&2 echo "--6n single 6 index"
-    >&2 echo "--6nn8n single 6 index as dual 8 index"
-    >&2 echo "--88n single 8 index as dual 8 index"
+    >&2 echo "--s6 single 6 index"
+    >&2 echo "--s6s8 single 6 advertised as single 8 index"
+    >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
+    >&2 echo "--s8 single 8 index"
+    >&2 echo "--d8 dual 8 index"
+    >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
   fi
 else
   
