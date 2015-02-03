@@ -3,7 +3,8 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 #
-#   v5 [20150202]    added basemask selecting param
+#   v5 [20150203]    added 88n basemask
+#      [20150202]    added basemask selecting param
 #      [20150121]    added six2eight param
 #      [20140911]    adding project log
 #      [20140729]    changed clinstatsdb to the instance on hippocampus
@@ -58,6 +59,8 @@ if [ $BASEMASKBYPASS ]; then
     USEBASEMASK=Y101,I6n,Y101
   elif [ $BASEMASKBYPASS == '--6nn8n' ]; then
     USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
+  elif [ $BASEMASKBYPASS == '--88n' ]; then
+    USEBASEMASK=Y101,I8,nnnnnnnn,Y101
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -66,6 +69,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--6nn single 6 listed as 8 index"
     >&2 echo "--6n single 6 index"
     >&2 echo "--6nn8n single 6 index as dual 8 index"
+    >&2 echo "--88n single 8 index as dual 8 index"
   fi
 else
   
