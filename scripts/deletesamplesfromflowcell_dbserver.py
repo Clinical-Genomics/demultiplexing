@@ -7,23 +7,54 @@ import time
 import glob
 import re
 
-if len(sys.argv) == 2:
+# this script is written for database version:
+_MAJOR_ = 1
+_MINOR_ = 0
+_PATCH_ = 0
+
+if len(sys.argv) > 1:
    fcname = sys.argv[1]
 else:
-  print ("\n\tUsage: "+sys.argv[0]+" flowcell\n")
+  print ("\n\tUsage: "+sys.argv[0]+" <flowcell> <config_file:optional>\n")
   exit()
 
+configfile = "/home/hiseq.clinical/.scilifelabrc"
+if (len(sys.argv)>3):
+  if os.path.isfile(sys.argv[3]):
+    configfile = sys.argv[3]
+
 params = {}
-with open("/home/hiseq.clinical/.scilifelabrc", "r") as confs:
+with open(configfile, "r") as confs:
   for line in confs:
     if len(line) > 5 and not line[0] == "#":
       line = line.rstrip()
       pv = line.split(" ")
       params[pv[0]] = pv[1]
 
+# config file test
+sys.exit(configfile+ params['STATSDB'])
+
 now = time.strftime('%Y-%m-%d %H:%M:%S')
-cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], passwd=params['CLINICALDBPASSWD'], db='clinstatsdb')
+# this script is written for database version:
+_VERSION_ = params['DBVERSION']
+
+cnx = mysql.connect(user=params['CLINICALDBUSER'], port=int(params['CLINICALDBPORT']), host=params['CLINICALDBHOST'], 
+                    passwd=params['CLINICALDBPASSWD'], db=params['STATSDB'])
 cursor = cnx.cursor()
+
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+row = cursor.fetchone()
+if row is not None:
+  major = row[0]
+  minor = row[1]
+  patch = row[2]
+else:
+  sys.exit("Incorrect DB, version not found.")
+if (str(major)+"."+str(minor)+"."+str(patch) == _VERSION_):
+  print "Correct database "+str(_VERSION_)
+else:
+  exit ("Incorrect DB version. This script is made for "+str(_VERSION_)+
+        " not for "+str(major)+"."+str(minor)+"."+str(patch))
 
 print ("F: "+fcname)
 

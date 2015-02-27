@@ -3,7 +3,10 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 #
-#   v5 [20140911]    adding project log
+#   v5 [20150203]    added 88n basemask
+#      [20150202]    added basemask selecting param
+#      [20150121]    added six2eight param
+#      [20140911]    adding project log
 #      [20140729]    changed clinstatsdb to the instance on hippocampus
 #      [20140311]    added dual index handler for 8 + 8 bases
 #      [20140310]    to handle _either_ I6n or I8, v3ic   for  index choice
@@ -22,6 +25,7 @@ UNALIGNEDBASE=/home/clinical/DEMUX/
 BACKUPDIR=/home/clinical/BACKUP/
 BASE=$(echo $1 | awk '{if (substr($0,length($0),1) != "/") {print $0"/"} else {print $0}}')
 RUN=$(echo ${BASE} | awk 'BEGIN {FS="/"} {print $(NF-1)}')
+BASEMASKBYPASS=$2
 mkdir -p ${UNALIGNEDBASE}${RUN}
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
@@ -44,32 +48,56 @@ fi
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 
-######   uses windows end-of-line/return setting [=FUCKING stupid!]
-######
-indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
-indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
-
-#echo ${indexread1count}
-#echo ${indexread2count}
-
-#  start to assume standard singel index
-if [ "${indexread2count}" == 8 ]; then
-#  this is not true if second index equals 8
-  USEBASEMASK=Y101,I8,I8,Y101
-  echo  ${indexread2count} == "8" ix2
-else
-  echo  ${indexread2count} == 8 NOT ix2
-  if [ "${indexread1count}" == 8 ]; then
-    echo ${indexread1count} == 8
-#  not if first index equals 8 either
-#    USEBASEMASK=Y101,I6nn,Y101    # added to handle remaining sample after i8 run that only had 6 index bases
+if [ $BASEMASKBYPASS ]; then
+  if [ $BASEMASKBYPASS == '--d8' ]; then
+    USEBASEMASK=Y101,I8,I8,Y101
+  elif [ $BASEMASKBYPASS == '--s8' ]; then
     USEBASEMASK=Y101,I8,Y101
-  else 
-    echo ${indexread1count} == 8 NOT ix1
+  elif [ $BASEMASKBYPASS == '--s6s8' ]; then
+    USEBASEMASK=Y101,I6nn,Y101
+  elif [ $BASEMASKBYPASS == '--s6' ]; then
     USEBASEMASK=Y101,I6n,Y101
+  elif [ $BASEMASKBYPASS == '--s6d8' ]; then
+    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
+  elif [ $BASEMASKBYPASS == '--s8d8' ]; then
+    USEBASEMASK=Y101,I8,nnnnnnnn,Y101
+  else
+    >&2 echo "'$BASEMASKBYPASS' not recognized!"
+    >&2 echo "Available options are:"
+    >&2 echo "--s6 single 6 index"
+    >&2 echo "--s6s8 single 6 advertised as single 8 index"
+    >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
+    >&2 echo "--s8 single 8 index"
+    >&2 echo "--d8 dual 8 index"
+    >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
+  fi
+else
+  
+  ######   uses windows end-of-line/return setting [=FUCKING stupid!]
+  ######
+  indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+  indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+  
+  #echo ${indexread1count}
+  #echo ${indexread2count}
+  
+  #  start to assume standard singel index
+  if [ "${indexread2count}" == 8 ]; then
+  #  this is not true if second index equals 8
+    USEBASEMASK=Y101,I8,I8,Y101
+    echo  ${indexread2count} == "8" ix2
+  else
+    echo  ${indexread2count} == 8 NOT ix2
+    if [ "${indexread1count}" == 8 ]; then
+      echo ${indexread1count} == 8
+  #  not if first index equals 8 either
+        USEBASEMASK=Y101,I8,Y101
+    else 
+      echo ${indexread1count} == 8 NOT ix1
+      USEBASEMASK=Y101,I6n,Y101
+    fi
   fi
 fi
-
 
 #USEBASEMASK=
 # uncomment to check USEBASEMASK
