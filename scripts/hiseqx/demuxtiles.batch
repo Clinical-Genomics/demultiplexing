@@ -48,7 +48,7 @@ TILES=''
 for QUART in ${QUARTS[@]}; do
     TILES="${TILES} --tiles s_${LANE}_${QUART}"
 done
-echo [${NOW}] starting demultiplexing one lane ${LANE}, part ${PART}
+echo [${NOW}] starting demultiplexing one lane ${LANE}, part ${QUARTS[@]}
 bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES} -R ${INDIR} -o ${TMPDIR}/Xout/
 
 
