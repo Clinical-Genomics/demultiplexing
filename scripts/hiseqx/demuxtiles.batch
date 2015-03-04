@@ -18,7 +18,7 @@ LANE=$3 # 1-8
 QUARTS=${@:4} # remaining args are the tile identifiers: 11 12 21 22
 
 ########
-# MAIN #
+# INIT #
 ########
 
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -31,6 +31,10 @@ echo [${NOW}] QUARTS: ${QUARTS[@]}
 # set us up
 mkdir -p ${TMPDIR}/Xout
 
+#########
+# CP IN #
+#########
+
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] start copying
 cd /mnt/hds/proj/bioinfo/tmp/X/
@@ -41,7 +45,9 @@ done
 cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
 cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
 
-
+#########
+# DEMUX #
+#########
 
 NOW=$(date +"%Y%m%d%H%M%S")
 TILES=''
@@ -51,18 +57,21 @@ done
 echo [${NOW}] starting demultiplexing one lane ${LANE}, part ${QUARTS[@]}
 bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES} -R ${INDIR} -o ${TMPDIR}/Xout/
 
+##########
+# CP OUT #
+##########
 
-
+FULLOUTDIR=${OUTDIR}/l${LANE}t${QUARTS}/
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] starting copy output
-for QUART in ${QUARTS[@]}; do
-    echo "mkdir -p ${OUTDIR}/l${LANE}t${QUART}/"
-    mkdir -p ${OUTDIR}/l${LANE}t${QUART}/
-    echo "cp -R ${TMPDIR}/Xout/* ${OUTDIR}/l${LANE}t${QUART}/"
-    cp -R ${TMPDIR}/Xout/* ${OUTDIR}/l${LANE}t${QUART}/
-done
+echo [${NOW}] starting copy output to ${FULLOUTDIR}
+mkdir -p ${FULLOUTDIR}
+cp -R ${TMPDIR}/Xout/* ${FULLOUTDIR}
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] Done copying output
+
+############
+# CLEAN UP #
+############
 
 rm -r ${TMPDIR}/Xout/
 rm -r ${TMPDIR}/*
