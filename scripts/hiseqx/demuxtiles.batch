@@ -43,6 +43,7 @@ for TILE in ${TILES[@]}; do
 done
 cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
 cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
+cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
 
 #########
 # DEMUX #
