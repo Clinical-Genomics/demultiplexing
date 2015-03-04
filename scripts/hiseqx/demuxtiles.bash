@@ -14,13 +14,12 @@ RUNNAME=$1
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] starting overall process
 lanes=(1 2 3 4 5 6 7 8)
-quarts=('11 12' '21 22')
+tiles=('11 12' '21 22')
 for lane in "${lanes[@]}"; do
-  for quart in "${quarts[@]}"; do
+  for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [${NOW}] starting lane${lane}_${quart}
-    #echo "sbatch demuxtiles.batch $RUNNAME /mnt/hds2/proj/bioinfo/DEMUX/$(basename $RUNNAME) ${lane} ${quart}"
-    sbatch demuxtiles.batch $RUNNAME /mnt/hds/proj/bioinfo/tmp/X/$(basename $RUNNAME) ${lane} ${quart}
+    echo [${NOW}] starting lane ${lane} tile ${tile}
+    sbatch demuxtiles.batch $RUNNAME /mnt/hds/proj/bioinfo/tmp/X/$(basename $RUNNAME) ${lane} ${tile}
     # wait a minute so copying doesn't slow the server
     sleep 60 
   done
