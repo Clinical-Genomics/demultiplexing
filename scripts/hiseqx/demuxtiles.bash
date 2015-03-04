@@ -19,7 +19,7 @@ for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] starting lane ${lane} tile ${tile}
-    sbatch demuxtiles.batch $RUNNAME /mnt/hds/proj/bioinfo/tmp/X/$(basename $RUNNAME) ${lane} ${tile}
+    sbatch demuxtiles.batch $RUNNAME /mnt/hds2/proj/bioinfo/DEMUX/$(basename $RUNNAME) ${lane} ${tile}
     # wait a minute so copying doesn't slow the server
     sleep 60 
   done
