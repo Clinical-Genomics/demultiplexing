@@ -22,21 +22,22 @@ TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 ########
 
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] starting, will use ${TMPDIR}
-echo [${NOW}] INDIR: ${INDIR}
-echo [${NOW}] OUTDIR: ${OUTDIR}
-echo [${NOW}] LANE: ${LANE}
-echo [${NOW}] TILES: ${TILES[@]}
+echo "[${NOW}] starting, will use ${TMPDIR}"
+echo "[${NOW}] INDIR: ${INDIR}"
+echo "[${NOW}] OUTDIR: ${OUTDIR}"
+echo "[${NOW}] LANE: ${LANE}"
+echo "[${NOW}] TILES: ${TILES[@]}"
 
 # set us up
-mkdir -p ${TMPDIR}/Xout
+TMPOUT_DIR=${TMPDIR}/Xout
+mkdir -p ${TMPOUT_DIR}
 
 #########
 # CP IN #
 #########
 
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] start copying
+echo "[${NOW}] start copying"
 for TILE in ${TILES[@]}; do
     cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/*/s_${LANE}_${TILE}* ${TMPDIR}/
     cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/s_${LANE}_${TILE}* ${TMPDIR}/
@@ -44,30 +45,80 @@ done
 cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
 cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
 cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
+cp --parent ${INDIR}/runParameters.xml ${TMPDIR}/
+
+RUNDIR=${TMPDIR}/${INDIR}
 
 #########
 # DEMUX #
 #########
+
+# determine the basemask
+indexread1count=$(grep IndexRead1 ${RUNDIR}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+indexread2count=$(grep IndexRead2 ${RUNDIR}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+
+#  start to assume standard singel index
+if [[ "${indexread2count}" == 8 ]]; then
+    #  this is not true if second index equals 8
+    USEBASEMASK=Y151,I8,I8,Y151
+    echo " ${indexread2count} == "8" ix2"
+else
+    echo " ${indexread2count} == 8 NOT ix2"
+    if [[ "${indexread1count}" == 8 ]]; then
+        echo "${indexread1count} == 8"
+        #  not if first index equals 8 either
+        USEBASEMASK=Y151,I8,Y151
+    else 
+        echo "${indexread1count} == 8 NOT ix1"
+        USEBASEMASK=Y151,I6n,Y151
+    fi
+fi
 
 NOW=$(date +"%Y%m%d%H%M%S")
 TILES_OPTS=''
 for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
-echo [${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}
-bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${INDIR} -o ${TMPDIR}/Xout/
+echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
+echo "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${USEBASEMASK}"
+      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${USEBASEMASK}
 
 ##########
 # CP OUT #
 ##########
 
-FULLOUTDIR=${OUTDIR}/l${LANE}t${TILES[0]}/
+# first copy the lane-tile specific information
+OUTDIR_LT=${OUTDIR}/l${LANE}t${TILES[0]}/ 
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] starting copy output to ${FULLOUTDIR}
-mkdir -p ${FULLOUTDIR}
-cp -R ${TMPDIR}/Xout/* ${FULLOUTDIR}
+echo "[${NOW}] starting copy output"
+mkdir -p ${OUTDIR}
+mkdir -p ${OUTDIR_LT}
+cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
+cp ${INDIR}/SampleSheet.csv ${OUTDIR}/
+
+# second copy the actual fastq files
+for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
+    if [[ ${PROJECT_ID} == 'Reports' || ${PROJECT_ID} == 'Stats' ]]; then
+        continue
+    fi
+
+    OUTDIR_PROJECT=Project_${PROJECT_ID}
+    for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
+        for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
+            if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
+                continue
+            fi
+
+            mkdir -p ${OUTDIR}/${OUTDIR_PROJECT}/${SAMPLE_ID}
+            FASTQ_FILENAME=${FASTQ_FILE%%.*}
+            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${OUTDIR_PROJECT}/${SAMPLE_ID}/${FASTQ_FILENAME}_${TILES[0]}.fastq.gz
+            sleep 60 # give the network some slack
+        done
+    done
+done
+
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] Done copying output
+echo "[${NOW}] Done copying output"
 
 ############
 # CLEAN UP #
@@ -76,4 +127,4 @@ echo [${NOW}] Done copying output
 rm -r ${TMPDIR}/Xout/
 rm -r ${TMPDIR}/*
 NOW=$(date +"%Y%m%d%H%M%S")
-echo [${NOW}] Done removing temp files
+echo "[${NOW}] Done removing temp files"
