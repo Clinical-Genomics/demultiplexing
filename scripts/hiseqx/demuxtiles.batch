@@ -88,7 +88,8 @@ echo "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR}
 ##########
 
 # first copy the lane-tile specific information
-OUTDIR_LT=${OUTDIR}/l${LANE}t${TILES[0]}/ 
+TILE_DIR=l${LANE}t${TILES[0]}/ 
+OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] starting copy output"
 mkdir -p ${OUTDIR}
@@ -102,16 +103,15 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
         continue
     fi
 
-    OUTDIR_PROJECT=Project_${PROJECT_ID}
+    # skip the zero sized fastq files
     for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
         for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
             if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
                 continue
             fi
 
-            mkdir -p ${OUTDIR}/${OUTDIR_PROJECT}/${SAMPLE_ID}
-            FASTQ_FILENAME=${FASTQ_FILE%%.*}
-            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${OUTDIR_PROJECT}/${SAMPLE_ID}/${FASTQ_FILENAME}_${TILES[0]}.fastq.gz
+            mkdir -p ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}
+            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE}
             sleep 60 # give the network some slack
         done
     done
