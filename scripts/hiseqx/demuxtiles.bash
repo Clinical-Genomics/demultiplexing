@@ -19,7 +19,7 @@ for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}"
-    sbatch demuxtiles.batch $RUNDIR /mnt/hds2/proj/bioinfo/TESTDEMUX/$(basename $RUNDIR) ${lane} ${tile}
+    sbatch demuxtiles.batch $RUNDIR /mnt/hds2/proj/bioinfo/DEMUX/$(basename $RUNDIR) ${lane} ${tile}
     # give the server some slack
     sleep 120 
   done
