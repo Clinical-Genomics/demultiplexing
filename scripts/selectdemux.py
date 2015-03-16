@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #
 import sys
-import datetime
-import os
 from access import db
 
 """Reads stats from db.
