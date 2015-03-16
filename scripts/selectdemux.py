@@ -5,8 +5,8 @@ import datetime
 import os
 from access import db
 
-if (len(sys.argv)>3):
-  configfile = sys.argv[3]
+if (len(sys.argv)>2):
+  configfile = sys.argv[2]
 else:
   configfile = 'None'
 pars = db.readconfig(configfile)
@@ -24,8 +24,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
     else:
       print "Correct db " + pars['STATSDB'] + " v:" + pars['DBVERSION']
 
-    proje = sys.argv[1]
-    flowc = sys.argv[2]
+    proje = sys.argv[0]
+    flowc = sys.argv[1]
     query = (""" SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), 
     GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readcounts), 
     GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), 
