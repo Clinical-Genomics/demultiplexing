@@ -28,11 +28,12 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     proje = sys.argv[1]
     flowc = sys.argv[2]
-    query = """ SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), 
-    GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readcounts), 
-    GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), 
-    GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane), 
-    GROUP_CONCAT(TRUNCATE(mean_quality_score,2) ORDER BY unaligned.lane) 
+    query = """ SELECT sample.samplename AS smp, flowcell.flowcellname AS flc, 
+    GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane) AS lanes, 
+    GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane) AS reads, SUM(unaligned.readcounts) AS readsum, 
+    GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane) AS yield, SUM(unaligned.yield_mb) AS yieldsum, 
+    GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane) AS q30, 
+    GROUP_CONCAT(TRUNCATE(mean_quality_score,2) ORDER BY unaligned.lane) AS meanq
     FROM sample, flowcell, unaligned, project, demux WHERE sample.sample_id = unaligned.sample_id 
     AND flowcell.flowcell_id = demux.flowcell_id AND unaligned.demux_id = demux.demux_id 
     AND sample.project_id = project.project_id AND project.projectname = '""" + proje + """' 
@@ -42,4 +43,13 @@ with db.create_tunnel(pars['TUNNELCMD']):
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
     for hit in hits:
-      print hit['samplename'] + "\t" + hit[1] + "\t" + hit[2] + "\t" + hit[3] + "\t" + str(hit[4]) + "\t" + str(hit[5]) + "\t" + str(hit[6]) + "\t" + str(hit[7]) + "\t" + str(hit[8])
+      print hit['smp'] + "\t" + hit['flc'] + "\t" + hit['lanes'] + "\t" + hit['reads'] + "\t" + str(hit['readsum']) + "\t" + str(hit['yield']) + "\t" + str(hit['yieldsum']) + "\t" + str(hit['q30']) + "\t" + str(hit['meanq'])
+
+
+
+
+
+
+
+
+
