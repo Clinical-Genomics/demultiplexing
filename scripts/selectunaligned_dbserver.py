@@ -56,11 +56,16 @@ else:
 # SELECT stats
 proje = sys.argv[1]
 flowc = sys.argv[2]
-cursor.execute(""" SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readcounts), GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane), GROUP_CONCAT(TRUNCATE(mean_quality_score,2) ORDER BY unaligned.lane)
-FROM sample, flowcell, unaligned, project
+cursor.execute(""" SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), 
+GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readcounts), 
+GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), 
+GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane), GROUP_CONCAT(TRUNCATE(mean_quality_score,2) 
+ORDER BY unaligned.lane)
+FROM sample, flowcell, unaligned, project, demux
 WHERE sample.sample_id     = unaligned.sample_id
-AND   flowcell.flowcell_id = unaligned.flowcell_id
-AND   sample.project_id    = project.project_id 
+AND   flowcell.flowcell_id = demux.flowcell_id
+AND   unalinged.demux_id = demux.demux_id
+AND   sample.project_id    = project.project_id
 AND   project.projectname   =  %s
 AND   flowcell.flowcellname = %s
 GROUP BY samplename, flowcell.flowcell_id
