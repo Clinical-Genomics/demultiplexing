@@ -42,6 +42,6 @@ with db.create_tunnel(pars['TUNNELCMD']):
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
     for hit in hits:
-      outline = (hit[0] + "\t" + hit[1] + "\t" + hit[2] + "\t" + hit[3] + "\t" + str(hit[4]) + "\t" + str(hit[5]) + "\t"
-             + str(hit[6]) + "\t" + str(hit[7]) + "\t" + str(hit[8]))
+      outline = """ hit[0] + "\t" + hit[1] + "\t" + hit[2] + "\t" + hit[3] + "\t" + str(hit[4]) + "\t" + str(hit[5]) + "\t"
+             + str(hit[6]) + "\t" + str(hit[7]) + "\t" + str(hit[8]) """
       print outline
