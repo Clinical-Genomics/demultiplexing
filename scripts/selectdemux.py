@@ -11,10 +11,7 @@ else:
   configfile = 'None'
 pars = db.readconfig(configfile)
 
-if not os.path.isdir(pars['BACKUPCOPYFOLDER']):
-  sys.exit("No directory " + pars['BACKUPCOPYFOLDER'])
-
-with create_tunnel(pars['TUNNELCMD']):
+with db.create_tunnel(pars['TUNNELCMD']):
 
   with dbconnect(pars['CLINICALDBHOST'], pars['CLINICALDBPORT'], pars['STATSDB'], 
                         pars['CLINICALDBUSER'], pars['CLINICALDBPASSWD']) as dbc:
