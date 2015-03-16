@@ -64,7 +64,7 @@ ORDER BY unaligned.lane)
 FROM sample, flowcell, unaligned, project, demux
 WHERE sample.sample_id     = unaligned.sample_id
 AND   flowcell.flowcell_id = demux.flowcell_id
-AND   unalinged.demux_id = demux.demux_id
+AND   unaligned.demux_id = demux.demux_id
 AND   sample.project_id    = project.project_id
 AND   project.projectname   =  %s
 AND   flowcell.flowcellname = %s
