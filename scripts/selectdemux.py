@@ -39,7 +39,6 @@ with db.create_tunnel(pars['TUNNELCMD']):
     AND sample.project_id = project.project_id AND project.projectname = '""" + proje + """' 
     AND flowcell.flowcellname = '""" + flowc + """' GROUP BY samplename, flowcell.flowcell_id 
     ORDER BY lane, sample.samplename, flowcellname """
-    print query
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
     for hit in hits:
