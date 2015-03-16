@@ -4,19 +4,28 @@ import sys
 from access import db
 
 """Parses demux stats to db.
-  usage: parsedemux.py  <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>"
+  usage: parsedemux.py  <BASEDIRECTORYforUNALIGNED> <UNALIGNEDsubdir> <samplesheetcsv> <config_file:optional>
 Args:
   BASEDIRECTORYforUNALIGNED (str): path to demux directory
-  absolutepathtosamplesheetcsv (str): path to samplesheet
+  UNALIGNEDsubdir (str): subdir with demux data structure
+  pathtosamplesheetcsv (str): absolute path to samplesheet
 Returns:
   Outputs what data have been added to database including row id for each table
 """
 
-if (len(sys.argv)>3):
-  configfile = sys.argv[3]
+if (len(sys.argv)>4):
+  configfile = sys.argv[4]
 else:
-  configfile = 'None'
+  if len(sys.argv) == 4:
+    configfile = 'None'
+  else:
+    print "usage: parsedemux.py <BASEDIRECTORYforUNALIGNED> <UNALIGNEDsubdir> <samplesheetcsv> <config_file:optional>"
 pars = db.readconfig(configfile)
+basedir = sys.argv[1]
+unaligned = sys.argv[2]
+samplesheet = sys.argv[3]
+
+print basedir, unaligned, samplesheet
 
 with db.create_tunnel(pars['TUNNELCMD']):
 
