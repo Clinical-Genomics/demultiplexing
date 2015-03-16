@@ -19,7 +19,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     ver = dbc.versioncheck(pars['STATSDB'], pars['DBVERSION'])
 
     if not ver == 'True':
-      print "Wrong db " + pars['STATSDB'] + " v:" + ver
+      print "Wrong db " + pars['STATSDB'] + " v:" + pars['DBVERSION']
       exit(0) 
     else:
-      print "Correct db " + pars['STATSDB'] + " v:" + ver
+      print "Correct db " + pars['STATSDB'] + " v:" + pars['DBVERSION']
