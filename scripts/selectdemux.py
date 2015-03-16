@@ -5,7 +5,14 @@ import datetime
 import os
 from access import db
 
-print sys.argv[0], sys.argv[1], sys.argv[2], sys.argv[3]
+"""Reads stats from db.
+  usage: selectdemux.py <project> <flowcell> <config_file:optional>"
+Args:
+  project (str): name of project in database
+  flowcell (str): name of flowcell in database
+Returns:
+  str: statistics for each sample in project on flowcell [stored in database]
+"""
 
 if (len(sys.argv)>3):
   configfile = sys.argv[3]
