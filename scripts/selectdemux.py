@@ -9,7 +9,7 @@ if (len(sys.argv)>1):
   db.configfile = sys.argv[1]
 else:
   configfile = 'None'
-pars = readconfig(configfile)
+pars = db.readconfig(configfile)
 
 if not os.path.isdir(pars['BACKUPCOPYFOLDER']):
   sys.exit("No directory " + pars['BACKUPCOPYFOLDER'])
