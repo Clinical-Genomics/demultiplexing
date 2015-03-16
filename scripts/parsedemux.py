@@ -20,7 +20,7 @@ else:
     configfile = 'None'
   else:
     print "usage: parsedemux.py <BASEDIRECTORYforUNALIGNED> <UNALIGNEDsubdir> <samplesheetcsv> <config_file:optional>"
-    exit
+    exit 1
 pars = db.readconfig(configfile)
 basedir = sys.argv[1]
 unaligned = sys.argv[2]
