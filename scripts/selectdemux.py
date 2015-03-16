@@ -30,7 +30,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     flowc = sys.argv[2]
     query = """ SELECT sample.samplename AS smp, flowcell.flowcellname AS flc, 
     GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane) AS lanes, 
-    GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane) AS reads, SUM(unaligned.readcounts) AS readsum, 
+    GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane) AS rds, SUM(unaligned.readcounts) AS readsum, 
     GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane) AS yield, SUM(unaligned.yield_mb) AS yieldsum, 
     GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane) AS q30, 
     GROUP_CONCAT(TRUNCATE(mean_quality_score,2) ORDER BY unaligned.lane) AS meanq
@@ -43,7 +43,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
     for hit in hits:
-      print hit['smp'] + "\t" + hit['flc'] + "\t" + hit['lanes'] + "\t" + hit['reads'] + "\t" + str(hit['readsum']) + "\t" + str(hit['yield']) + "\t" + str(hit['yieldsum']) + "\t" + str(hit['q30']) + "\t" + str(hit['meanq'])
+      print hit['smp'] + "\t" + hit['flc'] + "\t" + hit['lanes'] + "\t" + hit['rds'] + "\t" + str(hit['readsum']) + "\t" + str(hit['yield']) + "\t" + str(hit['yieldsum']) + "\t" + str(hit['q30']) + "\t" + str(hit['meanq'])
 
 
 
