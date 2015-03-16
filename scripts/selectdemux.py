@@ -28,7 +28,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     proje = sys.argv[1]
     flowc = sys.argv[2]
-    query = (""" SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), 
+    query = """ SELECT sample.samplename, flowcell.flowcellname, GROUP_CONCAT(unaligned.lane ORDER BY unaligned.lane), 
     GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readcounts), 
     GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), 
     GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane), 
@@ -36,7 +36,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     FROM sample, flowcell, unaligned, project, demux WHERE sample.sample_id = unaligned.sample_id 
     AND flowcell.flowcell_id = demux.flowcell_id AND unaligned.demux_id = demux.demux_id 
     AND sample.project_id = project.project_id AND project.projectname = %s AND flowcell.flowcellname = %s 
-    GROUP BY samplename, flowcell.flowcell_id ORDER BY lane, sample.samplename, flowcellname; """, (proje, flowc, ))
+    GROUP BY samplename, flowcell.flowcell_id ORDER BY lane, sample.samplename, flowcellname; """, (proje, flowc, )
     print query
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
