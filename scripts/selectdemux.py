@@ -35,8 +35,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
     GROUP_CONCAT(TRUNCATE(mean_quality_score,2) ORDER BY unaligned.lane) 
     FROM sample, flowcell, unaligned, project, demux WHERE sample.sample_id = unaligned.sample_id 
     AND flowcell.flowcell_id = demux.flowcell_id AND unaligned.demux_id = demux.demux_id 
-    AND sample.project_id = project.project_id AND project.projectname = %s AND flowcell.flowcellname = %s 
-    GROUP BY samplename, flowcell.flowcell_id ORDER BY lane, sample.samplename, flowcellname; """, (proje, flowc, )
+    AND sample.project_id = project.project_id AND project.projectname = '""" + proje + """' 
+    AND flowcell.flowcellname = '""" + flowc + """' GROUP BY samplename, flowcell.flowcell_id 
+    ORDER BY lane, sample.samplename, flowcellname """
     print query
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
