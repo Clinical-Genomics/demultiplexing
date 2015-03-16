@@ -3,7 +3,7 @@
 import sys
 import datetime
 import os
-from dbaccess import *
+from access import *
 
 if (len(sys.argv)>1):
   configfile = sys.argv[1]
