@@ -6,7 +6,7 @@ import os
 from access import db
 
 if (len(sys.argv)>1):
-  db.configfile = sys.argv[1]
+  configfile = sys.argv[1]
 else:
   configfile = 'None'
 pars = db.readconfig(configfile)
