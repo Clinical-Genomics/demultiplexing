@@ -133,13 +133,13 @@ with db.create_tunnel(pars['TUNNELCMD']):
     commandline = command.replace("$_Command-line = [\n","")
 
     Samplesheet = open(samplesheet)
-    SampleSheet = ""
-    for line in Samplesheet.readlines():
-      print "LINE", line
-      if re.match(",", line):
-        SampleSheet += line
-      line = line.strip()
-      print line
+    SampleSheet = Samplesheet.read()
+#    for line in Samplesheet.readlines():
+#      print "LINE", line
+#      if re.match(",", line):
+#        SampleSheet += line
+#      line = line.strip()
+#      print line
     Samplesheet.close()
 
     print Idstring, Program, Systempid, Systemos, Systemperlv, Systemperlexe
