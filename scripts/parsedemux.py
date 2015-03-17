@@ -217,7 +217,27 @@ with db.create_tunnel(pars['TUNNELCMD']):
       demuxid = dbc.sqlinsert('demux', insertdict)
     else:
       demuxid = indbdemux[0]['demux_id']
-    print "Demux " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
+    print "Demux with " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
+
+    """ Set up data for table project """
+
+    projects = {}
+    tables = soup.findAll("table")
+    rows = tables[1].findAll('tr')
+    for row in rows:
+      cols = row.findAll('td')
+      project = unicode(cols[6].string).encode('utf8')
+  
+      getprojquery = """ SELECT project_id, time FROM project WHERE projectname = '""" + project + """' """
+      indbproj = dbc..generalquery(getdemuxquery)
+      if not indbproj:
+        print "Project not yet added"
+        insertdict = { 'projectname': project, 'time': now }
+        projects[project] = dbc.sqlinsert('project', insertdict)
+      else:
+        projects[project] = indbproj[0]['project_id']
+      print "Project " + project + " exists in DB with project_id: "+str(projects[project])
+
 
 
     print now
