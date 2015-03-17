@@ -174,10 +174,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
                      'systemos': Systemos, 'systemperlv': Systemperlv, 'systemperlexe': Systemperlexe,
                      'idstring': Idstring, 'program': Program, 'commandline': commandline, 
                      'sampleconfig_path': samplesheet, 'sampleconfig': SampleSheet, 'time': now }
-      supportparamsid = dbc.sqlinsert('supportparams', insertdict)
+      supportparamsid = dbc.sqlinsert('supportparams', insertdict)[0]['supportparams_id']
     else:
-      thehit = indbsupport[0]
-      supportparamsid = thehit['supportparams_id']
+      supportparamsid = indbsupport[0]['supportparams_id']
     print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
 
     """ Set up data for table datasource """
@@ -190,10 +189,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
       print "Data source not yet added"
       insertdict = { 'document_path': demultistats, 'runname': runname, 'rundate': rundate, 'machine': machine, 
                      'supportparams_id': supportparamsid, 'server': servername, 'time': now }
-      datasourceid = dbc.sqlinsert('datasource', insertdict)
+      datasourceid = dbc.sqlinsert('datasource', insertdict)[0]['datasource_id']
     else:
-      thehit = indbdatas[0]
-      datasourceid = thehit['datasource_id']
+      datasourceid = indbdatas[0]['datasource_id']
     print "Datasource " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
 
     """ Set up data for table flowcell """
