@@ -154,10 +154,10 @@ with db.create_tunnel(pars['TUNNELCMD']):
       if cla == "  '--use-bases-mask',":
         isbm = True
     print bmask
-#basem = bmask.split("'")
-#  basemask = basem[1]
 
-
+    getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
+                      """support.txt' """)
+    print getsupportquery
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
     print now
