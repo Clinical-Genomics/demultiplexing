@@ -162,7 +162,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     """ Set up data for supportparams table """
 
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
-                      """suport.txt' """)
+                      """support.txt' """)
     print getsupportquery
     indbsupport = dbc.generalquery(getsupportquery)
     if not indbsupport:
