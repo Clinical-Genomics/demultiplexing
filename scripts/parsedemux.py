@@ -210,7 +210,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     
     getdemuxquery = """ SELECT demux_id FROM demux WHERE flowcell_id = '""" + str(flowcellid) + """' 
                         AND datasource_id = '""" + str(datasourceid) + """' AND basemask = '""" + bmask + """' """
-    inbddemux = dbc.generalquery(getdemuxquery)
+    indbdemux = dbc.generalquery(getdemuxquery)
     if not indbdemux:
       print "Demux not yet added"
       insertdict = { 'flowcell_id': flowcellid, 'datasource_id': datasourceid, 'basemask': bmask, 'time': now }
