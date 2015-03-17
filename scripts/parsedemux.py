@@ -176,8 +176,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
                      'sampleconfig_path': samplesheet, 'sampleconfig': SampleSheet, 'time': now }
       supportparamsid = dbc.sqlinsert('supportparams', insertdict)
     else:
-      output = indbsupport[0]
-      supportparamsid = output['supportparams_id']
+      thehit = indbsupport[0]
+      supportparamsid = thehit['supportparams_id']
     print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
 
     """ Set up data for table datasource """
@@ -192,7 +192,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
                      'supportparams_id': supportparamsid, 'server': servername, 'time': now }
       datasourceid = dbc.sqlinsert('datasource', insertdict)
     else:
-      datasourceid = indbdatas[0]['datasource_id']
+      thehit = indbdatas[0]
+      datasourceid = thehit['datasource_id']
     print "Datasource " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
 
     """ Set up data for table flowcell """
@@ -204,7 +205,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
       insertdict = { 'flowcellname': fc, 'flowcell_pos': Flowcellpos, 'time': now }
       flowcellid = dbc.sqlinsert('flowcell', insertdict)
     else:
-      flowcellid = indbfc[0]['flowcell_id']
+      thehit = indbfc[0]
+      flowcellid = thehit['flowcell_id']
     print "Flowcell " + fc + " exists in DB with flowcell_id: " + str(flowcellid)
 
     """ Set up data for table demux """
@@ -217,7 +219,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
       insertdict = { 'flowcell_id': flowcellid, 'datasource_id': datasourceid, 'basemask': bmask, 'time': now }
       demuxid = dbc.sqlinsert('demux', insertdict)
     else:
-      demuxid = indbdemux[0]['demux_id']
+      thehit = indbdemux[0]
+      demuxid = thehit['demux_id']
     print "Demux with " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
 
     """ Set up data for table project """
@@ -235,7 +238,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
         insertdict = { 'projectname': project, 'time': now }
         projects[project] = dbc.sqlinsert('project', insertdict)
       else:
-        projects[project] = indbproj[0]['project_id']
+        thehit = indbproj[0]
+        projects[project] = thehit['project_id']
       print "Project " + project + " exists in DB with project_id: "+str(projects[project])
 
     """ Set up data for table sample """
@@ -256,7 +260,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
         insertdict = { 'samplename': samplename, 'project_id': projects[project], 'barcode': barcode, 'time': now }
         samples[samplename] = dbc.sqlinsert('sample', insertdict)
       else:
-        samples[samplename] = indbsample[0]['sample_id']
+        thehit = indbsample[0]
+        samples[samplename] = thehit['sample_id']
       print "Sample " + samplename + " exists in DB with sample_id: "+str(samples[samplename])
 
     """ Set up data for table unaligned """
@@ -289,7 +294,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
                         'mean_quality_score': mean_quality_score, 'time': now }
         unalignedid = dbc.sqlinsert('unaligned', insertdict)
       else:
-        unalignedid = indbunal[0]['unaligned_id']
+        thehit = indbunal[0]
+        unalignedid = thehit['unaligned_id']
       print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
 
 
