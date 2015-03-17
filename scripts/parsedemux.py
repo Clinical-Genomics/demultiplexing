@@ -4,6 +4,7 @@ import sys
 import os
 import glob
 import time
+from bs4 import BeautifulSoup
 from access import db
 
 """Parses demux stats to db.
@@ -58,13 +59,37 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     demux = (basedir + unaligned + "Basecall_Stats*")
     demux_stat_dir = glob.glob(demux)[0]
-    print demux_stat_dir
-# read in run parameters from Unaligned/support.txt
+    if not os.path.isdir(demux_stat_dir): 
+      exit("Bad statistics dir")
+    if not (demux_stat_dir[-1:] == "/"):
+      demux_stat_dir = demux_stat_dir + "/"
+
     if not os.path.isfile(basedir + unaligned + "support.txt"):
       exit ("Bad support.txt")
     support = open(basedir + unaligned + "support.txt")
     support_lines = support.readlines()
     support.close()
+
+    demultistats = (demux_stat_dir + "Demultiplex_Stats.htm")
+    if not os.path.isfile(demultistats):
+      exit("Bad demux stats file")
+    soup = BeautifulSoup(open(demultistats))
+
+    h1fc = soup.find("h1")
+    fcentry = unicode(h1fc.string).encode('utf8')
+    fc = fcentry.replace("Flowcell: ","")
+###print basedir
+    baseparts = basedir.split("_")
+    Flowcellpos = baseparts[len(baseparts)-1]
+    Flowcellpos = Flowcellpos.replace(fc+"/","") 
+    dirs = basedir.split("/")
+    runname = dirs[len(dirs)-2]
+###print Flowcellpos
+    name_ = runname.split("_")
+    rundate = list(name_[0])
+    rundate = "20"+rundate[0]+rundate[1]+"-"+rundate[2]+rundate[3]+"-"+rundate[4]+rundate[5]
+    machine = name_[1]
+    print runname, rundate, machine
 
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
