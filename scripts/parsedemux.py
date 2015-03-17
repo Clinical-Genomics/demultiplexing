@@ -201,10 +201,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
     if not indbfc:
       print "Data source not yet added"
       insertdict = { 'flowcellname': fc, 'flowcell_pos': Flowcellpos, 'time': now }
-      flowcellid = dbc.sqlinsert('flowcell', insertdict)
+      flowcellid = dbc.sqlinsert('flowcell', insertdict)[0]['flowcell_id']
     else:
-      thehit = indbfc[0]
-      flowcellid = thehit['flowcell_id']
+      flowcellid = indbfc[0]['flowcell_id']
     print "Flowcell " + fc + " exists in DB with flowcell_id: " + str(flowcellid)
 
     """ Set up data for table demux """
@@ -215,10 +214,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
     if not indbdemux:
       print "Demux not yet added"
       insertdict = { 'flowcell_id': flowcellid, 'datasource_id': datasourceid, 'basemask': bmask, 'time': now }
-      demuxid = dbc.sqlinsert('demux', insertdict)
+      demuxid = dbc.sqlinsert('demux', insertdict)[0]['demux_id']
     else:
-      thehit = indbdemux[0]
-      demuxid = thehit['demux_id']
+      demuxid = indbdemux[0]['demux_id']
     print "Demux with " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
 
     """ Set up data for table project """
@@ -234,10 +232,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
       if not indbproj:
         print "Project not yet added"
         insertdict = { 'projectname': project, 'time': now }
-        projects[project] = dbc.sqlinsert('project', insertdict)
+        projects[project] = dbc.sqlinsert('project', insertdict)[0]['project_id']
       else:
-        thehit = indbproj[0]
-        projects[project] = thehit['project_id']
+        projects[project] = indbproj[0]['project_id']
       print "Project " + project + " exists in DB with project_id: "+str(projects[project])
 
     """ Set up data for table sample """
@@ -256,10 +253,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
       if not indbsample:
         print "Sample not yet added"
         insertdict = { 'samplename': samplename, 'project_id': projects[project], 'barcode': barcode, 'time': now }
-        samples[samplename] = dbc.sqlinsert('sample', insertdict)
+        samples[samplename] = dbc.sqlinsert('sample', insertdict)[0]['sample_id']
       else:
-        thehit = indbsample[0]
-        samples[samplename] = thehit['sample_id']
+        samples[samplename] = indbsample[0]['sample_id']
       print "Sample " + samplename + " exists in DB with sample_id: "+str(samples[samplename])
 
     """ Set up data for table unaligned """
@@ -290,10 +286,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
                         'raw_clusters_per_lane_pct': raw_clusters_per_lane_pct, 
                         'perfect_indexreads_pct': perfect_indexreads_pct, 'q30_bases_pct': q30_bases_pct, 
                         'mean_quality_score': mean_quality_score, 'time': now }
-        unalignedid = dbc.sqlinsert('unaligned', insertdict)
+        unalignedid = dbc.sqlinsert('unaligned', insertdict)[0]['unaligned_id']
       else:
-        thehit = indbunal[0]
-        unalignedid = thehit['unaligned_id']
+        unalignedid = indbunal[0]['unaligned_id']
         print thehit, unalignedid
       print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
 
