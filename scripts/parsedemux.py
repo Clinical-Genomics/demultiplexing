@@ -229,7 +229,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       project = unicode(cols[6].string).encode('utf8')
   
       getprojquery = """ SELECT project_id, time FROM project WHERE projectname = '""" + project + """' """
-      indbproj = dbc.generalquery(getdemuxquery)
+      indbproj = dbc.generalquery(getprojquery)
       if not indbproj:
         print "Project not yet added"
         insertdict = { 'projectname': project, 'time': now }
