@@ -277,7 +277,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       mean_quality_score = unicode(cols[14].string).encode('utf8')
 
       getunalquery = """ SELECT unaligned_id FROM unaligned WHERE sample_id = '""" + str(samples[samplename]) + """' 
-                         AND lane = '""" + lane + """' AND flowcell_id = '""" + str(fcid) + """' """
+                         AND lane = '""" + lane + """' AND flowcell_id = '""" + str(flowcellid) + """' """
       indbunal = dbc.generalquery(getunalquery)
       if not indbunal:
         print "UnalignedStats not yet added"
