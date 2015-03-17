@@ -289,7 +289,6 @@ with db.create_tunnel(pars['TUNNELCMD']):
         unalignedid = dbc.sqlinsert('unaligned', insertdict)[0]['unaligned_id']
       else:
         unalignedid = indbunal[0]['unaligned_id']
-        print thehit, unalignedid
       print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
 
 
