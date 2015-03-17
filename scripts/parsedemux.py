@@ -5,6 +5,7 @@ import os
 import glob
 import time
 import re
+import socket
 from bs4 import BeautifulSoup
 from access import db
 
