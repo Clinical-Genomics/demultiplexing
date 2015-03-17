@@ -158,6 +158,9 @@ with db.create_tunnel(pars['TUNNELCMD']):
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
                       """support.txt' """)
     print getsupportquery
+    indbsupport = dbc.generalquery(getsupportquery)
+    print indbsupport
+    
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
     print now
