@@ -57,8 +57,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
       print "Correct db " + pars['STATSDB'] + " v:" + pars['DBVERSION']
 
     demux = (basedir + unaligned + "Basecall_Stats*")
-    demux_stat_dir = glob.glob(demux)
-    print demux_stat_dir
+    demux_stat_dir = glob.glob(demux)[0]
+     print demux_stat_dir
 # read in run parameters from Unaligned/support.txt
     if not os.path.isfile(basedir + unaligned + "support.txt"):
       exit ("Bad support.txt")
