@@ -149,11 +149,13 @@ with db.create_tunnel(pars['TUNNELCMD']):
     isbm = False
     for cla in clas:
       if isbm:
-        bmask = cla
+        bmask = cla.split("'")[1]
         isbm = False
       if cla == "  '--use-bases-mask',":
         isbm = True
     print bmask
+#basem = bmask.split("'")
+#  basemask = basem[1]
 
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
