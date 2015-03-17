@@ -159,7 +159,10 @@ with db.create_tunnel(pars['TUNNELCMD']):
                       """support.xt' """)
     print getsupportquery
     indbsupport = dbc.generalquery(getsupportquery)
-    print indbsupport
+    if not indbsupport:
+      print "noone"
+    else:
+      print indbsupport
     
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
