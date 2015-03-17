@@ -135,6 +135,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     Samplesheet = open(samplesheet)
     SampleSheet = ""
     for line in Samplesheet.readlines():
+      print "LINE", line
       if re.match(",", line):
         SampleSheet += line
       line = line.strip()
