@@ -164,7 +164,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       insertquery = """ INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, 
                       idstring, program, commandline, sampleconfig_path, sampleconfig, time) VALUES (%s, %s, %s, %s, 
                       %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, 
-                      Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, now, ))
+                      Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, NOW(), )
       print insertquery
     else:
       print indbsupport[0]['supportparams_id']
