@@ -4,6 +4,7 @@ import sys
 import os
 import glob
 import time
+import re
 from bs4 import BeautifulSoup
 from access import db
 
