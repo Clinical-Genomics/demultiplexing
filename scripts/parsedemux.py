@@ -156,7 +156,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     print bmask
 
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
-                      """support.txt' """)
+                      """support.xt' """)
     print getsupportquery
     indbsupport = dbc.generalquery(getsupportquery)
     print indbsupport
