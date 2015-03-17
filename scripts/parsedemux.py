@@ -258,5 +258,38 @@ with db.create_tunnel(pars['TUNNELCMD']):
         samples[samplename] = indbsample[0]['sample_id']
       print "Sample " + samplename + " exists in DB with sample_id: "+str(samples[samplename])
 
+    """ Set up data for table unaligned """
+
+    for row in rows:
+      cols = row.findAll('td')
+      lane = unicode(cols[0].string).encode('utf8')
+      samplename = unicode(cols[1].string).encode('utf8')
+      barcode = unicode(cols[3].string).encode('utf8')
+      project = unicode(cols[6].string).encode('utf8')
+      yield_mb = unicode(cols[7].string).encode('utf8')
+      yield_mb = yield_mb.replace(",","")
+      passed_filter_pct = unicode(cols[8].string).encode('utf8')
+      Readcounts = unicode(cols[9].string).encode('utf8')
+      Readcounts = Readcounts.replace(",","")
+      raw_clusters_per_lane_pct = unicode(cols[10].string).encode('utf8')
+      perfect_indexreads_pct = unicode(cols[11].string).encode('utf8')
+      q30_bases_pct = unicode(cols[13].string).encode('utf8')
+      mean_quality_score = unicode(cols[14].string).encode('utf8')
+
+      getunalquery = """ SELECT unaligned_id FROM unaligned WHERE sample_id = '""" + str(samples[samplename]) + """' 
+                         AND lane = '""" + lane + """' AND flowcell_id = '""" + str(fcid) + """' """
+      indbunal = dbc.generalquery(getunalquery)
+      if not indbunal:
+        print "UnalignedStats not yet added"
+        insertdict = { 'sample_id': samples[samplename], 'flowcell_id': str(flowcellid), 'lane': lane, 
+                       'yield_mb': yield_mb, 'passed_filter_pct': passed_filter_pct, 'readcounts': Readcounts, 
+                        'raw_clusters_per_lane_pct': raw_clusters_per_lane_pct, 
+                        'perfect_indexreads_pct': perfect_indexreads_pct, 'q30_bases_pct': q30_bases_pct, 
+                        'mean_quality_score': mean_quality_score, 'time': now }
+        unalignedid = dbc.sqlinsert('unaligned', insertdict)
+      else:
+        unalignedid = indbunal[0]['unaligned_id']
+      print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
+
 
     print now
