@@ -155,7 +155,10 @@ with db.create_tunnel(pars['TUNNELCMD']):
         isbm = False
       if cla == "  '--use-bases-mask',":
         isbm = True
-    print bmask
+    if not bmask:
+      exit("Bad basemask")
+    else:
+      print bmask
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -177,6 +180,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
 
     """ Set up data for table datasource """
+    
     servername = socket.gethostname()
     getdatasquery = """ SELECT datasource_id FROM datasource WHERE document_path = '""" + demultistats + """' """
     print getdatasquery
@@ -188,8 +192,32 @@ with db.create_tunnel(pars['TUNNELCMD']):
       datasourceid = dbc.sqlinsert('datasource', insertdict)
     else:
       datasourceid = indbdatas[0]['datasource_id']
-    print "Data source " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
+    print "Datasource " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
 
+    """ Set up data for table flowcell """
+
+    getflowcellquery = """ SELCT flowcell_id FROM flowcell WHERE flowcellname = '""" + fc + """' """
+    inbdfc = dbc.generalquery(getflowcellquery)
+    if not indbfc:
+      print "Data source not yet added"
+      insertdict = { 'flowcellname': fc, 'flowcell_pos': Flowcellpos, 'time': now }
+      flowcellid = dbc.sqlinsert('flowcell', insertdict)
+    else:
+      flowcellid = indbfc[0]['flowcell_id']
+    print "Flowcell " + fc + " exists in DB with flowcell_id: " + str(flowcellid)
+
+    """ Set up data for table demux """
+    
+    getdemuxquery = """ SELCT demux_id FROM demux WHERE flowcell_id = '""" + flowcellid + """' AND datasource_id = '""" +
+                        datasourceid + """' AND basemask = '""" + bmask + """' """
+    inbddemux = dbc.generalquery(getdemuxquery)
+    if not indbdemux:
+      print "Demux not yet added"
+      insertdict = { 'flowcell_id': flowcellid, 'datasource_id': datasourceid, 'basemask': bmask, 'time': now }
+      demuxid = dbc.sqlinsert('demux', insertdict)
+    else:
+      demuxid = indbdemux[0]['demux_id']
+    print "Demux " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
 
 
     print now
