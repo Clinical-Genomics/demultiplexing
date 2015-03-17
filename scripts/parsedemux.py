@@ -162,7 +162,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     if not indbsupport:
       print "noone"
     else:
-      print indbsupport
+      print indbsupport[0]['supportparams_id']
     
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
