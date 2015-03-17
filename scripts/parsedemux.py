@@ -176,7 +176,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
                      'sampleconfig_path': samplesheet, 'sampleconfig': SampleSheet, 'time': now }
       supportparamsid = dbc.sqlinsert('supportparams', insertdict)
     else:
-      supportparamsid = (indbsupport[0])['supportparams_id']
+      output = indbsupport[0]
+      supportparamsid = output['supportparams_id']
     print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
 
     """ Set up data for table datasource """
