@@ -196,7 +196,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     """ Set up data for table flowcell """
 
-    getflowcellquery = """ SELCT flowcell_id FROM flowcell WHERE flowcellname = '""" + fc + """' """
+    getflowcellquery = """ SELECT flowcell_id FROM flowcell WHERE flowcellname = '""" + fc + """' """
     inbdfc = dbc.generalquery(getflowcellquery)
     if not indbfc:
       print "Data source not yet added"
