@@ -281,7 +281,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       indbunal = dbc.generalquery(getunalquery)
       if not indbunal:
         print "UnalignedStats not yet added"
-        insertdict = { 'sample_id': samples[samplename], 'flowcell_id': str(flowcellid), 'lane': lane, 
+        insertdict = { 'sample_id': samples[samplename], 'demux_id': str(demuxid), 'lane': lane, 
                        'yield_mb': yield_mb, 'passed_filter_pct': passed_filter_pct, 'readcounts': Readcounts, 
                         'raw_clusters_per_lane_pct': raw_clusters_per_lane_pct, 
                         'perfect_indexreads_pct': perfect_indexreads_pct, 'q30_bases_pct': q30_bases_pct, 
