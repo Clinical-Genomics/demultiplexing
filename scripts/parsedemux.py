@@ -16,6 +16,8 @@ Returns:
 
 if (len(sys.argv)>4):
   configfile = sys.argv[4]
+  if not os.path.isfile(configfile):
+    exit("Bad configfile")
 else:
   if len(sys.argv) == 4:
     configfile = 'None'
