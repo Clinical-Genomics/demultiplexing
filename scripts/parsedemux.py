@@ -155,6 +155,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
         isbm = True
     print bmask
 
+    now = time.strftime('%Y-%m-%d %H:%M:%S')
+
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
                       """suport.txt' """)
     print getsupportquery
@@ -169,6 +171,5 @@ with db.create_tunnel(pars['TUNNELCMD']):
     else:
       print indbsupport[0]['supportparams_id']
     
-    now = time.strftime('%Y-%m-%d %H:%M:%S')
 
     print now
