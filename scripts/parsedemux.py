@@ -208,7 +208,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     """ Set up data for table demux """
     
-    getdemuxquery = """ SELCT demux_id FROM demux WHERE flowcell_id = '""" + flowcellid + """' 
+    getdemuxquery = """ SELECT demux_id FROM demux WHERE flowcell_id = '""" + flowcellid + """' 
                         AND datasource_id = '""" + datasourceid + """' AND basemask = '""" + bmask + """' """
     inbddemux = dbc.generalquery(getdemuxquery)
     if not indbdemux:
