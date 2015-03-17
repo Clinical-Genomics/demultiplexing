@@ -91,6 +91,58 @@ with db.create_tunnel(pars['TUNNELCMD']):
     machine = name_[1]
     print runname, rundate, machine
 
+    system = ""
+    command = ""
+    idstring = ""
+    program = ""
+#print samplesheet
+    for line in range(1, len(support_lines)):
+      if re.match("^\$\_System", support_lines[line]):
+        while not (re.match("};", support_lines[line])):
+          system += support_lines[line]
+          line += 1
+      if re.match("^\$\_ID-string", support_lines[line]):
+        idstring += support_lines[line]
+      if re.match("^\$\_Program", support_lines[line]):
+        program += support_lines[line]
+      if re.match("^\$\_Command-line", support_lines[line]):
+        while not (re.match("];", support_lines[line])):
+          command += support_lines[line]
+          line += 1
+
+    Idstring = idstring.replace("$_ID-string = '","")
+    Idstring = Idstring.replace("';","")
+    Idstring = Idstring.strip()
+    Program = program.replace("$_Program = '","")
+    Program = Program.replace("';","")
+    Program = Program.strip()
+    sysentries = system.splitlines()
+    Systempid = sysentries[1]
+    Systempid = Systempid.replace("  'PID' : '","")
+    Systempid = Systempid.replace("',","")
+    Systemos = sysentries[2]
+    Systemos = Systemos.replace("  'OS' : '","")
+    Systemos = Systemos.replace("',","")
+    Systemperlv = sysentries[3]
+    Systemperlv = Systemperlv.replace("  'PERL_VERSION' : '","")
+    Systemperlv = Systemperlv.replace("',","")
+    Systemperlexe = sysentries[4]
+    Systemperlexe = Systemperlexe.replace("  'PERL_EXECUTABLE' : '","")
+    Systemperlexe = Systemperlexe.replace("'","")
+    commandline = command.replace("$_Command-line = [\n","")
+
+    Samplesheet = open(samplesheet)
+    SampleSheet = ""
+    for line in Samplesheet.readlines():
+      if re.match(",", line):
+        SampleSheet += line
+      line = line.strip()
+      print line
+    Samplesheet.close()
+
+    print Idstring, Program, Systempid, Systemos, Systemperlv, Systemperlexe
+    print commandline, samplesheet
+    print SampleSheet
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
