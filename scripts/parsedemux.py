@@ -178,7 +178,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     """ Set up data for table datasource """
     servername = socket.gethostname()
-    getdatasquery = """ SELECT datasource_id FROM datasource WHERE document_path = %s """, (demultistats, )
+    getdatasquery = """ SELECT datasource_id FROM datasource WHERE document_path = '""" + demultistats + ' """
     print getdatasquery
     indbdatas = dbc.generalquery(getdatasquery)
     if not indbdatas:
