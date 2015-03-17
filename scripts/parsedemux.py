@@ -144,6 +144,17 @@ with db.create_tunnel(pars['TUNNELCMD']):
     print Idstring, Program, Systempid, Systemos, Systemperlv, Systemperlexe
     print commandline, samplesheet
     print SampleSheet
+    
+    clas = commandline.split('\n')
+    isbm = False
+    for cla in clas:
+      if isbm:
+        bmask = cla
+        isbm = False
+      if cla == "  '--use-bases-mask',":
+        isbm = True
+    print bmask
+
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
