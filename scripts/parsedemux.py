@@ -156,11 +156,16 @@ with db.create_tunnel(pars['TUNNELCMD']):
     print bmask
 
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
-                      """support.txt' """)
+                      """suport.txt' """)
     print getsupportquery
     indbsupport = dbc.generalquery(getsupportquery)
     if not indbsupport:
-      print "noone"
+      print "Support parameters not yet added"
+      insertquery = """ INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, 
+                      idstring, program, commandline, sampleconfig_path, sampleconfig, time) VALUES (%s, %s, %s, %s, 
+                      %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, 
+                      Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, now, ))
+      print insertquery
     else:
       print indbsupport[0]['supportparams_id']
     
