@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 import sys
+import os
 from access import db
 
 """Parses demux stats to db.
@@ -23,8 +24,18 @@ else:
     exit(1)
 pars = db.readconfig(configfile)
 basedir = sys.argv[1]
+if not (basedir[-1:] == "/"):
+  basedir = basedir + "/"
+if not os.path.isdir(basedir):
+  exit("Bad basedir")
 unaligned = sys.argv[2]
+if not (unaligned[-1:] == "/"):
+  unaligned = unaligned + "/"
+if not os.path.isdir(basedir + unaligned):
+  exit("Bad unaligned dir")
 samplesheet = sys.argv[3]
+if not os.path.isfile(samplesheet):
+  exit("Bad samplesheet")
 
 print basedir, unaligned, samplesheet
 
