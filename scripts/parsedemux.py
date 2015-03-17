@@ -227,7 +227,6 @@ with db.create_tunnel(pars['TUNNELCMD']):
     for row in rows:
       cols = row.findAll('td')
       project = unicode(cols[6].string).encode('utf8')
-  
       getprojquery = """ SELECT project_id, time FROM project WHERE projectname = '""" + project + """' """
       indbproj = dbc.generalquery(getprojquery)
       if not indbproj:
@@ -238,6 +237,26 @@ with db.create_tunnel(pars['TUNNELCMD']):
         projects[project] = indbproj[0]['project_id']
       print "Project " + project + " exists in DB with project_id: "+str(projects[project])
 
+    """ Set up data for table sample """
+
+    for var in projects:
+      print var, projects[var]
+    samples = {}
+    for row in rows:
+      cols = row.findAll('td')
+      samplename = unicode(cols[1].string).encode('utf8')
+      barcode = unicode(cols[3].string).encode('utf8')
+      project = unicode(cols[6].string).encode('utf8')
+      getsamplequery = """ SELECT sample_id FROM sample WHERE samplename = '""" + samplename + """' 
+                           AND barcode = '""" + barcode + """' """
+      indbsample = dbc.generalquery(getsamplequery)
+      if not indbsample:
+        print "Sample not yet added"
+        insertdict = { 'samplename': samplename, 'project_id': projects[project], 'barcode': barcode, 'time': now }
+        samples[samplename] = dbc.sqlinsert('sample', insertdict)
+      else:
+        samples[samplename] = indbsample[0]['sample_id']
+      print "Sample " + samplename + " exists in DB with sample_id: "+str(samples[samplename])
 
 
     print now
