@@ -158,19 +158,37 @@ with db.create_tunnel(pars['TUNNELCMD']):
 
     now = time.strftime('%Y-%m-%d %H:%M:%S')
 
+    """ Set up data for supportparams table """
+
     getsupportquery = (""" SELECT supportparams_id FROM supportparams WHERE document_path = '""" + basedir + unaligned + 
                       """suport.txt' """)
     print getsupportquery
     indbsupport = dbc.generalquery(getsupportquery)
     if not indbsupport:
       print "Support parameters not yet added"
-      insertquery = """ INSERT INTO `supportparams` (document_path, systempid, systemos, systemperlv, systemperlexe, 
-                      idstring, program, commandline, sampleconfig_path, sampleconfig, time) VALUES (%s, %s, %s, %s, 
-                      %s, %s, %s, %s, %s, %s, %s) """, (basedir+"Unaligned/support.txt", Systempid, Systemos, 
-                      Systemperlv, Systemperlexe, Idstring, Program, commandline, samplesheet, SampleSheet, now, )
-      print insertquery
+      insertdict = { 'document_path': basedir + unaligned + 'support.txt', 'systempid': Systempid, 
+                     'systemos': Systemos, 'systemperlv': Systemperlv, 'systemperlexe': Systemperlexe,
+                     'idstring': Idstring, 'program': Program, 'commandline': commandline, 
+                     'sampleconfig_path': samplesheet, 'sampleconfig': SampleSheet, 'time': now }
+      supportparamsid = sqlinsert('supportparams', insertdict)
     else:
-      print indbsupport[0]['supportparams_id']
-    
+      supportparamsid = indbsupport[0]['supportparams_id']
+    print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
+
+    """ Set up data for table datasource """
+    servername = socket.gethostname()
+    getdatasquery = """ SELECT datasource_id FROM datasource WHERE document_path = %s """, (demultistats, )
+    print getdatasquery
+    indbdatas = dbc.generalquery(getdatasquery)
+    if not indbdatas:
+      print "Data source not yet added"
+      insertdict = { 'document_path': demultistats, 'runname': runname, 'rundate': rundate, 'machine': machine, 
+                     'supportparams_id': supportparamsid, 'server': servername, 'time': now }
+      datasourceid = sqlinsert('datasource', insertdict)
+    else:
+      datasourceid = indbdatas[0]['datasource_id']
+    print "Data source " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
+
+
 
     print now
