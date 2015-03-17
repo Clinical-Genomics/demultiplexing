@@ -3,6 +3,7 @@
 import sys
 import os
 import glob
+import time
 from access import db
 
 """Parses demux stats to db.
