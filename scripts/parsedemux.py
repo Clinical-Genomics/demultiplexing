@@ -296,6 +296,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       else:
         thehit = indbunal[0]
         unalignedid = thehit['unaligned_id']
+        print thehit, unaligned
       print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
 
 
