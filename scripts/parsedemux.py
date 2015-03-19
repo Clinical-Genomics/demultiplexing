@@ -292,8 +292,8 @@ with db.create_tunnel(pars['TUNNELCMD']):
                         'raw_clusters_per_lane_pct': raw_clusters_per_lane_pct, 
                         'perfect_indexreads_pct': perfect_indexreads_pct, 'q30_bases_pct': q30_bases_pct, 
                         'mean_quality_score': mean_quality_score, 'time': now }
-        outcome = dbc.sqlinsert('unaligned', insertdict)[0]['unaligned_id']
-        unalignedid = [0]['unaligned_id']
+        outcome = dbc.sqlinsert('unaligned', insertdict)
+        unalignedid = outcome['unaligned_id']
       else:
         unalignedid = indbunal[0]['unaligned_id']
       print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(unalignedid)
