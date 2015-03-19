@@ -259,7 +259,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
         print "Sample not yet added"
         insertdict = { 'samplename': samplename, 'project_id': projects[project], 'barcode': barcode, 'time': now }
         outcome = dbc.sqlinsert('sample', insertdict)
-        samples[samplename] = outcome[0]['sample_id']
+        samples[samplename] = outcome['sample_id']
       else:
         samples[samplename] = indbsample[0]['sample_id']
       print "Sample " + samplename + " exists in DB with sample_id: "+str(samples[samplename])
