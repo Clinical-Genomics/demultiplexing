@@ -201,7 +201,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     getflowcellquery = """ SELECT flowcell_id FROM flowcell WHERE flowcellname = '""" + fc + """' """
     indbfc = dbc.generalquery(getflowcellquery)
     if not indbfc:
-      print "Data source not yet added"
+      print "Flowcell not yet added"
       insertdict = { 'flowcellname': fc, 'flowcell_pos': Flowcellpos, 'time': now }
       outcome = dbc.sqlinsert('flowcell', insertdict)
       flowcellid = outcome['flowcell_id']
