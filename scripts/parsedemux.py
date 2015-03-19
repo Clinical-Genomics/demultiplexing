@@ -175,7 +175,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
                      'idstring': Idstring, 'program': Program, 'commandline': commandline, 
                      'sampleconfig_path': samplesheet, 'sampleconfig': SampleSheet, 'time': now }
       outcome = dbc.sqlinsert('supportparams', insertdict)
-      supportparamsid = outcome[0]['supportparams_id']
+      supportparamsid = outcome['supportparams_id']
     else:
       supportparamsid = indbsupport[0]['supportparams_id']
     print "Support " + basedir + unaligned + 'support.txt' + " exists in DB with supportparams_id: " + str(supportparamsid)
@@ -191,7 +191,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       insertdict = { 'document_path': demultistats, 'runname': runname, 'rundate': rundate, 'machine': machine, 
                      'supportparams_id': supportparamsid, 'server': servername, 'time': now }
       outcome = dbc.sqlinsert('datasource', insertdict)
-      datasourceid = outcome[0]['datasource_id']
+      datasourceid = outcome['datasource_id']
     else:
       datasourceid = indbdatas[0]['datasource_id']
     print "Datasource " + demultistats + " exists in DB with datasource_id: "+str(datasourceid)
@@ -204,7 +204,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       print "Data source not yet added"
       insertdict = { 'flowcellname': fc, 'flowcell_pos': Flowcellpos, 'time': now }
       outcome = dbc.sqlinsert('flowcell', insertdict)
-      flowcellid = outcome[0]['flowcell_id']
+      flowcellid = outcome['flowcell_id']
     else:
       flowcellid = indbfc[0]['flowcell_id']
     print "Flowcell " + fc + " exists in DB with flowcell_id: " + str(flowcellid)
@@ -218,7 +218,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
       print "Demux not yet added"
       insertdict = { 'flowcell_id': flowcellid, 'datasource_id': datasourceid, 'basemask': bmask, 'time': now }
       outcome = dbc.sqlinsert('demux', insertdict)
-      demuxid = outcome[0]['demux_id']
+      demuxid = outcome['demux_id']
     else:
       demuxid = indbdemux[0]['demux_id']
     print "Demux with " + bmask + " from Flowcell: " + fc + " exists in DB with demux_id: " + str(demuxid)
@@ -237,7 +237,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
         print "Project not yet added"
         insertdict = { 'projectname': project, 'time': now }
         outcome = dbc.sqlinsert('project', insertdict)
-        projects[project] = outcome[0]['project_id']
+        projects[project] = outcome['project_id']
       else:
         projects[project] = indbproj[0]['project_id']
       print "Project " + project + " exists in DB with project_id: "+str(projects[project])
