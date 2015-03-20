@@ -27,6 +27,7 @@ BASE=$(echo $1 | awk '{if (substr($0,length($0),1) != "/") {print $0"/"} else {p
 RUN=$(echo ${BASE} | awk 'BEGIN {FS="/"} {print $(NF-1)}')
 BASEMASKBYPASS=$2
 mkdir -p ${UNALIGNEDBASE}${RUN}
+date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
