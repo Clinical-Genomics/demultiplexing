@@ -51,16 +51,22 @@ echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 if [ $BASEMASKBYPASS ]; then
   if [ $BASEMASKBYPASS == '--d8' ]; then
     USEBASEMASK=Y101,I8,I8,Y101
+    UNALDIR=Unaligned1
   elif [ $BASEMASKBYPASS == '--s8' ]; then
     USEBASEMASK=Y101,I8,Y101
+    UNALDIR=Unaligned2
   elif [ $BASEMASKBYPASS == '--s6s8' ]; then
     USEBASEMASK=Y101,I6nn,Y101
+    UNALDIR=Unaligned3
   elif [ $BASEMASKBYPASS == '--s6' ]; then
     USEBASEMASK=Y101,I6n,Y101
+    UNALDIR=Unaligned
   elif [ $BASEMASKBYPASS == '--s6d8' ]; then
     USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
+    UNALDIR=Unaligned4
   elif [ $BASEMASKBYPASS == '--s8d8' ]; then
     USEBASEMASK=Y101,I8,nnnnnnnn,Y101
+    UNALDIR=Unaligned5
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -85,6 +91,7 @@ else
   if [ "${indexread2count}" == 8 ]; then
   #  this is not true if second index equals 8
     USEBASEMASK=Y101,I8,I8,Y101
+    UNALDIR=Unaligned1
     echo  ${indexread2count} == "8" ix2
   else
     echo  ${indexread2count} == 8 NOT ix2
@@ -92,9 +99,11 @@ else
       echo ${indexread1count} == 8
   #  not if first index equals 8 either
         USEBASEMASK=Y101,I8,Y101
+        UNALDIR=Unaligned2
     else 
       echo ${indexread1count} == 8 NOT ix1
       USEBASEMASK=Y101,I6n,Y101
+      UNALDIR=Unaligned
     fi
   fi
 fi
@@ -109,18 +118,20 @@ fi
 
 
 /usr/local/bin/configureBclToFastq.pl --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}Data/Intensities/BaseCalls --output-dir ${UNALIGNEDBASE}${RUN}/Unaligned >> ${logfile}
-cd ${UNALIGNEDBASE}${RUN}/Unaligned
+cd ${UNALIGNEDBASE}${RUN}/${UNALDIR}
 echo [${NOW}] [${RUN}] Starting  . . .  /usr/local/bin/configureBclToFastq.pl >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --input-dir ${BASE}Data/Intensities/BaseCalls >> ${PROJECTLOG}
-echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/Unaligned >> ${PROJECTLOG}
+echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${PROJECTLOG}
 nohup make -j 8 > nohup.${NOW}.out 2>&1
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . .  >> ${PROJECTLOG}
 bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv
+# # # # the new python script for parsing using demux table
+python /home/clinical/git/rikard/demultiplexing/scripts/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.alt_test_db
 echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 
@@ -129,6 +140,8 @@ PROJs=$(ls ${UNALIGNEDBASE}${RUN}/Unaligned/ | grep Proj)
 for PROJ in ${PROJs[@]};do
   prj=$(echo ${PROJ} | sed 's/Project_//')
   bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt
+  # # # # the new python script for parsing using demux table
+  python /home/clinical/git/rikard/demultiplexing/scripts/selectdemux.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt ~/.alt_test_db
   echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py >> ${PROJECTLOG}
   echo "[${NOW}] [${RUN}] ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
