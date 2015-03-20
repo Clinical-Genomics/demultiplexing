@@ -141,7 +141,7 @@ for PROJ in ${PROJs[@]};do
   prj=$(echo ${PROJ} | sed 's/Project_//')
   bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt
   # # # # the new python script for parsing using demux table
-  python /home/clinical/git/rikard/demultiplexing/scripts/selectdemux.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt ~/.alt_test_db
+  python /home/clinical/git/rikard/demultiplexing/scripts/selectdemux.py ${prj} ${FC} ~/.alt_test_db > ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
   echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py >> ${PROJECTLOG}
   echo "[${NOW}] [${RUN}] ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
