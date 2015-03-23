@@ -40,11 +40,13 @@ if not (basedir[-1:] == "/"):
 # config file test
 #sys.exit(configfile+ params['STATSDB'])
 
-unaligned = (basedir+"Unaligned/Basecall_Stats*")
+unaligned = (basedir+"Unaligne*/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)
 
 # read in run parameters from Unaligned/support.txt
-support = open(basedir+"Unaligned/support.txt")
+supfilesearch = (basedir+"Unaligne*/support.txt")
+supfile = glob.glob(supfilesearch)
+support = open(supfile)
 support_lines = support.readlines()
 support.close()
 
