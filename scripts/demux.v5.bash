@@ -30,7 +30,7 @@ mkdir -p ${UNALIGNEDBASE}${RUN}
 date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
-if [ -f hejhopp.sko ]; then ######### to block out code in-between
+## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
   runfc=$(echo ${BASE} | awk 'BEGIN {FS="_"} {print substr($4,2,9)}')
@@ -50,7 +50,7 @@ fi
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 
-fi ##################### end if hejhop
+## ## ## ## ## ## ## fi ##################### end if hejhop
 
 if [ $BASEMASKBYPASS ]; then
   if [ $BASEMASKBYPASS == '--d8' ]; then
@@ -120,7 +120,7 @@ fi
 #echo USE ${USEBASEMASK}
 #exit 22
 
-if [ -f hejhopp.sko ]; then ######### to block out code in-between
+## ## ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 
 
 /usr/local/bin/configureBclToFastq.pl --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}Data/Intensities/BaseCalls --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${logfile}
@@ -132,7 +132,7 @@ echo [${NOW}] [${RUN}] --input-dir ${BASE}Data/Intensities/BaseCalls >> ${PROJEC
 echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${PROJECTLOG}
 nohup make -j 8 > nohup.${NOW}.out 2>&1
 
-fi ##################### end if hejhop
+## ## ## ## ## ## ## ## ## ## fi ##################### end if hejhop
 
 
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -160,7 +160,7 @@ NOW=$(date +"%Y%m%d%H%M%S")
 
 echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
 
-if [ -f hejhopp.sko ]; then ######### to block out code in-between
+## ## ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 
 rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/
 rc=$?
@@ -181,7 +181,7 @@ else
   scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
 fi
 
-fi ##################### end if hejhop
+## ## ## ## ## ## ## ## ## ## fi ##################### end if hejhop
 
 
 # the file copycomplete.txt shows that the copy is done
