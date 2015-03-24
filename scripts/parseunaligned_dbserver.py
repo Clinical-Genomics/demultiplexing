@@ -46,7 +46,7 @@ unaligned_stat_dir = glob.glob(unaligned)
 # read in run parameters from Unaligned/support.txt
 supfilesearch = (basedir+"Unaligne*/support.txt")
 supfile = glob.glob(supfilesearch)
-support = open(supfile)
+support = open(supfile[0])
 support_lines = support.readlines()
 support.close()
 
