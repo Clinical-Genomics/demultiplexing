@@ -1,0 +1,130 @@
+#!/bin/bash
+#SBATCH -t 1-24:00:00
+#SBATCH -c 16
+#SBATCH -A prod001
+#SBATCH -J Xdem
+#SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-%j.out
+#SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-%j.err
+#SBATCH --mail-type=END
+#SBATCH --mail-user=kenny.billiau@scilifelab.se
+
+##########
+# PARAMS #
+##########
+
+INDIR=$1 # Run dir
+OUTDIR=$2
+LANE=$3 # 1-8
+TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
+
+########
+# INIT #
+########
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] starting, will use ${TMPDIR}"
+echo "[${NOW}] INDIR: ${INDIR}"
+echo "[${NOW}] OUTDIR: ${OUTDIR}"
+echo "[${NOW}] LANE: ${LANE}"
+echo "[${NOW}] TILES: ${TILES[@]}"
+
+# set us up
+TMPOUT_DIR=${TMPDIR}/Xout
+mkdir -p ${TMPOUT_DIR}
+
+#########
+# CP IN #
+#########
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] start copying"
+for TILE in ${TILES[@]}; do
+    cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/*/s_${LANE}_${TILE}* ${TMPDIR}/
+    cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/s_${LANE}_${TILE}* ${TMPDIR}/
+done
+cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
+cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
+cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
+cp --parent ${INDIR}/runParameters.xml ${TMPDIR}/
+
+RUNDIR=${TMPDIR}/${INDIR}
+
+#########
+# DEMUX #
+#########
+
+# determine the basemask
+indexread1count=$(grep IndexRead1 ${RUNDIR}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+indexread2count=$(grep IndexRead2 ${RUNDIR}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+
+#  start to assume standard singel index
+if [[ "${indexread2count}" == 8 ]]; then
+    #  this is not true if second index equals 8
+    USEBASEMASK=Y151,I8,I8,Y151
+    echo " ${indexread2count} == "8" ix2"
+else
+    echo " ${indexread2count} == 8 NOT ix2"
+    if [[ "${indexread1count}" == 8 ]]; then
+        echo "${indexread1count} == 8"
+        #  not if first index equals 8 either
+        USEBASEMASK=Y151,I8,Y151
+    else 
+        echo "${indexread1count} == 8 NOT ix1"
+        USEBASEMASK=Y151,I6n,Y151
+    fi
+fi
+
+NOW=$(date +"%Y%m%d%H%M%S")
+TILES_OPTS=''
+for TILE in ${TILES[@]}; do
+    TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
+done
+echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
+echo "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${USEBASEMASK}"
+      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${USEBASEMASK}
+
+##########
+# CP OUT #
+##########
+
+# first copy the lane-tile specific information
+TILE_DIR=l${LANE}t${TILES[0]}/ 
+OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] starting copy output"
+mkdir -p ${OUTDIR}
+mkdir -p ${OUTDIR_LT}
+cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
+cp ${INDIR}/SampleSheet.csv ${OUTDIR}/
+
+# second copy the actual fastq files
+for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
+    if [[ ${PROJECT_ID} == 'Reports' || ${PROJECT_ID} == 'Stats' ]]; then
+        continue
+    fi
+
+    # skip the zero sized fastq files
+    for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
+        for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
+            if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
+                continue
+            fi
+
+            mkdir -p ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}
+            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE}
+            sleep 60 # give the network some slack
+        done
+    done
+done
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] Done copying output"
+
+############
+# CLEAN UP #
+############
+
+rm -r ${TMPDIR}/Xout/
+rm -r ${TMPDIR}/*
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] Done removing temp files"
