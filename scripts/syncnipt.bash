@@ -1,32 +1,37 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
-# takes on argument: the rundir name
-
-run=$1
 
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
-
-NIPTSERV=rastapopoulos.scilifelab.se
-NIPTPATH=/mnt/hds2/proj/bioinfo/NIPT/
+NIPTOUTPATH=/srv/nipt_runs/
 
 NOW=$(date +"%Y%m%d%H%M%S")
-if [ -f ${RUNBASE}${run}/RTAComplete.txt ]; then
-  if [ -e ${NIPTBASE}${run} ]; then
-    echo [${NOW}] ${run} is finished and syncing has already started 
-  else
-    echo [${NOW}] ${run} is finished, starting syncing
-    rsync -r -t --exclude RTAComplete.txt -e ssh ${RUNBASE}${run} ${NIPTSERV}:${NIPTPATH} && \
-    scp ${RUNBASE}/$run ${NIPTSERV}:${NIPTPATH}/${run} && \
-    ln -s ${RUNBASE}/${run} ${NIPTBASE}
+RUNS=$(ls ${RUNBASE})
 
-    NOW=$(date +"%Y%m%d%H%M%S")
-    if [[ $? == 0 ]]; then
-    	echo [${NOW}] ${run} has finished syncing
+for RUN in ${RUNS[@]}; do
+  # simple NIPT detection
+  grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
+  if [[ $? -eq 0 ]]; then
+    if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
+      echo [${NOW}] ${RUN} is finished, starting mv
+      mv ${RUNBASE}/${RUN} ${NIPTBASE}/
+      NOW=$(date +"%Y%m%d%H%M%S")
+      echo [${NOW}] ${RUN} move is finished, starting sync
+      rsync -r -t --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
+      cp ${NIPTBASE}/${RUN}/RTAComplete.txt ${NIPTOUTPATH}/${RUN}/
+  
+      if [[ $? == 0 ]]; then
+      	NOW=$(date +"%Y%m%d%H%M%S")
+      	echo [${NOW}] ${RUN} has finished syncing
+      else
+      	NOW=$(date +"%Y%m%d%H%M%S")
+      	echo [${NOW}] ${RUN} has FAILED syncing
+      fi
     else
-    	echo [${NOW}] ${run} has FAILED syncing
+      echo [${NOW}] ${RUN} is not finished yet
     fi
+  else
+    NOW=$(date +"%Y%m%d%H%M%S")
+    echo [$NOW] ${RUN} is not a NIPT run!
   fi
-else
-  echo [${NOW}] ${run} is not finished yet
-fi
+done
