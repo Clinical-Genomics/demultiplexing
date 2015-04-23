@@ -9,29 +9,34 @@ NOW=$(date +"%Y%m%d%H%M%S")
 RUNS=$(ls ${RUNBASE})
 
 for RUN in ${RUNS[@]}; do
-  # simple NIPT detection
-  grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
-  if [[ $? -eq 0 ]]; then
-    if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
-      echo [${NOW}] ${RUN} is finished, starting mv
-      mv ${RUNBASE}/${RUN} ${NIPTBASE}/
-      NOW=$(date +"%Y%m%d%H%M%S")
-      echo [${NOW}] ${RUN} move is finished, starting sync
-      rsync -r -t --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
-      cp ${NIPTBASE}/${RUN}/RTAComplete.txt ${NIPTOUTPATH}/${RUN}/
-  
-      if [[ $? == 0 ]]; then
-      	NOW=$(date +"%Y%m%d%H%M%S")
-      	echo [${NOW}] ${RUN} has finished syncing
+  if [[ ! -e ${NIPTBASE}${RUN} ]]; then
+    # simple NIPT detection
+    grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
+    if [[ $? -eq 0 ]]; then
+      if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
+        echo [${NOW}] ${RUN} is finished, linking
+        cp -al ${RUNBASE}${RUN} ${NIPTBASE}
+        NOW=$(date +"%Y%m%d%H%M%S")
+        echo [${NOW}] ${RUN} linking is finished, starting sync
+        rsync -r -t --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
+        cp ${NIPTBASE}/${RUN}/RTAComplete.txt ${NIPTOUTPATH}/${RUN}/
+    
+        if [[ $? == 0 ]]; then
+          NOW=$(date +"%Y%m%d%H%M%S")
+          echo [${NOW}] ${RUN} has finished syncing
+        else
+          NOW=$(date +"%Y%m%d%H%M%S")
+          echo [${NOW}] ${RUN} has FAILED syncing
+        fi
       else
-      	NOW=$(date +"%Y%m%d%H%M%S")
-      	echo [${NOW}] ${RUN} has FAILED syncing
+        echo [${NOW}] ${RUN} is not finished yet
       fi
     else
-      echo [${NOW}] ${RUN} is not finished yet
+      NOW=$(date +"%Y%m%d%H%M%S")
+      echo [$NOW] ${RUN} is not a NIPT run!
     fi
   else
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [$NOW] ${RUN} is not a NIPT run!
+    echo [$NOW] ${RUN} has already synced
   fi
 done
