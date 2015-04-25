@@ -30,7 +30,11 @@ echo "[${NOW}] TILES: ${TILES[@]}"
 
 # set us up
 TMPOUT_DIR=${TMPDIR}/Xout
+CP_COMPLETE_DIR=${INDIR}/copycomplete/
+CP_BACK_COMPLETE_DIR=${INDIR}/copybackcomplete/
 mkdir -p ${TMPOUT_DIR}
+mkdir -p ${CP_COMPLETE_DIR}
+mkdir -p ${CP_BACK_COMPLETE_DIR}
 
 #########
 # CP IN #
@@ -46,6 +50,8 @@ cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
 cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
 cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
 cp --parent ${INDIR}/runParameters.xml ${TMPDIR}/
+
+touch ${CP_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 
 RUNDIR=${TMPDIR}/${INDIR}
 
@@ -103,6 +109,12 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
         continue
     fi
 
+    # wait until other jobs finished copying ... yes yes, race condition
+    while [[ $( ls -A ${CP_BACK_COMPLETE_DIR}) ]]; do
+        sleep 10
+    done
+    touch ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
+
     # skip the zero sized fastq files
     for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
         for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
@@ -111,10 +123,13 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             fi
 
             mkdir -p ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}
+
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE}
-            sleep 60 # give the network some slack
         done
     done
+
+    # we're done copying, release the lock
+    rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 done
 
 NOW=$(date +"%Y%m%d%H%M%S")
