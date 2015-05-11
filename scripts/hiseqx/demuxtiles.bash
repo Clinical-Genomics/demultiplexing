@@ -12,6 +12,12 @@ RUNDIR=$1
 ########
 
 NOW=$(date +"%Y%m%d%H%M%S")
+
+if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
+    echo >&2 "[$NOW] ${RUNDIR}/SampleSheet.csv not found! Aborting ..."
+    exit 1
+fi
+
 echo "[${NOW}] starting overall process"
 lanes=(1 2 3 4 5 6 7 8)
 tiles=('11 12' '21 22')
