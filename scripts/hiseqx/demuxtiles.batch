@@ -122,10 +122,11 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
                 continue
             fi
+            
+            SAMPLE_OUTDIR=${OUTDIR}/${TILE_DIR}/Project_${PROJECT_ID}/Sample_${SAMPLE_ID}
+            mkdir -p ${SAMPLE_OUTDIR}
 
-            mkdir -p ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}
-
-            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${OUTDIR}/${TILE_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE}
+            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
         done
     done
 
