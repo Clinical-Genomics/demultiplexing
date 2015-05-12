@@ -6,6 +6,7 @@
 ##########
 
 RUNDIR=$1
+OUTDIR=/mnt/hds2/proj/bioinfo/DEMUX/
 
 ########
 # MAIN #
@@ -26,12 +27,12 @@ for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}"
-    sbatch demuxtiles.batch $RUNDIR /mnt/hds2/proj/bioinfo/DEMUX/$(basename $RUNDIR) ${lane} ${tile}
+    sbatch demuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile}
     # Wait until the copy is complete ...
     tile_qs=( ${tile} )
     echo "${RUNDIR}/copycomplete/l${lane}t${tile_qs[0]}"
     while [[ ! -e ${RUNDIR}/copycomplete/l${lane}t${tile_qs[0]} ]]; do
-        sleep 10 
+        sleep 10
     done
   done
 done
