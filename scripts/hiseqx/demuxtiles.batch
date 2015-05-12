@@ -13,7 +13,7 @@
 ##########
 
 INDIR=$1 # Run dir
-OUTDIR=$2
+OUTDIR=$2 # Demux dir
 LANE=$3 # 1-8
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 
@@ -51,6 +51,7 @@ cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
 cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
 cp --parent ${INDIR}/runParameters.xml ${TMPDIR}/
 
+# we finished copying, let the pipeline know
 touch ${CP_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 
 RUNDIR=${TMPDIR}/${INDIR}
