@@ -8,7 +8,7 @@ import re
 import os
 from access import db, lims
 
-__version__ = '3.0.1'
+__version__ = '3.1.0'
 
 def getsamplesfromflowcell(demuxdir, flwc):
   samples = glob.glob("{demuxdir}*{flowcell}*/l?t??/Project_*/Sample_*".\
