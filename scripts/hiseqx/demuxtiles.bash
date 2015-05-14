@@ -6,7 +6,7 @@
 ##########
 
 RUNDIR=$1
-OUTDIR=/mnt/hds2/proj/bioinfo/DEMUX/
+OUTDIR=/mnt/hds2/proj/bioinfo/TESTDEMUX/
 
 ########
 # MAIN #
@@ -15,8 +15,18 @@ OUTDIR=/mnt/hds2/proj/bioinfo/DEMUX/
 NOW=$(date +"%Y%m%d%H%M%S")
 
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    echo >&2 "[$NOW] ${RUNDIR}/SampleSheet.csv not found! Aborting ..."
-    exit 1
+    FC=$(echo ${run} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+    wget http://tools.scilifelab.se/samplesheet/${FC}.csv
+
+    # Downloaded samplesheet has following headers:
+    #FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+
+    # Needs to be changed to this:
+    #[Data]
+    #FCID,Lane,SampleID,SampleRef,Index,SampleName,Control,Recipe,Operator,Project
+
+    echo '[Data]' > ${RUNDIR}/SampleSheet.csv
+    sed  -e 's/Description/SampleName/' -e 's/Project$/SampleProject/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
 fi
 
 echo "[${NOW}] starting overall process"
