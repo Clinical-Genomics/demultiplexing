@@ -15,8 +15,9 @@ OUTDIR=/mnt/hds2/proj/bioinfo/TESTDEMUX/
 NOW=$(date +"%Y%m%d%H%M%S")
 
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    FC=$(echo ${run} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-    wget http://tools.scilifelab.se/samplesheet/${FC}.csv
+    FC=$(echo ${RUNDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+    echo [$NOW] wget http://tools.scilifelab.se/samplesheet/${FC}.csv
+    wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/${FC}.csv
 
     # Downloaded samplesheet has following headers:
     #FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
@@ -26,8 +27,9 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     #FCID,Lane,SampleID,SampleRef,Index,SampleName,Control,Recipe,Operator,Project
 
     echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-    sed  -e 's/Description/SampleName/' -e 's/Project$/SampleProject/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
+    sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
 fi
+exit
 
 echo "[${NOW}] starting overall process"
 lanes=(1 2 3 4 5 6 7 8)
