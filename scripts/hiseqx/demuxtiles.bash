@@ -5,8 +5,8 @@
 # PARAMS #
 ##########
 
-RUNDIR=$1
-OUTDIR=/mnt/hds2/proj/bioinfo/TESTDEMUX/
+RUNDIR=$1 # full path to run dir
+OUTDIR=/mnt/hds/proj/bioinfo/DEMUX/
 
 ########
 # MAIN #
