@@ -16,18 +16,67 @@ BASEMASKBYPASS=$2
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 NOW=$(date +"%Y%m%d%H%M%S")
 
-# add to the DB
+if [ $BASEMASKBYPASS ]; then
+  if [ $BASEMASKBYPASS == '--d8' ]; then
+    UNALDIR=Unaligned1
+  elif [ $BASEMASKBYPASS == '--s8' ]; then
+    UNALDIR=Unaligned2
+  elif [ $BASEMASKBYPASS == '--s6s8' ]; then
+    UNALDIR=Unaligned3
+  elif [ $BASEMASKBYPASS == '--s6' ]; then
+    UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--s6d8' ]; then
+    UNALDIR=Unaligned4
+  elif [ $BASEMASKBYPASS == '--s8d8' ]; then
+    UNALDIR=Unaligned5
+  elif [ $BASEMASKBYPASS == '--s8n' ]; then
+    UNALDIR=Unaligned6
+  else
+    >&2 echo "'$BASEMASKBYPASS' not recognized!"
+    >&2 echo "Available options are:"
+    >&2 echo "--s6 single 6 index"
+    >&2 echo "--s6s8 single 6 advertised as single 8 index"
+    >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
+    >&2 echo "--s8 single 8 index"
+    >&2 echo "--d8 dual 8 index"
+    >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
+    >&2 echo "--s8n single 8 index advertised as single 9 index"
+  fi
+else
+  
+  ######   uses windows end-of-line/return setting [=FUCKING stupid!]
+  ######
+  indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+  indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+
+  #  start to assume standard singel index
+  if [ "${indexread2count}" == 8 ]; then
+    UNALDIR=Unaligned1
+  else
+    if [ "${indexread1count}" == 8 ]; then
+      UNALDIR=Unaligned2
+    else 
+      UNALDIR=Unaligned
+    fi
+  fi
+fi
+
+NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . .  >> ${PROJECTLOG}
-bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv
+bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
+# # # # the new python script for parsing using demux table
+/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.alt_test_db >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 
 FC=$(echo ${BASE} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${UNALIGNEDBASE}${RUN}/Unaligned/ | grep Proj)
+PROJs=$(ls ${UNALIGNEDBASE}${RUN}/${UNALDIR}/ | grep Proj)
 for PROJ in ${PROJs[@]};do
   prj=$(echo ${PROJ} | sed 's/Project_//')
   bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt
+  # # # # the new python script for parsing using demux table
+  /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} ~/.alt_test_db >> ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
   echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py >> ${PROJECTLOG}
   echo "[${NOW}] [${RUN}] ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
