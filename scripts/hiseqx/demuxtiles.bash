@@ -8,6 +8,12 @@
 RUNDIR=$1 # full path to run dir
 OUTDIR=/mnt/hds/proj/bioinfo/DEMUX/
 
+#############
+# FUNCTIONS #
+#############
+
+function join { local IFS="$1"; shift; echo "$*"; }
+
 ########
 # MAIN #
 ########
@@ -34,12 +40,15 @@ exit
 echo "[${NOW}] starting overall process"
 lanes=(1 2 3 4 5 6 7 8)
 tiles=('11 12' '21 22')
+DEMUX_JOBIDS=()
 mkdir -p ${RUNDIR}/copycomplete/
 for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}"
-    sbatch demuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile}
+    RS=$(sbatch demuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile})
+    DEMUX_JOBIDS[$(( $i - 1 ))]=${RS##* }
+
     # Wait until the copy is complete ...
     tile_qs=( ${tile} )
     echo "${RUNDIR}/copycomplete/l${lane}t${tile_qs[0]}"
@@ -48,6 +57,17 @@ for lane in "${lanes[@]}"; do
     done
   done
 done
+
+# launch the stats generation and linking after demux finishes ok
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] submit postfase"
+JOINED_DEMUX_JOBIDS=$(join : ${ALIGN_JOBIDS[@]})
+sbatch --dependency=afterok:${JOINED_DEMUX_JOBIDS} postface.batch ${OUTDIR}/$(basename ${RUNDIR})
+
+###########
+# CLEANUP #
+###########
+
 rm ${RUNDIR}/copycomplete/*
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] everything started
