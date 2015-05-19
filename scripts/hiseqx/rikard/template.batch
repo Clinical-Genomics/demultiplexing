@@ -1,0 +1,39 @@
+#!/bin/bash
+#SBATCH -t 1-24:00:00
+#SBATCH -c 16
+#SBATCH -A prod001
+#SBATCH -J Xdem
+#SBATCH --output=/mnt/hds/proj/bioinfo/tmp/X/xdem-%j.out
+#SBATCH --error=/mnt/hds/proj/bioinfo/tmp/X/xdem-%j.err
+#SBATCH --mail-type=END
+#SBATCH --mail-user=rikard.erlandsson@scilifelab.se
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting, will use ${TMPDIR}
+
+if [ -d "${TMPDIR}/Xout/" ]; then
+  rm -r ${TMPDIR}/Xout/
+fi
+mkdir -p ${TMPDIR}/Xout/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+mkdir -p ${TMPDIR}/RUNDIR/Data/Intensities/BaseCalls/L00NUMBER/
+echo [${NOW}] starting copy
+cp -R /mnt/hds/proj/bioinfo/tmp/X/141204_ST-E00201_0013_AH0075CCXX/Data/Intensities/BaseCalls/L00NUMBER/* ${TMPDIR}/RUNDIR/Data/Intensities/BaseCalls/L00NUMBER/
+cp /mnt/hds/proj/bioinfo/tmp/X/141204_ST-E00201_0013_AH0075CCXX/Data/Intensities/s.locs ${TMPDIR}/RUNDIR/Data/Intensities/
+cp /mnt/hds/proj/bioinfo/tmp/X/141204_ST-E00201_0013_AH0075CCXX/RunInfo.xml ${TMPDIR}/RUNDIR/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting demultiplexing one lane
+bcl2fastq -d 2 -r 4 -w 4 -p 14 --tiles s_NUMBER -R ${TMPDIR}/RUNDIR/ -o ${TMPDIR}/Xout/
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting copy output
+mkdir -p /mnt/hds/proj/bioinfo/tmp/X/laneNUMBER/
+cp -R ${TMPDIR}/Xout/* /mnt/hds/proj/bioinfo/tmp/X/laneNUMBER/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] Done copying output
+
+rm -r ${TMPDIR}/Xout/
+rm -r ${TMPDIR}/RUNDIR/
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] Done removing temp files
