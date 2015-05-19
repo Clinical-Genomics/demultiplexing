@@ -22,10 +22,11 @@ NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] INDIR: ${RUNDIR}"
 
 # create the stats file
-/mnt/hds/proj/bioinfo/SCRIPTS/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
+# needs python 2.7+ !
+/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
 
 # link to OUTBOX
 /mnt/hds/proj/bioinfo/SCRIPTS/xgetfastq.bash ${DEMUXDIR}
 # link to MIP_ANALYSIS
 FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-/mnt/hds/proj/bioinfo/SCRIPTS/xcreatefastqlinks.py $FC
+/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatefastqlinks.py $FC
