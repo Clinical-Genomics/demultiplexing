@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH -t 1-24:00:00
+#SBATCH -c 16
+#SBATCH -A prod001
+#SBATCH -J Xdem
+#SBATCH --output=/mnt/hds/proj/bioinfo/tmp/X/xdem-%j.out
+#SBATCH --error=/mnt/hds/proj/bioinfo/tmp/X/xdem-%j.err
+#SBATCH --mail-type=END
+#SBATCH --mail-user=rikard.erlandsson@scilifelab.se
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting, will use ${TMPDIR}
+
+if [ -d "${TMPDIR}/Xout/" ]; then
+  rm -r ${TMPDIR}/Xout/
+fi
+mkdir -p ${TMPDIR}/Xout/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+
+echo [${NOW}] start copying
+cd /mnt/hds/proj/bioinfo/tmp/X/
+cp --parent 141204_ST-E00201_0013_AH0075CCXX/Data/Intensities/BaseCalls/L00NUMBER/*/s_NUMBER_QUART* ${TMPDIR}/
+cp --parent 141204_ST-E00201_0013_AH0075CCXX/Data/Intensities/BaseCalls/L00NUMBER/s_NUMBER_QUART* ${TMPDIR}/
+cp --parent 141204_ST-E00201_0013_AH0075CCXX/Data/Intensities/s.locs ${TMPDIR}/
+cp --parent 141204_ST-E00201_0013_AH0075CCXX/RunInfo.xml ${TMPDIR}/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting demultiplexing one lane
+bcl2fastq -d 2 -r 4 -w 4 -p 14 --tiles s_NUMBER_QUART -R ${TMPDIR}/141204_ST-E00201_0013_AH0075CCXX/ -o ${TMPDIR}/Xout/
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] starting copy output
+mkdir -p /mnt/hds/proj/bioinfo/tmp/X/lNUMBERtQUART/
+cp -R ${TMPDIR}/Xout/* /mnt/hds/proj/bioinfo/tmp/X/lNUMBERtQUART/
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] Done copying output
+
+rm -r ${TMPDIR}/Xout/
+rm -r ${TMPDIR}/141204_ST-E00201_0013_AH0075CCXX/
+NOW=$(date +"%Y%m%d%H%M%S")
+echo [${NOW}] Done removing temp files
