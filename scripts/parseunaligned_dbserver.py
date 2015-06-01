@@ -15,7 +15,7 @@ import socket
 import os
 import select
 
-__version__ = '3.5.0'
+__version__ = '3.5.1'
 
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
