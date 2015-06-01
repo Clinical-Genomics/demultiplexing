@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH -t 00:05:00
+#SBATCH -c 1
+#SBATCH -A prod001
+#SBATCH -J Xdem
+#SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
+#SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
+#SBATCH --mail-type=END
+#SBATCH --mail-user=kenny.billiau@scilifelab.se
+
+##########
+# PARAMS #
+##########
+
+DEMUXDIR=$1 # absolute path to the DEMUX/rundir
+
+########
+# INIT #
+########
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] INDIR: ${RUNDIR}"
+
+# create the stats file
+# needs python 2.7+ !
+/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
+
+# link to OUTBOX
+/mnt/hds/proj/bioinfo/SCRIPTS/xgetfastq.bash ${DEMUXDIR}
+# link to MIP_ANALYSIS
+FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatefastqlinks.py $FC
