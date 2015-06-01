@@ -15,6 +15,8 @@ import socket
 import os
 import select
 
+__version__ = '3.5.0'
+
 if (len(sys.argv)>1):
   basedir = sys.argv[1]
 else:
@@ -102,7 +104,7 @@ print runname, rundate, machine
 
 #sys.exit(0)
 
-print (basedir+"Unaligned/support.txt")
+print (supfile[0])
 print (sys.argv[2])
 
 #print support_lines[5], len(support_lines)
