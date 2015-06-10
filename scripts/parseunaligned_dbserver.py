@@ -18,10 +18,11 @@ import select
 __version__ = '3.6.2'
 print('version {} {}'.format(__file__, __version__))
 
-if (len(sys.argv)>1):
+if (len(sys.argv)>2):
   basedir = sys.argv[1]
+  unaligneddir = sys.argv[2]
 else:
-  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
+  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <UNALIGNEDsubdir> <absolutepathtosamplesheetcsv> <config_file:optional>")
   sys.exit(message)
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
@@ -43,12 +44,11 @@ if not (basedir[-1:] == "/"):
 # config file test
 #sys.exit(configfile+ params['STATSDB'])
 
-unaligned = (basedir+"Unaligne*/Basecall_Stats*")
-unaligned_stat_dir = glob.glob(unaligned)
+unaligned = (basedir + unaligneddir + "/Basecall_Stats*")
+unaligned_stat_dir = glob.glob(unaligned)[0]
 
 # read in run parameters from Unaligned/support.txt
-supfilesearch = (basedir+"Unaligne*/support.txt")
-supfile = glob.glob(supfilesearch)
+supfilesearch = (basedir + unaligneddir + "/support.txt")
 support = open(supfile[0])
 support_lines = support.readlines()
 support.close()
@@ -84,7 +84,7 @@ else:
 #  print "\nWill continue after 10 sec delay!"
 
 #Determine the name of the basecall stats file
-demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
+demultistats = (unaligned_stat_dir+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
 
 h1fc = soup.find("h1")
