@@ -7,8 +7,8 @@ for run in ${runs[@]}; do
   if [ -f ${RAWBASE}${run}/RTAComplete.txt ]; then
     if [ ! -f ${RAWBASE}${run}/demuxstarted.txt ]; then
         echo [${NOW}] ${run} starting demultiplexing  
-        /mnt/hds/proj/bioinfo/SCRIPTS/demuxtiles.bash ${RAWBASE}${run} &
         date +'%Y%m%d%H%M%S' > ${RAWBASE}${run}/demuxstarted.txt
+        /mnt/hds/proj/bioinfo/SCRIPTS/xdemuxtiles.bash ${RAWBASE}${run} &
     else 
       echo [${NOW}] ${run} is finished and demultiplexing has already started - started.txt exists
     fi
