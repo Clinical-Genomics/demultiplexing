@@ -26,9 +26,9 @@ else:
   sys.exit(message)
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
-if (len(sys.argv)>3):
-  if os.path.isfile(sys.argv[3]):
-    configfile = sys.argv[3]
+if (len(sys.argv)>4):
+  if os.path.isfile(sys.argv[4]):
+    configfile = sys.argv[4]
     
 params = {}
 with open(configfile, "r") as confs:
@@ -48,8 +48,7 @@ unaligned = (basedir + unaligneddir + "/Basecall_Stats*")
 unaligned_stat_dir = glob.glob(unaligned)[0]
 
 # read in run parameters from Unaligned/support.txt
-supfilesearch = (basedir + unaligneddir + "/support.txt")
-support = open(supfile[0])
+support = open(basedir + unaligneddir + "/support.txt")
 support_lines = support.readlines()
 support.close()
 
@@ -105,15 +104,15 @@ print runname, rundate, machine
 
 #sys.exit(0)
 
-print (supfile[0])
-print (sys.argv[2])
+print (support)
+print (sys.argv[3])
 
 #print support_lines[5], len(support_lines)
 system = ""
 command = ""
 idstring = ""
 program = ""
-samplesheet = (sys.argv[2])
+samplesheet = (sys.argv[3])
 #print samplesheet
 for line in range(1, len(support_lines)):
   if re.match("^\$\_System", support_lines[line]):
