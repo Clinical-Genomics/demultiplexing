@@ -54,7 +54,7 @@ for lane in "${lanes[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}"
     RS=$(sbatch ${SCRIPT_DIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile})
-    DEMUX_JOBIDS[$(($i++))]=${RS##* }
+    DEMUX_JOBIDS[$((i++))]=${RS##* }
 
     # Wait until the copy is complete ...
     tile_qs=( ${tile} )
