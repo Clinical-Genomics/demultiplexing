@@ -7,7 +7,7 @@ import xml.etree.ElementTree as et
 import sys
 import glob
 
-__version__ = '3.6.2'
+__version__ = '3.7.0'
 
 def xpathsum(tree, xpath):
     """TODO: Docstring for xpathsum.
