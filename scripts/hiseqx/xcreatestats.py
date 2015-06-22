@@ -10,25 +10,30 @@ import glob
 __version__ = '3.7.0'
 
 def xpathsum(tree, xpath):
-    """TODO: Docstring for xpathsum.
+    """Sums all numbers found at these xpath nodes
 
     Args:
-        et (TODO): TODO
-        xpath (TODO): TODO
+        tree (an elementTree): parsed XML as an elementTree
+        xpath (str): an xpath the XML nodes
 
-    Returns: TODO
+    Returns (int): the sum of all nodes
 
     """
     numbers = tree.findall(xpath)
     return sum([ int(number.text) for number in numbers ])
 
 def get_summary(tree):
-    """TODO: Docstring for get_summary.
+    """Calculates following statistics from the provided elementTree:
+    * pf clusters
+    * pf yield
+    * pf Q30
+    * raw Q30
+    * pf Q Score
 
     Args:
-        tree (TODO): TODO
+        tree (an elementTree): parsed XML as an elementTree
 
-    Returns: TODO
+    Returns (dict): with following keys: pf_clusters, pf_yield, pf_q30, raw_q30, pf_qscore_sum, pf_qscore
 
     """
     #raw_clusters = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Raw/ClusterCount")
@@ -92,10 +97,10 @@ def get_lanes(sample_sheet):
     return [ line['Lane'] for line in sample_sheet ] # remove headers
 
 def main(argv):
-    """TODO: Docstring for main.
+    """Takes a DEMUX dir and calculates statistics for the run.
 
     Args:
-        argv[0] (str): the RUNDIR
+        argv[0] (str): the DEMUX dir
 
     """
 
