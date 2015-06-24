@@ -20,13 +20,20 @@ DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] INDIR: ${RUNDIR}"
+SCRIPT_DIR=$(dirname $(readlink -nm $0))
 
 # create the stats file
 # needs python 2.7+ !
-/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
+echo "[$NOW] /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
+/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
 
 # link to OUTBOX
-/mnt/hds/proj/bioinfo/SCRIPTS/xgetfastq.bash ${DEMUXDIR}
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[$NOW] ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}"
+bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}
 # link to MIP_ANALYSIS
+
 FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-/home/hiseq.clinical/miniconda/envs/prod/bin/python /mnt/hds/proj/bioinfo/SCRIPTS/xcreatefastqlinks.py $FC
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[$NOW] /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC"
+/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC

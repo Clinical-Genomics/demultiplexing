@@ -15,19 +15,20 @@ import socket
 import os
 import select
 
-__version__ = '3.6.2'
+__version__ = '3.8.0'
 print('version {} {}'.format(__file__, __version__))
 
-if (len(sys.argv)>1):
+if (len(sys.argv)>2):
   basedir = sys.argv[1]
+  unaligneddir = sys.argv[2]
 else:
-  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <absolutepathtosamplesheetcsv> <config_file:optional>")
+  message = ("usage: "+sys.argv[0]+" <BASEDIRECTORYforUNALIGNED> <UNALIGNEDsubdir> <absolutepathtosamplesheetcsv> <config_file:optional>")
   sys.exit(message)
 
 configfile = "/home/hiseq.clinical/.scilifelabrc"
-if (len(sys.argv)>3):
-  if os.path.isfile(sys.argv[3]):
-    configfile = sys.argv[3]
+if (len(sys.argv)>4):
+  if os.path.isfile(sys.argv[4]):
+    configfile = sys.argv[4]
     
 params = {}
 with open(configfile, "r") as confs:
@@ -43,13 +44,11 @@ if not (basedir[-1:] == "/"):
 # config file test
 #sys.exit(configfile+ params['STATSDB'])
 
-unaligned = (basedir+"Unaligne*/Basecall_Stats*")
-unaligned_stat_dir = glob.glob(unaligned)
+unaligned = (basedir + unaligneddir + "/Basecall_Stats*")
+unaligned_stat_dir = glob.glob(unaligned)[0]
 
 # read in run parameters from Unaligned/support.txt
-supfilesearch = (basedir+"Unaligne*/support.txt")
-supfile = glob.glob(supfilesearch)
-support = open(supfile[0])
+support = open(basedir + unaligneddir + "/support.txt")
 support_lines = support.readlines()
 support.close()
 
@@ -84,7 +83,7 @@ else:
 #  print "\nWill continue after 10 sec delay!"
 
 #Determine the name of the basecall stats file
-demultistats = (unaligned_stat_dir[0]+"/Demultiplex_Stats.htm")
+demultistats = (unaligned_stat_dir+"/Demultiplex_Stats.htm")
 soup = BeautifulSoup(open(demultistats))
 
 h1fc = soup.find("h1")
@@ -105,15 +104,15 @@ print runname, rundate, machine
 
 #sys.exit(0)
 
-print (supfile[0])
-print (sys.argv[2])
+print (support)
+print (sys.argv[3])
 
 #print support_lines[5], len(support_lines)
 system = ""
 command = ""
 idstring = ""
 program = ""
-samplesheet = (sys.argv[2])
+samplesheet = (sys.argv[3])
 #print samplesheet
 for line in range(1, len(support_lines)):
   if re.match("^\$\_System", support_lines[line]):
