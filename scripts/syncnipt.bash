@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
+VERSION=3.9.0
+
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/

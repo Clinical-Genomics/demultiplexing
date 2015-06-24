@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to send run results
 
+VERSION=3.9.0
+
 ##########
 # PARAMS #
 ##########
