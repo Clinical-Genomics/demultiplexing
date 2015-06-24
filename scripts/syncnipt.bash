@@ -18,7 +18,7 @@ for RUN in ${RUNS[@]}; do
         cp -al ${RUNBASE}${RUN} ${NIPTBASE}
         NOW=$(date +"%Y%m%d%H%M%S")
         echo [${NOW}] ${RUN} linking is finished, starting sync
-        rsync -r -t --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
+        rsync -r --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
         cp ${NIPTBASE}/${RUN}/RTAComplete.txt ${NIPTOUTPATH}/${RUN}/
     
         if [[ $? == 0 ]]; then
