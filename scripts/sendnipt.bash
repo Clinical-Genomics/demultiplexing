@@ -7,7 +7,7 @@
 
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
-MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se
+MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,nipt@karolinska.se
 
 #######
 # RUN #
@@ -43,7 +43,8 @@ for RUN in $(ls ${NIPTRUNS}); do
         cd ${OUTDIR}
         tar -czf results_${RUN}.tgz *
         cd -
-        mail -s "Results NIPT ${RUN}" -a ${OUTDIR}/results_${RUN}.tgz ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+	SUBJECT=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Experiment Name' - | cut -d, -f2)
+        mail -s "Results ${SUBJECT}" -a ${OUTDIR}/results_${RUN}.tgz ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
         rm -Rf ${OUTDIR}
 
 	date +'%Y%m%d%H%M%S' > ${NIPTRUNS}/${RUN}/delivery.txt
