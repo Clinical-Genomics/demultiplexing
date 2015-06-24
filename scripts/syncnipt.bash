@@ -2,15 +2,23 @@
 # script to rsync a run to the NIPT server
 
 VERSION=3.9.0
+echo "Version $VERSION"
+
+##########
+# PARAMS #
+##########
 
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/
-
-NOW=$(date +"%Y%m%d%H%M%S")
 RUNS=$(ls ${RUNBASE})
 
+#######
+# RUN #
+#######
+
 for RUN in ${RUNS[@]}; do
+  NOW=$(date +"%Y%m%d%H%M%S")
   if [[ ! -e ${NIPTBASE}${RUN} ]]; then
     # simple NIPT detection
     grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv

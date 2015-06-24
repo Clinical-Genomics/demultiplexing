@@ -2,6 +2,7 @@
 # script to send run results
 
 VERSION=3.9.0
+echo "Version $VERSION"
 
 ##########
 # PARAMS #
