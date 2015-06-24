@@ -2,23 +2,9 @@
 #   usage: demux.bash <absolute-path-to-run-dir>
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
-#
-#   v5 [20150203]    added 88n basemask
-#      [20150202]    added basemask selecting param
-#      [20150121]    added six2eight param
-#      [20140911]    adding project log
-#      [20140729]    changed clinstatsdb to the instance on hippocampus
-#      [20140311]    added dual index handler for 8 + 8 bases
-#      [20140310]    to handle _either_ I6n or I8, v3ic   for  index choice
-#      [20140310]    made v3 for 8 cycle index
-#      [20140205]    removed cerebellum stuff added --fastq-cluster-count 0 again
-#      [20140204]    added file copy to cerebellum when demux done, removed entry below
-#      [20140203]    added --fastq-cluster-count 0, to specify single fastq file
-#   v2 [20140108]    took away parts that should be run on the cluster
-#                    now demultiplexing is run, stats added to db and 
-#                    demux-files copied to the cluster . . .
-#       
-#
+
+VERSION=3.6.2 
+
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
 UNALIGNEDBASE=/home/clinical/DEMUX/
@@ -29,7 +15,7 @@ BASEMASKBYPASS=$2
 mkdir -p ${UNALIGNEDBASE}${RUN}
 date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
-echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
+echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
