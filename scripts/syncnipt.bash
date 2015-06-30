@@ -4,9 +4,6 @@
 VERSION=3.11.0
 echo "Version $VERSION"
 
-# exit on errr
-set -e
-
 ##########
 # PARAMS #
 ##########
