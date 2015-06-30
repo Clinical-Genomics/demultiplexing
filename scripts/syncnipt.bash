@@ -4,6 +4,9 @@
 VERSION=3.10.3
 echo "Version $VERSION"
 
+# exit on errr
+set -e
+
 ##########
 # PARAMS #
 ##########
@@ -23,13 +26,27 @@ for RUN in ${RUNS[@]}; do
     # simple NIPT detection
     grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
     if [[ $? -eq 0 ]]; then
+      cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
+
       # transform SampleSheet from Mac to Unix
-      sed -i.mac 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+      grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv
+      if [[ $? -eq 0 ]]; then
+          sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+      fi
+
       # validate
       /home/clinical/SCRIPTS/validatenipt.py ${RUNBASE}${RUN}/SampleSheet.csv
       if [[ $? -ne 0 ]]; then
+          NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
+          continue
       fi
+
+      # make SampleSheet NIPT ready
+      /home/clinical/SCRIPTS/massagenipt.py ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
+      mv ${RUNBASE}${RUN}/SampleSheet.mas ${RUNBASE}${RUN}/SampleSheet.csv
+
+      # sync run to NIPT-TT server
       if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
         echo [${NOW}] ${RUN} is finished, linking
         cp -al ${RUNBASE}${RUN} ${NIPTBASE}
