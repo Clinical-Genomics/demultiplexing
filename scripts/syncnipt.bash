@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
-VERSION=3.10.2
+VERSION=3.10.3
 echo "Version $VERSION"
 
 ##########
@@ -23,6 +23,13 @@ for RUN in ${RUNS[@]}; do
     # simple NIPT detection
     grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
     if [[ $? -eq 0 ]]; then
+      # transform SampleSheet from Mac to Unix
+      sed -i.mac 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+      # validate
+      /home/clinical/SCRIPTS/validatenipt.py ${RUNBASE}${RUN}/SampleSheet.csv
+      if [[ $? -ne 0 ]]; then
+          echo [${NOW}] ${RUN} has badly formatted SampleSheet!
+      fi
       if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
         echo [${NOW}] ${RUN} is finished, linking
         cp -al ${RUNBASE}${RUN} ${NIPTBASE}
