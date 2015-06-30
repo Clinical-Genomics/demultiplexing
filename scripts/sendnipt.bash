@@ -43,10 +43,11 @@ for RUN in $(ls ${NIPTRUNS}); do
         cp ${NIPTOUT}/${RUN}_*/*_NIPT_RESULTS.csv ${OUTDIR}
         cp ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt ${OUTDIR}
         
-        cd ${OUTDIR}
-        tar -czf results_${RUN}.tgz *
-        cd -
 	SUBJECT=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Investigator Name' - | cut -d, -f2)
+
+        cd ${OUTDIR}
+        tar -czf results_${SUBJECT}.tgz *
+        cd -
         mail -s "Results ${SUBJECT}" -a ${OUTDIR}/results_${RUN}.tgz ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
         rm -Rf ${OUTDIR}
 
