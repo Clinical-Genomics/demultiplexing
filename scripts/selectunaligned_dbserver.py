@@ -61,10 +61,9 @@ GROUP_CONCAT(unaligned.readcounts ORDER BY unaligned.lane), SUM(unaligned.readco
 GROUP_CONCAT(unaligned.yield_mb ORDER BY unaligned.lane), SUM(unaligned.yield_mb), 
 GROUP_CONCAT(TRUNCATE(q30_bases_pct,2) ORDER BY unaligned.lane), GROUP_CONCAT(TRUNCATE(mean_quality_score,2) 
 ORDER BY unaligned.lane)
-FROM sample, flowcell, unaligned, project, demux
+FROM sample, flowcell, unaligned, project
 WHERE sample.sample_id     = unaligned.sample_id
-AND   flowcell.flowcell_id = demux.flowcell_id
-AND   unaligned.demux_id = demux.demux_id
+AND   flowcell.flowcell_id = unaligned.flowcell_id
 AND   sample.project_id    = project.project_id
 AND   project.projectname   =  %s
 AND   flowcell.flowcellname = %s
