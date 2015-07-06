@@ -70,8 +70,11 @@ NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] submit postface"
 RUNNING_JOBIDS=( $(squeue -h --format=%i) ) # get all running/queued jobs
 REMAINING_JOBIDS=( $(comm -12 <(${RUNNING_JOBIDS[@]}) <(${DEMUX_JOBIDS[@]})) ) # get all jobs that are still relevant
-JOINED_DEMUX_JOBIDS=$(join : ${REMAINING_JOBIDS[@]})
-sbatch --dependency=afterok:${JOINED_DEMUX_JOBIDS} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})
+DEPENDENCY=""
+if [[ ${#REMAINING_JOBIDS[@]} > 0 ]]; then
+    DEPENDENCY="afterok:$(join : ${REMAINING_JOBIDS[@]})"
+fi
+sbatch ${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})
 
 ###########
 # CLEANUP #
