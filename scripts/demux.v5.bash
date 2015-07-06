@@ -2,23 +2,9 @@
 #   usage: demux.bash <absolute-path-to-run-dir>
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
-#
-#   v5 [20150203]    added 88n basemask
-#      [20150202]    added basemask selecting param
-#      [20150121]    added six2eight param
-#      [20140911]    adding project log
-#      [20140729]    changed clinstatsdb to the instance on hippocampus
-#      [20140311]    added dual index handler for 8 + 8 bases
-#      [20140310]    to handle _either_ I6n or I8, v3ic   for  index choice
-#      [20140310]    made v3 for 8 cycle index
-#      [20140205]    removed cerebellum stuff added --fastq-cluster-count 0 again
-#      [20140204]    added file copy to cerebellum when demux done, removed entry below
-#      [20140203]    added --fastq-cluster-count 0, to specify single fastq file
-#   v2 [20140108]    took away parts that should be run on the cluster
-#                    now demultiplexing is run, stats added to db and 
-#                    demux-files copied to the cluster . . .
-#       
-#
+
+VERSION=3.12.0
+
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
 UNALIGNEDBASE=/home/clinical/DEMUX/
@@ -29,7 +15,7 @@ BASEMASKBYPASS=$2
 mkdir -p ${UNALIGNEDBASE}${RUN}
 date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
-echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 >> ${PROJECTLOG}
+echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
@@ -74,6 +60,9 @@ if [ $BASEMASKBYPASS ]; then
   elif [ $BASEMASKBYPASS == '--s8n' ]; then
     USEBASEMASK=Y101,I8n,Y101
     UNALDIR=Unaligned6
+  elif [ $BASEMASKBYPASS == '--ho' ]; then
+    USEBASEMASK=Y126,I8,Y126
+    UNALDIR=Unaligned
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -84,6 +73,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--d8 dual 8 index"
     >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
     >&2 echo "--s8n single 8 index advertised as single 9 index"
+    >&2 echo "--ho High Output run"
   fi
 else
   
@@ -127,12 +117,12 @@ fi
 ## ## ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
 
 
-#/usr/local/bin/configureBclToFastq.pl --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}Data/Intensities/BaseCalls --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${logfile}
-/usr/local/bin/configureBclToFastq.pl --mismatches 1 --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}Data/Intensities/BaseCalls --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${logfile}
+/usr/local/bin/configureBclToFastq.pl --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv --mismatches 1 --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}Data/Intensities/BaseCalls --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${logfile}
 cd ${UNALIGNEDBASE}${RUN}/${UNALDIR}
 echo [${NOW}] [${RUN}] Starting  . . .  /usr/local/bin/configureBclToFastq.pl >> ${PROJECTLOG}
-echo [${NOW}] [${RUN}] --mismatches 1 >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --sample-sheet ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
+echo [${NOW}] [${RUN}] --mismatches 1 >> ${PROJECTLOG}
+echo [${NOW}] [${RUN}] --ignore-missing-bcl --ignore-missing-stats >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] --input-dir ${BASE}Data/Intensities/BaseCalls >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${PROJECTLOG}
@@ -144,9 +134,9 @@ nohup make -j 8 > nohup.${NOW}.out 2>&1
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . .  >> ${PROJECTLOG}
-bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/git/rikard/demultiplexing/scripts/parseunaligned_dbserver.py /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
+bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR} /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 # # # # the new python script for parsing using demux table
-/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/git/rikard/demultiplexing/scripts/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.alt_test_db >> ${PROJECTLOG}
+/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.alt_test_db >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/parseunaligned_dbserver.py >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 
@@ -156,7 +146,7 @@ for PROJ in ${PROJs[@]};do
   prj=$(echo ${PROJ} | sed 's/Project_//')
   bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt
   # # # # the new python script for parsing using demux table
-  /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/git/rikard/demultiplexing/scripts/selectdemux.py ${prj} ${FC} ~/.alt_test_db >> ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
+  /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} ~/.alt_test_db >> ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
   echo [${NOW}] [${RUN}] bash /home/clinical/SCRIPTS/rundbquery.bash /home/clinical/SCRIPTS/selectunaligned_dbserver.py >> ${PROJECTLOG}
   echo "[${NOW}] [${RUN}] ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
@@ -164,27 +154,31 @@ done
 NOW=$(date +"%Y%m%d%H%M%S")
 #    copy the demultiplexed files to rasta
 
-echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
-
-## ## ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
-
-rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/
-rc=$?
-NOW=$(date +"%Y%m%d%H%M%S")
-if [[ ${rc} != 0 ]] ; then
-  echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${logfile}
-  echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${PROJECTLOG}
-else 
-  date > ${UNALIGNEDBASE}${RUN}/copycomplete.txt
-  scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
-  echo [${NOW}] [${RUN}] scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
-  ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}"
-  echo [${NOW}] [${RUN}] ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}" >> ${PROJECTLOG}
-#  scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt cerebellum.scilifelab.se:/home/hiseq.clinical/Runs/${RUN}/demuxdone.txt
-  echo [${NOW}] [${RUN}] scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
-  echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${logfile}
-  echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${PROJECTLOG}
-  scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
+# skip NIPT runs
+grep -qs Description,NIPTv1 ${UNALIGNEDBASE}${RUN}/SampleSheet.csv
+if [[ $? -ne 0 ]]; then
+  echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
+  
+  ## ## ## ## ## ## ## ## ## ## if [ -f hejhopp.sko ]; then ######### to block out code in-between
+  
+  rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/
+  rc=$?
+  NOW=$(date +"%Y%m%d%H%M%S")
+  if [[ ${rc} != 0 ]] ; then
+    echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${logfile}
+    echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${PROJECTLOG}
+  else 
+    date > ${UNALIGNEDBASE}${RUN}/copycomplete.txt
+    scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
+    echo [${NOW}] [${RUN}] scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
+    ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}"
+    echo [${NOW}] [${RUN}] ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}" >> ${PROJECTLOG}
+  #  scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt cerebellum.scilifelab.se:/home/hiseq.clinical/Runs/${RUN}/demuxdone.txt
+    echo [${NOW}] [${RUN}] scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
+    echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${logfile}
+    echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${PROJECTLOG}
+    scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
+  fi
 fi
 
 ## ## ## ## ## ## ## ## ## ## fi ##################### end if hejhop
