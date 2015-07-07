@@ -7,10 +7,10 @@ for run in ${runs[@]}; do
   NOW=$(date +"%Y%m%d%H%M%S")
   if [ -f ${RAWBASE}${run}/RTAComplete.txt ]; then
     if [ ! -f ${RAWBASE}${run}/demuxstarted.txt ]; then
-        echo [${NOW}] ${run} starting demultiplexing  
+        echo [${NOW}] ${run} starting demultiplexing
         date +'%Y%m%d%H%M%S' > ${RAWBASE}${run}/demuxstarted.txt
         ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}${run}
-    else 
+    else
       echo [${NOW}] ${run} is finished and demultiplexing has already started
     fi
   else
