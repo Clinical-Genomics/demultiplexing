@@ -31,7 +31,7 @@ echo "[$NOW] /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/x
 # link to OUTBOX
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[$NOW] ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}"
-bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}
+bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}/
 # link to MIP_ANALYSIS
 
 FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
