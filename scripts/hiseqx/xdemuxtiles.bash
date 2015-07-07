@@ -53,7 +53,7 @@ for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}"
-    RS=$(sbatch ${SCRIPT_DIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile})
+    RS=$(sbatch -J "Xdem-${lane}-${tile}" ${SCRIPT_DIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
 
     # Wait until the copy is complete ...
@@ -69,17 +69,22 @@ done
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] submit postface"
 RUNNING_JOBIDS=( $(squeue -h --format=%i) ) # get all running/queued jobs
-REMAINING_JOBIDS=( $(comm -12 <(${RUNNING_JOBIDS[@]}) <(${DEMUX_JOBIDS[@]})) ) # get all jobs that are still relevant
+REMAINING_JOBIDS=( $(comm -12 <( printf '%s\n' "${RUNNING_JOBIDS[@]}" | LC_ALL=C sort ) <( printf '%s\n' "${DEMUX_JOBIDS[@]}" | LC_ALL=C sort )) ) # get all jobs that are still relevant
 DEPENDENCY=""
 if [[ ${#REMAINING_JOBIDS[@]} > 0 ]]; then
     DEPENDENCY="afterok:$(join : ${REMAINING_JOBIDS[@]})"
 fi
-sbatch ${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})
+echo "[${NOW}] Running ${RUNNING_JOBIDS[@]}"
+echo "[${NOW}] Demux ${DEMUX_JOBIDS[@]}"
+echo "[${NOW}] Remaining ${REMAINING_JOBIDS[@]}"
+echo "[${NOW}] sbatch -A prod001 -t '00:01:00' --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})"
+sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})
 
 ###########
 # CLEANUP #
 ###########
 
-rm ${RUNDIR}/copycomplete/*
+rm -Rf ${RUNDIR}/copycomplete/
+rm -Rf ${RUNDIR}/copybackcomplete/
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] everything started

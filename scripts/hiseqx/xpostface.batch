@@ -20,7 +20,8 @@ DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] INDIR: ${RUNDIR}"
-SCRIPT_DIR=$(dirname $(readlink -nm $0))
+#SCRIPT_DIR=$(dirname $(readlink -nm $0))
+SCRIPT_DIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 
 # create the stats file
 # needs python 2.7+ !
