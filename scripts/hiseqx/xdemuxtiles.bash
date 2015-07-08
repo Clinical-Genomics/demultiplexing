@@ -5,8 +5,9 @@
 # PARAMS #
 ##########
 
+VERSION=3.13.0
 RUNDIR=$1 # full path to run dir
-OUTDIR=/mnt/hds/proj/bioinfo/DEMUX/
+OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
 
 #############
 # FUNCTIONS #
@@ -19,8 +20,9 @@ function join { local IFS="$1"; shift; echo "$*"; }
 ########
 
 NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] VERSION ${VERSION}"
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
-PROJECTLOG=${OUTDIR}/$(basename ${RUNDIR})/projectlog.$(date +'%Y%m%d%H%M%S').log
+PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
@@ -51,11 +53,12 @@ tiles=('11 12' '21 22')
 DEMUX_JOBIDS=()
 i=0
 mkdir -p ${RUNDIR}/copycomplete/
+mkdir -p ${OUTDIR}
 for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
     echo "[${NOW}] starting lane ${lane} tile ${tile}" >> ${PROJECTLOG}
-    RS=$(sbatch -J "Xdem-${lane}-${tile}" ${SCRIPT_DIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/$(basename ${RUNDIR}) ${lane} ${tile})
+    RS=$(sbatch -J "Xdem-${lane}-${tile}" ${SCRIPT_DIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
 
     # Wait until the copy is complete ...
@@ -78,8 +81,8 @@ fi
 echo "[${NOW}] Running ${RUNNING_JOBIDS[@]}" >> ${PROJECTLOG}
 echo "[${NOW}] Demux ${DEMUX_JOBIDS[@]}" >> ${PROJECTLOG}
 echo "[${NOW}] Remaining ${REMAINING_JOBIDS[@]}" >> ${PROJECTLOG}
-echo "[${NOW}] sbatch -A prod001 -t '00:01:00' --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})" >> ${PROJECTLOG}
-sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} --output=${PROJECTLOG} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/$(basename ${RUNDIR})
+echo "[${NOW}] sbatch -A prod001 -t '00:01:00' --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/" >> ${PROJECTLOG}
+sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} --output=${PROJECTLOG} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/
 
 ###########
 # CLEANUP #
