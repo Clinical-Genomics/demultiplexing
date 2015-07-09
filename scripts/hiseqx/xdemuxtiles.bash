@@ -5,7 +5,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.14.0
+VERSION=3.14.1
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
 
@@ -83,7 +83,7 @@ echo "[${NOW}] Running ${RUNNING_JOBIDS[@]}" >> ${PROJECTLOG}
 echo "[${NOW}] Demux ${DEMUX_JOBIDS[@]}" >> ${PROJECTLOG}
 echo "[${NOW}] Remaining ${REMAINING_JOBIDS[@]}" >> ${PROJECTLOG}
 echo "[${NOW}] sbatch -A prod001 -t '00:01:00' --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/" >> ${PROJECTLOG}
-sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} --output=${PROJECTLOG} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/
+sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.batch ${OUTDIR}/
 
 ###########
 # CLEANUP #
