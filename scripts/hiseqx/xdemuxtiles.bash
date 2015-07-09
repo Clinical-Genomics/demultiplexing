@@ -5,7 +5,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.13.0
+VERSION=3.14.0
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
 
@@ -19,10 +19,12 @@ function join { local IFS="$1"; shift; echo "$*"; }
 # MAIN #
 ########
 
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] VERSION ${VERSION}"
+mkdir -p ${OUTDIR}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
+
+NOW=$(date +"%Y%m%d%H%M%S")
+echo "[${NOW}] VERSION ${VERSION}"
 
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
@@ -53,7 +55,6 @@ tiles=('11 12' '21 22')
 DEMUX_JOBIDS=()
 i=0
 mkdir -p ${RUNDIR}/copycomplete/
-mkdir -p ${OUTDIR}
 for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
