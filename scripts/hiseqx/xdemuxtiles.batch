@@ -94,7 +94,7 @@ for TILE in ${TILES[@]}; do
 done
 echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
 echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}   --sample-sheet ${RUNDIR}/SampleSheet.csv"
-      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK} --sample-sheet ${RUNDIR}/SampleSheet.csv"
+      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK} --sample-sheet ${RUNDIR}/SampleSheet.csv
 
 ##########
 # CP OUT #
