@@ -24,7 +24,7 @@ SCRIPT_DIR=$(dirname $(readlink -nm $0))
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
 NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] VERSION ${VERSION}"
+echo "[${NOW}] VERSION ${VERSION}" >> ${PROJECTLOG}
 
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')

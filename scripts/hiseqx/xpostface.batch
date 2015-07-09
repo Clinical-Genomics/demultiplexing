@@ -21,7 +21,7 @@ DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "[${NOW}] VERSION ${VERSION}"
-echo "[${NOW}] INDIR: ${DEMUXIR}"
+echo "[${NOW}] INDIR: ${DEMUXDIR}"
 #SCRIPT_DIR=$(dirname $(readlink -nm $0))
 SCRIPT_DIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 

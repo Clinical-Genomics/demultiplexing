@@ -62,7 +62,7 @@ RUNDIR=${TMPDIR}/${INDIR}
 
 # Get the index length from the sample sheet
 # This assumes a lane is on line nr + 2 (2 headers)
-SAMPLE_INDEX=( $(cat ${TMPDIR}/SampleSheet.csv | sed -n "$(( ${LANE} + 2 ))p" | sed -e 's/,/\n/g' ) )
+SAMPLE_INDEX=( $(cat ${RUNDIR}/SampleSheet.csv | sed -n "$(( ${LANE} + 2 ))p" | sed -e 's/,/\n/g' ) )
 SAMPLE_INDEX=( $( echo ${SAMPLE_INDEX[4]} | sed -e 's/-/\n/g' ) )
 LEN_SAMPLE_INDEX1=${#SAMPLE_INDEX[0]}
 LEN_SAMPLE_INDEX2=${#SAMPLE_INDEX[1]}
@@ -79,7 +79,7 @@ I2=''
 
 if [[ ${indexread2count} -gt 0 ]]; then # dual
     if [[ ${LEN_SAMPLE_INDEX2} -gt 0 ]]; then
-        I2="I${LEN_SAMPLE_INDEX2}"
+        I2=",I${LEN_SAMPLE_INDEX2}"
     fi
     I2n=$(head -c $(( ${indexread2count} - ${LEN_SAMPLE_INDEX2} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
     I2=",${I2}${I2n}"
@@ -93,7 +93,7 @@ for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
 echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
-echo "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
+echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
       bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
 
 ##########
