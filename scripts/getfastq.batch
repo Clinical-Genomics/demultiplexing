@@ -6,7 +6,7 @@
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/getfastq-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/getfastq-%j.err
 #SBATCH --mail-type=END
-#SBATCH --mail-user=emma.sernstad@scilifelab.se
+#SBATCH --mail-user=emma.sernstad@scilifelab.se,daniel.backman@scilifelab.se
 BASE=${1}
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${BASE}] generating output to OUTBOX
