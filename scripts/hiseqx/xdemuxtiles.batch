@@ -93,8 +93,8 @@ for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
 echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
-echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}   --sample-sheet ${RUNDIR}/SampleSheet.csv"
-      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK} --sample-sheet ${RUNDIR}/SampleSheet.csv
+echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
+      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
 
 ##########
 # CP OUT #
@@ -133,8 +133,17 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             mkdir -p ${SAMPLE_OUTDIR}
 
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
+
+            # copy the undetermined indexes
+            # this works as we only expect one sample/lane!
+            for UNDETERMINED in `ls ${TMPOUT_DIR}/Undetermined*`; do
+                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} ]]; then
+                    cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}
+                fi
+            done
         done
     done
+
 
     # we're done copying, release the lock
     rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
