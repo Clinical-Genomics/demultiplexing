@@ -115,6 +115,9 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
     if [[ ${PROJECT_ID} == 'Reports' || ${PROJECT_ID} == 'Stats' ]]; then
         continue
     fi
+    if [[ ${PROJECT_ID} =~ ^Undetermined.* ]]; then
+        continue
+    fi 
 
     # wait until other jobs finished copying ... yes yes, race condition
     while [[ $( ls -A ${CP_BACK_COMPLETE_DIR}) ]]; do
@@ -136,14 +139,14 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
 
             # copy the undetermined indexes
             # this works as we only expect one sample/lane!
-            for UNDETERMINED in `ls ${TMPOUT_DIR}/Undetermined*`; do
-                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} ]]; then
+            for UNDETERMINED in $( ( ${TMPOUT_DIR}/ && ls Undetermined*) ); do
+                # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
+                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${TMPOUT_DIR}/${UNDETERMINED} ]]; then
                     cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}
                 fi
             done
         done
     done
-
 
     # we're done copying, release the lock
     rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}

@@ -8,6 +8,7 @@
 VERSION=3.16.0
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
+CP_COMPLETE_DIR=${RUNDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 
 #############
 # FUNCTIONS #
@@ -20,6 +21,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 ########
 
 mkdir -p ${OUTDIR}
+mkdir -p $CP_COMPLETE_DIR
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
@@ -54,7 +56,6 @@ lanes=(1 2 3 4 5 6 7 8)
 tiles=('11 12' '21 22')
 DEMUX_JOBIDS=()
 i=0
-mkdir -p ${RUNDIR}/copycomplete/
 for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     NOW=$(date +"%Y%m%d%H%M%S")
@@ -64,7 +65,7 @@ for lane in "${lanes[@]}"; do
 
     # Wait until the copy is complete ...
     tile_qs=( ${tile} )
-    while [[ ! -e ${RUNDIR}/copycomplete/l${lane}t${tile_qs[0]} ]]; do
+    while [[ ! -e ${CP_COMPLETE_DIR}/l${lane}t${tile_qs[0]} ]]; do
         sleep 10
     done
   done
@@ -89,7 +90,6 @@ sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} ${SCRIPT_DIR}/xpostface.bat
 # CLEANUP #
 ###########
 
-rm -Rf ${RUNDIR}/copycomplete/
-rm -Rf ${RUNDIR}/copybackcomplete/
+rm -Rf ${CP_COMPLETE_DIR}
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] Everything started >> ${PROJECTLOG}
