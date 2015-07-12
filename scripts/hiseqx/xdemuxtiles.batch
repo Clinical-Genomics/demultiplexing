@@ -92,7 +92,7 @@ TILES_OPTS=''
 for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
-echo "[${NOW}] starting demultiplexing one lane ${LANE}, part ${TILES[@]}"
+echo "[${NOW}] start demultiplexing one lane ${LANE}, part ${TILES[@]}"
 echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
       bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
 
@@ -137,11 +137,15 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
 
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
 
-            # copy the undetermined indexes
-            # this works as we only expect one sample/lane!
-            for UNDETERMINED in $( ( ${TMPOUT_DIR}/ && ls Undetermined*) ); do
+            # Copy the undetermined indexes
+            # This works as we only expect one sample/lane! So no files get overwritten.
+            # Make sure we only get the file listing and not the path/file
+            ls ${TMPOUT_DIR}
+            for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
+                echo $UNDETERMINED
                 # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
-                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${TMPOUT_DIR}/${UNDETERMINED} ]]; then
+                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${SAMPLE_OUTDIR}/${UNDETERMINED} ]]; then
+                    echo "cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}"
                     cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}
                 fi
             done
