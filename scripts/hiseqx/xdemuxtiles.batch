@@ -17,21 +17,29 @@ OUTDIR=$2 # Demux dir
 LANE=$3 # 1-8
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 
+#############
+# FUNCTIONS #
+#############
+
+log() {
+    NOW=$(date +"%Y%m%d%H%M%S")
+    echo [${NOW}] $@
+}
+
 ########
 # INIT #
 ########
 
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] starting, will use ${TMPDIR}"
-echo "[${NOW}] INDIR: ${INDIR}"
-echo "[${NOW}] OUTDIR: ${OUTDIR}"
-echo "[${NOW}] LANE: ${LANE}"
-echo "[${NOW}] TILES: ${TILES[@]}"
+log "starting, will use ${TMPDIR}"
+log "INDIR: ${INDIR}"
+log "OUTDIR: ${OUTDIR}"
+log "LANE: ${LANE}"
+log "TILES: ${TILES[@]}"
 
 # set us up
 TMPOUT_DIR=${TMPDIR}/Xout
-CP_COMPLETE_DIR=${INDIR}/copycomplete/
-CP_BACK_COMPLETE_DIR=${INDIR}/copybackcomplete/
+CP_COMPLETE_DIR=${OUTDIR}/copycomplete/
+CP_BACK_COMPLETE_DIR=${OUTDIR}/copybackcomplete/
 mkdir -p ${TMPOUT_DIR}
 mkdir -p ${CP_COMPLETE_DIR}
 mkdir -p ${CP_BACK_COMPLETE_DIR}
@@ -40,8 +48,7 @@ mkdir -p ${CP_BACK_COMPLETE_DIR}
 # CP IN #
 #########
 
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] start copying"
+log "start copying"
 for TILE in ${TILES[@]}; do
     cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/*/s_${LANE}_${TILE}* ${TMPDIR}/
     cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/s_${LANE}_${TILE}* ${TMPDIR}/
@@ -87,24 +94,22 @@ fi
 
 BASEMASK="Y151,${I1}${I2},Y151"
 
-NOW=$(date +"%Y%m%d%H%M%S")
 TILES_OPTS=''
 for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
-echo "[${NOW}] start demultiplexing one lane ${LANE}, part ${TILES[@]}"
-echo "[${NOW}] bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
-      bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
+log "start demultiplexing one lane ${LANE}, part ${TILES[@]}"
+log "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
+     bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
 
 ##########
 # CP OUT #
 ##########
 
 # first copy the lane-tile specific information
-TILE_DIR=l${LANE}t${TILES[0]}/ 
+TILE_DIR=l${LANE}t${TILES[0]}/
 OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] starting copy output"
+log "starting copy output"
 mkdir -p ${OUTDIR}
 mkdir -p ${OUTDIR_LT}
 cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
@@ -117,7 +122,7 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
     fi
     if [[ ${PROJECT_ID} =~ ^Undetermined.* ]]; then
         continue
-    fi 
+    fi
 
     # wait until other jobs finished copying ... yes yes, race condition
     while [[ $( ls -A ${CP_BACK_COMPLETE_DIR}) ]]; do
@@ -131,21 +136,20 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
                 continue
             fi
-            
+
             SAMPLE_OUTDIR=${OUTDIR}/${TILE_DIR}/Project_${PROJECT_ID}/Sample_${SAMPLE_ID}
             mkdir -p ${SAMPLE_OUTDIR}
 
+            log "cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}"
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
 
             # Copy the undetermined indexes
             # This works as we only expect one sample/lane! So no files get overwritten.
             # Make sure we only get the file listing and not the path/file
-            ls ${TMPOUT_DIR}
             for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
-                echo $UNDETERMINED
                 # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
                 if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${SAMPLE_OUTDIR}/${UNDETERMINED} ]]; then
-                    echo "cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}"
+                    log "cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}"
                     cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}
                 fi
             done
@@ -156,8 +160,7 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
     rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 done
 
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] Done copying output"
+log "Done copying output"
 
 ############
 # CLEAN UP #
@@ -165,5 +168,4 @@ echo "[${NOW}] Done copying output"
 
 rm -r ${TMPDIR}/Xout/
 rm -r ${TMPDIR}/*
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] Done removing temp files"
+log "Done removing temp files"

@@ -8,7 +8,7 @@
 VERSION=3.16.1
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
-CP_COMPLETE_DIR=${RUNDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
+CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 
 #############
 # FUNCTIONS #
