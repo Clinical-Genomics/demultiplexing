@@ -7,7 +7,6 @@ import glob
 import re
 import os
 from access import db, lims
-from pprint import pprint
 
 __version__ = '3.16.3'
 
@@ -79,7 +78,6 @@ def make_link(demuxdir, outputdir, family_id, cust_name, sample_name, fc, index)
                 print(" - FAIL")
             else:
                 print(" - SUCCESS")
-        exit
 
 def main(argv):
 
