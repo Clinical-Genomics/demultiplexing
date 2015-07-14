@@ -3,5 +3,5 @@
 RUNDIR=$1
 LANE=$2
 
-echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/Project*/Sample_*/*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/${LANE}.index.stats.txt"
-zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/${LANE}.index.stats.txt
+echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/${LANE}.index.stats.txt"
+zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/${LANE}.index.stats.txt
