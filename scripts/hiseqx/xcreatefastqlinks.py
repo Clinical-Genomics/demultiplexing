@@ -9,7 +9,7 @@ import os
 from access import db, lims
 from pprint import pprint
 
-__version__ = '3.16.2'
+__version__ = '3.16.3'
 
 def getsamplesfromflowcell(demuxdir, flwc):
   samples = glob.glob("{demuxdir}*{flowcell}/l?t??/Project_*/Sample_*".\
