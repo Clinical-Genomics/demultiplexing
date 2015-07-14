@@ -5,7 +5,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.17.0
+VERSION=3.17.1
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
