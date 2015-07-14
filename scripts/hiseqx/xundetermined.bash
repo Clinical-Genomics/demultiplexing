@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION=3.16.5
+
 RUNDIR=$1
 echo $RUNDIR;
 for LANE in 1 2 3 4 5 6 7 8; do
