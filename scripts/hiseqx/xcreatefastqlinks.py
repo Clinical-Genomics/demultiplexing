@@ -7,11 +7,12 @@ import glob
 import re
 import os
 from access import db, lims
+from pprint import pprint
 
 __version__ = '3.16.2'
 
 def getsamplesfromflowcell(demuxdir, flwc):
-  samples = glob.glob("{demuxdir}*{flowcell}*/l?t??/Project_*/Sample_*".\
+  samples = glob.glob("{demuxdir}*{flowcell}/l?t??/Project_*/Sample_*".\
     format(demuxdir=demuxdir, flowcell=flwc))
   fc_samples = {}
   for sample in samples:
@@ -23,7 +24,7 @@ def getsamplesfromflowcell(demuxdir, flwc):
 def get_indexes(demuxdir, flwc):
 
   indexes = {} # sample_name: index
-  samplesheet_file_name = glob.glob("{demuxdir}*{flowcell}*/SampleSheet.csv".\
+  samplesheet_file_name = glob.glob("{demuxdir}*{flowcell}/SampleSheet.csv".\
     format(demuxdir=demuxdir, flowcell=flwc))[0]
   with open(samplesheet_file_name, 'r') as samplesheet_fh:
     lines = [ line.split(',') for line in samplesheet_fh.readlines() ]
@@ -38,27 +39,31 @@ def get_indexes(demuxdir, flwc):
 
 def make_link(demuxdir, outputdir, family_id, cust_name, sample_name, fc, index):
     fastqfiles = glob.glob(
-        "{demuxdir}*{fc}*/l?t??/Project_*/Sample_{sample_name}_*/*fastq.gz".format(
+        "{demuxdir}*{fc}/l?t??/Project_*/Sample_{sample_name}_*/*fastq.gz".format(
           demuxdir=demuxdir, fc=fc, sample_name=sample_name
         ))
     fastqfiles.extend(glob.glob(
-        "{demuxdir}*{fc}*/l?t??/Project_*/Sample_{sample_name}[BF]_*/*fastq.gz".format(
+        "{demuxdir}*{fc}/l?t??/Project_*/Sample_{sample_name}[BF]_*/*fastq.gz".format(
           demuxdir=demuxdir, fc=fc, sample_name=sample_name
         )))
 
     for fastqfile in fastqfiles:
         nameparts = fastqfile.split("/")[-1].split("_")
+        undetermined = ''
+        if nameparts[0] == 'Undetermined':
+            undetermined = '-Undetermined'
         rundir = fastqfile.split("/")[6]
         tile = fastqfile.split("/")[7].split('t')[1]
         date = rundir.split("_")[0]
         fc = rundir[-9:] + '-' + tile
-        newname = "{lane}_{date}_{fc}_{sample_name}_{index}_{readdirection}.fastq.gz".format(
+        newname = "{lane}_{date}_{fc}{undetermined}_{sample_name}_{index}_{readdirection}.fastq.gz".format(
           lane=nameparts[2][-1:],
           date=date,
           fc=fc,
           sample_name=sample_name,
           index=index,
-          readdirection=nameparts[3][-1:]
+          readdirection=nameparts[3][-1:],
+          undetermined=undetermined
         )
 
         if cust_name != None and family_id != None:
@@ -74,6 +79,7 @@ def make_link(demuxdir, outputdir, family_id, cust_name, sample_name, fc, index)
                 print(" - FAIL")
             else:
                 print(" - SUCCESS")
+        exit
 
 def main(argv):
 
