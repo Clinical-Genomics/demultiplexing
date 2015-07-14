@@ -99,8 +99,8 @@ for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
 log "start demultiplexing one lane ${LANE}, part ${TILES[@]}"
-log "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}"
-     bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 0 --use-bases-mask ${BASEMASK}
+log "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}"
+     bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}
 
 ##########
 # CP OUT #

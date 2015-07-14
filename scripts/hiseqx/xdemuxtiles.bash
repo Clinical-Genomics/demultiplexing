@@ -46,7 +46,8 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     #FCID,Lane,SampleID,SampleRef,Index,SampleName,Control,Recipe,Operator,Project
 
     echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-    sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
+    sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
+    exit
 fi
 
 cat ${RUNDIR}/SampleSheet.csv >> ${PROJECTLOG}
