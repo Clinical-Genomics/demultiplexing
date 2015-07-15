@@ -6,6 +6,8 @@ from __future__ import print_function, division
 import xml.etree.ElementTree as et
 import sys
 import glob
+import re
+import os
 
 __version__ = '3.18.2'
 
@@ -84,6 +86,26 @@ def get_samplesheet(rundir, file_name='SampleSheet.csv', delim=','):
 
         return [ dict(zip(header, line)) for line in lines[1:] ]
 
+def calc_undetermined(rundir):
+    sizes = {}
+    all_files = glob.glob(rundir + '/l*/Project*/Sample*/*fastq.gz')
+    for f in all_files:
+        sample_name = re.search(r'Sample_(.*)/', f).group(1)
+        if sample_name not in sizes:
+            sizes[ sample_name ] = { 'size_of': 0, 'u_size_of': 0 }
+        sizes[ sample_name ]['size_of'] += os.path.getsize(f)
+
+    und_files = glob.glob(rundir + '/l*/Project*/Sample*/Undet*fastq.gz')
+    for f in und_files:
+        sample_name = re.search(r'Sample_(.*)/', f).group(1)
+        sizes[ sample_name ]['u_size_of'] += os.path.getsize(f)
+
+    proc_undetermined = {}
+    for sample_name, size in sizes.items():
+        proc_undetermined[ sample_name ] = float(size['u_size_of']) / size['size_of'] * 100
+
+    return proc_undetermined
+
 def get_lanes(sample_sheet):
     """Get the lanes from the SampleSheet
 
@@ -104,8 +126,12 @@ def main(argv):
 
     """
 
-    sample_sheet = get_samplesheet(argv[0])
+    rundir = argv[0]
+    sample_sheet = get_samplesheet(rundir)
     lanes = get_lanes(sample_sheet)
+
+    # get all % undetermined indexes / sample
+    proc_undetermined = calc_undetermined(rundir)
 
     # create a { 1: [], 2: [], ... } structure
     summaries = dict(zip(lanes, [ [] for t in xrange(len(lanes))])) # init ;)
@@ -146,7 +172,7 @@ def main(argv):
                 total_lane_summary[lane][ key ] += stat
 
     # print me a pretty report
-    print('\t'.join(('Sample', 'Flowcell', 'Lane', 'PF clusters', 'YieldMB', 'Q30', 'MeanQScore')))
+    print('\t'.join(('Sample', 'Flowcell', 'Lane', 'PF_clusters', 'YieldMB', 'Q30', 'MeanQScore', 'Undetermined')))
     for lane, summary in total_lane_summary.items():
         print('\t'.join( [
             summary['samplename'],
@@ -155,7 +181,8 @@ def main(argv):
             str(summary['pf_clusters']),
             str(round(summary['pf_yield'] / 1000000, 0)),
             str(round(summary['pf_q30'] / summary['pf_yield'] * 100, 2)),
-            str(round(summary['pf_qscore_sum'] / summary['pf_yield'], 2))
+            str(round(summary['pf_qscore_sum'] / summary['pf_yield'], 2)),
+            str(round(proc_undetermined[ summary['samplename'] ], 2)) if summary['samplename'] in proc_undetermined else '#NA'
         ]))
 
 if __name__ == '__main__':
