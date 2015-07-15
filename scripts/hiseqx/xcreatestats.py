@@ -7,7 +7,7 @@ import xml.etree.ElementTree as et
 import sys
 import glob
 
-__version__ = '3.18.0'
+__version__ = '3.18.1'
 
 def xpathsum(tree, xpath):
     """Sums all numbers found at these xpath nodes
