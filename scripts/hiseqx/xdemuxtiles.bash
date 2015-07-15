@@ -81,7 +81,7 @@ for lane in "${lanes[@]}"; do
     log "starting lane ${lane} tile ${tile}"
 
     tile_qs=( ${tile} )
-    JOB_TITLE="Xdem-${lane}-${tile_qs[0]}"
+    JOB_TITLE="Xdem-l${lane}t${tile_qs[0]}"
     log "sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile}"
     RS=$(sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
