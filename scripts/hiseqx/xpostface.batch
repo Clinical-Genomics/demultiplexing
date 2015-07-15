@@ -15,28 +15,38 @@
 VERSION=3.17.1
 DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
+#############
+# FUNCTIONS #
+#############
+
+log() {
+    NOW=$(date +"%Y%m%d%H%M%S")
+    echo [${NOW}] $@
+}
+
 ########
 # INIT #
 ########
 
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[${NOW}] VERSION ${VERSION}"
-echo "[${NOW}] INDIR: ${DEMUXDIR}"
-#SCRIPT_DIR=$(dirname $(readlink -nm $0))
+log "VERSION ${VERSION}"
+log "INDIR: ${DEMUXDIR}"
+#SCRIPT_DIR=$(dirname $(readlink -nm $0)) # takes the invocation dir on SLURM
 SCRIPT_DIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 
 # create the stats file
 # needs python 2.7+ !
-echo "[$NOW] /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
+log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
 /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
 
 # link to OUTBOX
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[$NOW] ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}"
+log "bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}/"
 bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}/
-# link to MIP_ANALYSIS
 
+# link to MIP_ANALYSIS
 FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-NOW=$(date +"%Y%m%d%H%M%S")
-echo "[$NOW] /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC"
+log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC"
 /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC
+
+# calculate Undetermined stats
+log "bash ${SCRIPT_DIR}/xundetermined.bash ${DEMUXDIR}/"
+bash ${SCRIPT_DIR}/xundetermined.bash ${DEMUXDIR}/

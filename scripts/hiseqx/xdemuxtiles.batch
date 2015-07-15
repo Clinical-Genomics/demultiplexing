@@ -35,6 +35,7 @@ log "INDIR: ${INDIR}"
 log "OUTDIR: ${OUTDIR}"
 log "LANE: ${LANE}"
 log "TILES: ${TILES[@]}"
+log $(bcl2fastq --version)
 
 # set us up
 TMPOUT_DIR=${TMPDIR}/Xout
@@ -110,9 +111,13 @@ log "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} 
 TILE_DIR=l${LANE}t${TILES[0]}/
 OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
 log "starting copy output"
+log "mkdir -p ${OUTDIR}"
 mkdir -p ${OUTDIR}
+log "mkdir -p ${OUTDIR_LT}"
 mkdir -p ${OUTDIR_LT}
+log "cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}"
 cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
+log "cp ${INDIR}/SampleSheet.csv ${OUTDIR}/"
 cp ${INDIR}/SampleSheet.csv ${OUTDIR}/
 
 # second copy the actual fastq files
@@ -138,6 +143,7 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             fi
 
             SAMPLE_OUTDIR=${OUTDIR}/${TILE_DIR}/Project_${PROJECT_ID}/Sample_${SAMPLE_ID}
+            log "mkdir -p ${SAMPLE_OUTDIR}"
             mkdir -p ${SAMPLE_OUTDIR}
 
             log "cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}"
@@ -168,4 +174,5 @@ log "Done copying output"
 
 rm -r ${TMPDIR}/Xout/
 rm -r ${TMPDIR}/*
+rm -r ${CP_BACK_COMPLETE_DIR}
 log "Done removing temp files"
