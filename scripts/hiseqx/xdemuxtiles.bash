@@ -34,6 +34,7 @@ log_file() {
 ########
 
 mkdir -p ${OUTDIR}
+mkdir -p ${LOGDIR}
 mkdir -p $CP_COMPLETE_DIR
 SCRIPTDIR=$(dirname $(readlink -nm $0))
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
@@ -62,7 +63,6 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 
     echo '[Data]' > ${RUNDIR}/SampleSheet.csv
     sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
-    exit
 fi
 
 log "Using sample sheet:" >> ${PROJECTLOG}
@@ -77,15 +77,15 @@ for lane in "${lanes[@]}"; do
   for tile in "${tiles[@]}"; do
     log "starting lane ${lane} tile ${tile}" >> ${PROJECTLOG}
 
-    JOB_TITLE="Xdem-${lane}-${tile}" 
+    tile_qs=( ${tile} )
+    JOB_TITLE="Xdem-${lane}-${tile_qs[0]}"
     log "sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile}" >> ${PROJECTLOG}
     RS=$(sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
 
-    log $RS
+    log $RS >> ${PROJECTLOG}
 
     # Wait until the copy is complete ...
-    tile_qs=( ${tile} )
     while [[ ! -e ${CP_COMPLETE_DIR}/l${lane}t${tile_qs[0]} ]]; do
         sleep 10
     done
