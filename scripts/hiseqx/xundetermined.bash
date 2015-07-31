@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.21.2
+VERSION=3.21.3
 
 RUNDIR=$1
 SCRIPTDIR=/mnt/hds/proj/bioinfo/SCRIPTS/
