@@ -54,7 +54,7 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | uniq
     for SAMPLE_DIR in $(find ${INDIR}/*/${PROJECT_DIR}/ -name 'Sample_*' -exec basename {} \; | uniq); do
         SAMPLE_ID=${SAMPLE_DIR##Sample_} # remove prefix Sample_
         BC=${BARCODE_OF[${SAMPLE_ID}]}   # look up the BarCode
-        SANE_SAMPLE_ID=${SAMPLE_ID//_/-} # replace _ with -
+        SANE_SAMPLE_ID=${SAMPLE_ID%%_*}  # remove all after _
 
         mkdir -p ${MIPDIR}/${SANE_SAMPLE_ID}/fastq/
 
@@ -89,5 +89,5 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | uniq
     done
 
     # cp stats file
-    cp ${INDIR}/stats.txt ${OUTDIR}/${PROJECT_DIR}/${FC}/stats.txt
+    cp ${INDIR}/stats.txt ${OUTDIR}/${PROJECT_DIR}/${FC}/stats-${PROJECT_ID}-${FC}.txt
 done
