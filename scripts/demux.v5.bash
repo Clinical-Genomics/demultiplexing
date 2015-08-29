@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.21.3
+VERSION=3.21.4
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
