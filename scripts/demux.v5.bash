@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.21.3
+VERSION=3.21.4
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -66,6 +66,9 @@ if [ $BASEMASKBYPASS ]; then
   elif [ $BASEMASKBYPASS == '--ho' ]; then
     USEBASEMASK=Y126,I8,Y126
     UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--hod8' ]; then
+    USEBASEMASK=Y126,I8,I8,Y126
+    UNALDIR=Unaligned8
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
