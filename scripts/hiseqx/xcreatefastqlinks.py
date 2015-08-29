@@ -32,7 +32,8 @@ def get_indexes(demuxdir, flwc):
       if line[0].startswith('['): continue
 
       # ADM1003A4_dual90
-      indexes[ line[2].split('_')[0] ] = line[4] # only take the sane sample name
+      sample=line[2].split('_')[0].rstrip('BF')
+      indexes[ sample ] = line[4] # only take the sane sample name
 
   return indexes
 
@@ -98,8 +99,14 @@ def main(argv):
 
   params = db.readconfig("non")
   smpls = getsamplesfromflowcell(params['DEMUXDIR'], fc)
+  indexes = get_indexes(params['DEMUXDIR'], fc)
 
   for sample in smpls.iterkeys():
+
+    if sample not in indexes:
+      print("ERROR '{}' not found in SampleSheet.csv! Skipping ...".format(sample))
+      continue
+
     family_id = None
     cust_name = None
     with lims.limsconnect(params['apiuser'], params['apipass'], params['baseuri']) as lmc:
@@ -121,8 +128,6 @@ def main(argv):
         print("WARNING '{}' internal customer name is not set".format(sample))
       if family_id == None:
         print("WARNING '{}' family_id is not set".format(sample))
-
-    indexes = get_indexes(params['DEMUXDIR'], fc)
 
     if readcounts:
       # try to create new dir structure
