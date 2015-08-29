@@ -66,6 +66,9 @@ if [ $BASEMASKBYPASS ]; then
   elif [ $BASEMASKBYPASS == '--ho' ]; then
     USEBASEMASK=Y126,I8,Y126
     UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--hod8' ]; then
+    USEBASEMASK=Y126,I8,I8,Y126
+    UNALDIR=Unaligned8
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"

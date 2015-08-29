@@ -32,6 +32,8 @@ if [ $BASEMASKBYPASS ]; then
     UNALDIR=Unaligned6
   elif [ $BASEMASKBYPASS == '--ho' ]; then
     UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--hod8' ]; then
+    UNALDIR=Unaligned8
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
