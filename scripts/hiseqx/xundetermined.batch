@@ -4,5 +4,8 @@ VERSION=3.21.5
 RUNDIR=$1
 LANE=$2
 
-echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/LOG/${LANE}.index.stats.txt"
-zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $RUNDIR/LOG/${LANE}.index.stats.txt
+LOGDIR=${RUNDIR}/LOG/
+[[ ! -e ${LOGDIR} ]] && mkdir ${LOGDIR}
+
+echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
+zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
