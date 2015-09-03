@@ -9,7 +9,7 @@ import glob
 import re
 import os
 
-__version__ = '3.21.7'
+__version__ = '3.21.8'
 
 def xpathsum(tree, xpath):
     """Sums all numbers found at these xpath nodes
