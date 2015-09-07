@@ -7,7 +7,7 @@
 # DEMUX/RUN DIR
 INDIR=$1
 OUTDIR=${2:-/mnt/hds/proj/bioinfo/OUTBOX/}
-#MIPDIR=${3:-/mnt/hds/proj/bioinfo/MIP_ANALYSIS/genomes/}
+MIPDIR=${3:-/mnt/hds/proj/bioinfo/MIP_ANALYSIS/genomes/}
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
@@ -78,7 +78,7 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | uniq
             
             # link
             ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${OUTDIR}/${PROJECT_DIR}/${FC}/${SAMPLE_FILE_NAME}
-            #ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${MIPDIR}/${SANE_SAMPLE_ID}/fastq/${SAMPLE_FILE_NAME}
+            ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${MIPDIR}/${SANE_SAMPLE_ID}/fastq/${SAMPLE_FILE_NAME}
 
             # write the fastq file to the meta file
             SAMPLE_FILE_NAMES="${SAMPLE_FILE_NAMES}	${SAMPLE_FILE_NAME}"
