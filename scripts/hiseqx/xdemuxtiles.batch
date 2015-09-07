@@ -37,7 +37,7 @@ log "LANE: ${LANE}"
 log "TILES: ${TILES[@]}"
 
 # log the version
-bcl2fastq --version 2>&1
+/usr/local/bin/bcl2fastq --version 2>&1
 
 # set us up
 TMPOUT_DIR=${TMPDIR}/Xout
@@ -102,8 +102,8 @@ for TILE in ${TILES[@]}; do
     TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
 done
 log "start demultiplexing one lane ${LANE}, part ${TILES[@]}"
-log "bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}"
-     bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}
+log "/usr/local/bin/bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}"
+     /usr/local/bin/bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}
 
 ##########
 # CP OUT #
