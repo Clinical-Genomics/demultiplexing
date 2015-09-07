@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.21.9
+VERSION=3.21.10
 RUNDIR=$1
 LANE=$2
 
