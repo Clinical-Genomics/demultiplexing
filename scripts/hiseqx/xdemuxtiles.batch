@@ -35,7 +35,9 @@ log "INDIR: ${INDIR}"
 log "OUTDIR: ${OUTDIR}"
 log "LANE: ${LANE}"
 log "TILES: ${TILES[@]}"
-log $(bcl2fastq --version)
+
+# log the version
+bcl2fastq --version 2>&1
 
 # set us up
 TMPOUT_DIR=${TMPDIR}/Xout

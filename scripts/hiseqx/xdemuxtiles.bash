@@ -107,8 +107,8 @@ log "Running ${RUNNING_JOBIDS[@]}"
 log "Demux ${DEMUX_JOBIDS[@]}"
 log "Remaining ${REMAINING_JOBIDS[@]}"
 JOB_TITLE="xdem-xpostface"
-log "sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
-$(sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/)
+log "sbatch -J 'Xdem-postface' --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
+sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/
 
 ###########
 # CLEANUP #
