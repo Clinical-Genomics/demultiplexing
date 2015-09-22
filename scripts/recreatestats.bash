@@ -37,6 +37,8 @@ if [ $BASEMASKBYPASS ]; then
     UNALDIR=Unaligned8
   elif [ $BASEMASKBYPASS == '--hos8d8' ]; then
     UNALDIR=Unaligned9
+  elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
+    UNALDIR=Unaligned10
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -51,6 +53,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--ho High Output run"
     >&2 echo "--hod8 High Output run with dual8 index"
     >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
+    >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
   fi
 else
   
@@ -80,7 +83,7 @@ FC=$(echo ${BASE} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr
 PROJs=$(ls ${UNALIGNEDBASE}${RUN}/${UNALDIR}/ | grep Proj)
 for PROJ in ${PROJs[@]};do
   prj=$(echo ${PROJ} | sed 's/Project_//')
-  /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} >> ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
+  /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} > ${UNALIGNEDBASE}${RUN}/${UNALDIR}/stats-${prj}-${FC}.txt
   echo "/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} ~/.alt_test_db >> ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
 
