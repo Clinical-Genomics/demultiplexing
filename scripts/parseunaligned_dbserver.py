@@ -15,7 +15,7 @@ import socket
 import os
 import select
 
-__version__ = '3.23.4'
+__version__ = '3.24.0'
 print('version {} {}'.format(__file__, __version__))
 
 if (len(sys.argv)>2):
