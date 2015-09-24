@@ -35,18 +35,22 @@ def get_summary(tree):
     Args:
         tree (an elementTree): parsed XML as an elementTree
 
-    Returns (dict): with following keys: pf_clusters, pf_yield, pf_q30, raw_q30, pf_qscore_sum, pf_qscore
+    Returns (dict): with following keys: pf_clusters, pf_yield, pf_q30, pf_read1_yield, pf_read2_yield, pf_read1_q30, pf_read2_q30, pf_qscore_sum, pf_qscore
 
     """
     #raw_clusters = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Raw/ClusterCount")
     pf_clusters = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/ClusterCount")
 
     pf_yield = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read/Yield")
+    pf_read1_yield = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read[@number='1']/Yield")
+    pf_read2_yield = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read[@number='2']/Yield")
     #raw_yield = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Raw/Read/Yield")
     #pf_clusters_pc = pf_yield / raw_yield
 
     pf_q30 = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read/YieldQ30")
-    raw_q30 = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Raw/Read/YieldQ30")
+    #raw_q30 = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Raw/Read/YieldQ30")
+    pf_read1_q30 = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read[@number='1']/YieldQ30")
+    pf_read2_q30 = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read[@number='2']/YieldQ30")
     #pf_q30_bases_pc = pf_q30 / pf_yield
 
     pf_qscore_sum = xpathsum(tree, ".//Project[@name='all']/Sample[@name='all']/Barcode[@name='all']//Pf/Read/QualityScoreSum")
@@ -57,10 +61,14 @@ def get_summary(tree):
         #'raw_yield': raw_yield,
         #'pf_clusters_pc': pf_clusters_pc,
         #'pf_q30_bases_pc': pf_q30_bases_pc,
+        #'raw_q30': raw_q30,
         'pf_clusters': pf_clusters,
         'pf_yield': pf_yield,
+        'pf_read1_yield': pf_read1_yield,
+        'pf_read2_yield': pf_read2_yield,
         'pf_q30': pf_q30,
-        'raw_q30': raw_q30,
+        'pf_read1_q30': pf_read1_q30,
+        'pf_read2_q30': pf_read2_q30,
         'pf_qscore_sum': pf_qscore_sum,
         'pf_qscore': pf_qscore
     }
@@ -158,8 +166,11 @@ def main(argv):
             #'pf_q30_bases_pc': 0,
             'pf_clusters': 0,
             'pf_yield': 0,
+            'pf_read1_yield': 0,
+            'pf_read2_yield': 0,
             'pf_q30': 0,
-            'raw_q30': 0,
+            'pf_read1_q30': 0,
+            'pf_read2_q30': 0,
             'pf_qscore_sum': 0,
             'pf_qscore': 0,
             'flowcell': line['FCID'],
@@ -172,7 +183,7 @@ def main(argv):
                 total_lane_summary[lane][ key ] += stat
 
     # print me a pretty report
-    print('\t'.join(('Sample', 'Flowcell', 'Lane', 'PF_clusters', 'YieldMB', 'Q30', 'MeanQScore', 'Undetermined')))
+    print('\t'.join(('Sample', 'Flowcell', 'Lane', 'PF_clusters', 'YieldMB', 'Q30', 'Q30_read1', 'Q30_read2', 'MeanQScore', 'Undetermined')))
     for lane, summary in total_lane_summary.items():
         print('\t'.join( [
             summary['samplename'],
@@ -181,6 +192,8 @@ def main(argv):
             str(summary['pf_clusters']),
             str(round(summary['pf_yield'] / 1000000, 0)),
             str(round(summary['pf_q30'] / summary['pf_yield'] * 100, 2)),
+            str(round(summary['pf_read1_q30'] / summary['pf_read1_yield'] * 100, 2)),
+            str(round(summary['pf_read2_q30'] / summary['pf_read2_yield'] * 100, 2)),
             str(round(summary['pf_qscore_sum'] / summary['pf_yield'], 2)),
             str(round(proc_undetermined[ summary['samplename'] ], 2)) if summary['samplename'] in proc_undetermined else '#NA'
         ]))
