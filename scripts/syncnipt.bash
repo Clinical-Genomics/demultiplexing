@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
-VERSION=3.24.0
+VERSION=3.25.0
 echo "Version $VERSION"
 
 ##########
