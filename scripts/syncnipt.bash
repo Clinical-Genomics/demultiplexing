@@ -42,6 +42,7 @@ for RUN in ${RUNS[@]}; do
       # make SampleSheet NIPT ready
       /home/clinical/SCRIPTS/massagenipt.py ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
       mv ${RUNBASE}${RUN}/SampleSheet.mas ${RUNBASE}${RUN}/SampleSheet.csv
+      cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/Data/Intensities/BaseCalls/
 
       # sync run to NIPT-TT server
       if [ -f ${RUNBASE}${RUN}/RTAComplete.txt ]; then
@@ -49,7 +50,9 @@ for RUN in ${RUNS[@]}; do
         cp -al ${RUNBASE}${RUN} ${NIPTBASE}
         NOW=$(date +"%Y%m%d%H%M%S")
         echo [${NOW}] ${RUN} linking is finished, starting sync
-        rsync -r --exclude RTAComplete.txt ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
+        rsync -r --exclude RTAComplete.txt --exclude SampleSheet.csv --exclude Data/Intensities/BaseCalls/SampleSheet.csv ${NIPTBASE}${RUN} ${NIPTOUTPATH} && \
+        cp ${NIPTBASE}/${RUN}/SampleSheet.csv ${NIPTOUTPATH}/${RUN}/
+        cp ${NIPTBASE}/${RUN}/SampleSheet.csv ${NIPTOUTPATH}/${RUN}/Data/Intensities/BaseCalls/
         cp ${NIPTBASE}/${RUN}/RTAComplete.txt ${NIPTOUTPATH}/${RUN}/
     
         if [[ $? == 0 ]]; then
