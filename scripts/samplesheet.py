@@ -110,6 +110,7 @@ class SampleSheet(object):
                 ordered_line.append(data_line[head])
             data_lines.append(ordered_line)
 
+        # remove all irrelevant sections
         self.section[self.DATA] = data_lines
         for key in self.section.keys():
             if key == self.DATA: continue
@@ -145,11 +146,11 @@ class SampleSheet(object):
 
 def main(argv):
     ss = SampleSheet(argv[0])
-    ss.validate()
     if 1 in argv:
         ss.massage_normal()
     else:
         ss.massage()
+    ss.validate()
     ss.write()
 
 if __name__ == '__main__':

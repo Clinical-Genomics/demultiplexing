@@ -22,6 +22,14 @@ if [ ! -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then
   echo [${NOW}] [${RUN}] SampleSheet not found! Exits . . . >> ${PROJECTLOG}
   exit
 fi
+
+echo [${NOW}] [${RUN}] Creating a demux SampleSheet ... >> ${logfile}
+echo [${NOW}] [${RUN}] Creating a demux SampleSheet ... >> ${PROJECTLOG}
+/home/clinical/SCRIPTS/massagenipt.py ${BASE}/SampleSheet.csv nuru > ${BASE}/SampleSheet.mas
+mv ${BASE}/SampleSheet.mas ${BASE}/SampleSheet.csv
+cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/
+
+NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 

@@ -12,7 +12,10 @@ def main(argv):
 
     """
     ss = SampleSheet(argv[0])
-    ss.massage()
+    if 'nuru' in argv:
+        ss.massage_normal()
+    else:
+        ss.massage()
     ss.write()
 
 if __name__ == '__main__':
