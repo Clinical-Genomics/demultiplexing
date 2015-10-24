@@ -41,6 +41,7 @@ if not (unaligned[-1:] == "/"):
 if not os.path.isdir(basedir + unaligned):
   exit("Bad unaligned dir")
 samplesheet = sys.argv[3]
+print samplesheet
 if not os.path.isfile(samplesheet):
   exit("Bad samplesheet")
 
@@ -73,6 +74,7 @@ with db.create_tunnel(pars['TUNNELCMD']):
     support.close()
 
     demultistats = (demux_stat_dir + "Demultiplex_Stats.htm")
+    print demultistats
     if not os.path.isfile(demultistats):
       exit("Bad demux stats file")
     soup = BeautifulSoup(open(demultistats))
