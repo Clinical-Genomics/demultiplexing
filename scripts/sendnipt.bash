@@ -17,10 +17,11 @@ MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,daniel.backman@sc
 #######
 
 for RUN in $(ls ${NIPTRUNS}); do
+    NOW=$(date +"%Y%m%d%H%M%S")
     if [[ ${RUN} =~ 'TEST' ]]; then
+        echo [${NOW}] [${RUN}] TEST run, skipping ...
         continue # skip test runs
     fi
-    NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] [${RUN}] Checking ...
     if [[ -e ${NIPTRUNS}/${RUN}/delivery.txt ]]; then
 	while read line; do echo [${NOW}] [${RUN}] Delivered on $line; done < ${NIPTRUNS}/${RUN}/delivery.txt
