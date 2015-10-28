@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.27.0
+VERSION=3.28.1
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -61,33 +61,23 @@ for PROJ in ${PROJs[@]};do
   echo "/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} ~/.alt_test_db >> ${UNALIGNEDBASE}${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECTLOG}
 done
 
+# copy the demultiplexed files to rasta
 NOW=$(date +"%Y%m%d%H%M%S")
-#    copy the demultiplexed files to rasta
-
-# skip NIPT runs
-grep -qs Description,NIPTv1 ${UNALIGNEDBASE}${RUN}/SampleSheet.csv
-if [[ $? -ne 0 ]]; then
-  echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
-  
-  rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/
-  rc=$?
-  NOW=$(date +"%Y%m%d%H%M%S")
-  if [[ ${rc} != 0 ]] ; then
-    echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${logfile}
-    echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${PROJECTLOG}
-  else 
-    date > ${UNALIGNEDBASE}${RUN}/copycomplete.txt
-    scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
-    echo [${NOW}] [${RUN}] scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
-    ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}"
-    echo [${NOW}] [${RUN}] ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}" >> ${PROJECTLOG}
-    echo [${NOW}] [${RUN}] scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
-    echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${logfile}
-    echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${PROJECTLOG}
-    scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
-  fi
+echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
+rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/
+rc=$?
+NOW=$(date +"%Y%m%d%H%M%S")
+if [[ ${rc} != 0 ]] ; then
+  echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${logfile}
+  echo [${NOW}] [${RUN}] rsync to rasta failed: Error code: ${rc} >> ${PROJECTLOG}
+else 
+  date > ${UNALIGNEDBASE}${RUN}/copycomplete.txt
+  scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
+  echo [${NOW}] [${RUN}] scp ${UNALIGNEDBASE}${RUN}/copycomplete.txt rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
+  ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}"
+  echo [${NOW}] [${RUN}] ssh rastapopoulos.scilifelab.se "chmod g+w /mnt/hds/proj/bioinfo/DEMUX/${RUN}" >> ${PROJECTLOG}
+  echo [${NOW}] [${RUN}] scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN} >> ${PROJECTLOG}
+  echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${logfile}
+  echo [${NOW}] [${RUN}] DEMUX transferred, script ends >> ${PROJECTLOG}
+  scp ${PROJECTLOG} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/${RUN}
 fi
-
-# the file copycomplete.txt shows that the copy is done
-#   can be used on RASTA to start downstream processing
-
