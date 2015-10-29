@@ -7,11 +7,11 @@ import os
 from glob import glob
 import logging
 import socket
-import time
 
 from sqlalchemy import func
 from clinstatsdb.db import SQL
-from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project
+from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
+from clinstatsdb.utils import xstats
 
 __version__ = '3.27.0'
 
@@ -173,9 +173,50 @@ def get_projects(demux_dir):
 
     project_dirs = glob(os.path.join(demux_dir, 'Unaligned', '*'))
     for project_dir in project_dirs:
-        projects.append(project_dir.split('_')[0])
+        projects.append(os.path.basename(os.path.normpath(project_dir)).split('_')[1])
 
     return projects
+
+def sanitize_sample(sample):
+    """Removes the _nxdual9 index indication
+    Removes the B (reprep) or F (reception fail) suffix from the sample name
+
+    Args:
+        sample (str): a sample name
+
+    Return (str): a sanitized sample name
+
+    """
+    return sample.split('_')[0].rstrip('BF')
+
+def get_samples(demux_dir):
+    """TODO: Docstring for get_samples.
+
+    Args:
+        demux_dir (TODO): TODO
+
+    Returns: TODO
+
+    """
+
+    samples = {} # sample_name: index
+    samplesheet_file_name = glob("{demux_dir}/SampleSheet.csv".format(demux_dir=demux_dir))[0]
+    with open(samplesheet_file_name, 'r') as samplesheet_fh:
+        lines = [ line.strip().split(',') for line in samplesheet_fh.readlines() ]
+        header = []
+        for line in lines:
+            # skip headers
+            if line[0].startswith('['): continue
+            if line[2] == 'SampleID':
+                header = line
+                continue
+
+            entry = dict(zip(header, line))
+    
+            # ADM1003A4_dual90
+            samples[ entry['SampleID'] ] = entry
+
+    return samples 
 
 def setup_logging(level='INFO'):
     root_logger = logging.getLogger()
@@ -270,19 +311,53 @@ def main(argv):
     
     print(demux_id)
 
+    project_id_of = {} # project name: project id
     for project_name in get_projects(demux_dir):
         project_id = Project.exists(project_name)
         if not project_id:
-            project = Project()
-            project.projectname = project_name
-            project.time = func.now()
+            p = Project()
+            p.projectname = project_name
+            p.time = func.now()
 
-            SQL.add(project)
+            SQL.add(p)
             SQL.flush()
-            project_id = project.project_id
-            project = None
+            project_id_of[ project_name ] = p.project_id
 
-        print(project_id)
+        print(project_id_of)
+
+    samples = get_samples(demux_dir)
+    sample_id_of = {} # sane sample name: sample id
+    stats = xstats.parse(demux_dir)
+    for sample in samples.values():
+        if not Sample.exists(sample['SampleID'], sample['index']):
+            s = Sample()
+            s.project_id = project_id_of[ sample['Project'] ]
+            s.samplename = sample['SampleID']
+            s.barcode = sample['index']
+            s.time = func.now()
+
+            SQL.add(s)
+            SQL.flush()
+            sample_id_of[ sanitize_sample(sample['SampleID']) ] = s.sample_id
+
+        if not Unaligned.exists(s.sample_id, demux_id, sample['Lane']):
+            u = Unaligned()
+            u.sample_id = s.sample_id
+            u.demux_id = demux_id
+            u.lane = sample['Lane']
+            u.yield_mb = round(int(stats[ sample['SampleID'] ]['pf_yield']) / 1000000, 2)
+            u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
+            u.readcounts = stats[ sample['SampleID'] ]['pf_clusters']
+            u.raw_clusters_per_lane_pct = stats[ sample['SampleID'] ]['raw_clusters_pc']
+            u.perfect_indexreads_pct = None
+            u.q30_bases_pct = stats[ sample['SampleID'] ]['pf_Q30']
+            u.mean_quality_score = stats[ sample['SampleID'] ]['pf_qscore']
+            u.time = func.now()
+
+            SQL.add(u)
+            SQL.flush()
+
+        print(sample_id_of)
 
 
     SQL.rollback()
