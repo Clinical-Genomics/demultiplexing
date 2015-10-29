@@ -37,7 +37,7 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
         SAMPLE_ID=${SAMPLE_DIR##Sample_} # remove prefix Sample_
         SANE_SAMPLE_ID=${SAMPLE_ID%%_*}  # remove all after _
 
-        mkdir -p ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_ID}/
+        mkdir -p ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/
 
         # loop over all fastq files of a sample
         for FASTQ_FILE_PATH in $(cd ${INDIR} && ls */${PROJECT_DIR}/${SAMPLE_DIR}/*.fastq.gz); do
@@ -58,7 +58,7 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
             
             # link
             #if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_ID}/${SAMPLE_FILE_NAME} ]]; then
-                ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_ID}/${SAMPLE_FILE_NAME}
+                ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}
             #fi
         done
     done
