@@ -5,7 +5,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.28.1
+VERSION=3.29.0
 RUNDIR=$1 # full path to run dir
 OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
 LOGDIR="${OUTDIR}/LOG"
