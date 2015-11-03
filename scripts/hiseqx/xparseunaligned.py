@@ -212,11 +212,11 @@ def get_samples(demux_dir):
                 continue
 
             entry = dict(zip(header, line))
-    
+
             # ADM1003A4_dual90
             samples[ entry['SampleID'] ] = entry
 
-    return samples 
+    return samples
 
 def setup_logging(level='INFO'):
     root_logger = logging.getLogger()
@@ -260,8 +260,6 @@ def main(argv):
         SQL.flush()
         supportparams_id = supportparams.supportparams_id
 
-    print(supportparams_id)
-
     datasource_id = Datasource.exists(os.path.join(demux_dir, 'l1t11/Stats/ConversionStats.xml'))
     if not datasource_id:
         new_datasource = gather_datasouce(demux_dir)
@@ -278,8 +276,6 @@ def main(argv):
         SQL.flush()
         datasource_id = datasource.datasource_id
 
-    print(datasource_id)
-
     full_flowcell_name = os.path.basename(os.path.normpath(demux_dir)).split('_')[-1]
     flowcell_name = full_flowcell_name[1:]
     flowcell_pos  = full_flowcell_name[0]
@@ -294,8 +290,6 @@ def main(argv):
         SQL.flush()
         flowcell_id = flowcell.flowcell_id
 
-    print(flowcell_id)
-
     new_demux = gather_demux(demux_dir)
     demux_id = Demux.exists(flowcell_id, new_demux['basemask'])
     if not demux_id:
@@ -308,8 +302,6 @@ def main(argv):
         SQL.add(demux)
         SQL.flush()
         demux_id = demux.demux_id
-    
-    print(demux_id)
 
     project_id_of = {} # project name: project id
     for project_name in get_projects(demux_dir):
@@ -322,8 +314,6 @@ def main(argv):
             SQL.add(p)
             SQL.flush()
             project_id_of[ project_name ] = p.project_id
-
-        print(project_id_of)
 
     samples = get_samples(demux_dir)
     sample_id_of = {} # sane sample name: sample id
@@ -349,18 +339,15 @@ def main(argv):
             u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
             u.readcounts = stats[ sample['SampleID'] ]['pf_clusters']
             u.raw_clusters_per_lane_pct = stats[ sample['SampleID'] ]['raw_clusters_pc']
-            u.perfect_indexreads_pct = None
+            u.perfect_indexreads_pct = stats[ sample['SampleID'] ]['perfect_barcodes']
             u.q30_bases_pct = stats[ sample['SampleID'] ]['pf_Q30']
             u.mean_quality_score = stats[ sample['SampleID'] ]['pf_qscore']
             u.time = func.now()
 
             SQL.add(u)
-            SQL.flush()
 
-        print(sample_id_of)
-
-
-    SQL.rollback()
+    SQL.flush()
+    SQL.commit()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
