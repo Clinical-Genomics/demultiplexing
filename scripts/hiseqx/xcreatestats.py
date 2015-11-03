@@ -82,7 +82,7 @@ def get_samplesheet(rundir, file_name='SampleSheet.csv', delim=','):
         rundir (path): FQ path of rundir
         delim (str): the samplesheet delimiter
 
-    Returns (list of dicts): 
+    Returns (list of dicts):
         Keys are the header, values the lines.
 
     """
@@ -154,7 +154,7 @@ def main(argv):
         for i, f in enumerate(stats_files):
             tree = et.parse(f)
             summaries[ lane ].append(get_summary(tree))
-    
+
     # sum the numbers over a lane
     # create a { 1: {'raw_clusters': 0, ... } } structure
     total_lane_summary = {}
