@@ -285,6 +285,7 @@ def main(argv):
         flowcell = Flowcell()
         flowcell.flowcellname = flowcell_name
         flowcell.flowcell_pos = flowcell_pos
+        flowcell.hiseeqtype = 'hiseqx'
         flowcell.time = func.now()
 
         SQL.add(flowcell)
