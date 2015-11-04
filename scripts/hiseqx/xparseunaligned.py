@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from __future__ import print_function
+from __future__ import print_function, division
 import sys
 import os
 from glob import glob
@@ -269,6 +269,7 @@ def main(argv):
         datasource.machine = new_datasource['machine']
         datasource.servername = new_datasource['servername']
         datasource.document_path = new_datasource['document_path']
+        datasource.document_type = 'xml'
         datasource.time = func.now()
         datasource.supportparams_id = supportparams_id
 
@@ -339,7 +340,7 @@ def main(argv):
             u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
             u.readcounts = stats[ sample['SampleID'] ]['pf_clusters']
             u.raw_clusters_per_lane_pct = stats[ sample['SampleID'] ]['raw_clusters_pc']
-            u.perfect_indexreads_pct = stats[ sample['SampleID'] ]['perfect_barcodes']
+            u.perfect_indexreads_pct = stats[ sample['SampleID'] ]['perfect_barcodes'] / stats[ sample['SampleID'] ]['barcodes'] * 100
             u.q30_bases_pct = stats[ sample['SampleID'] ]['pf_Q30']
             u.mean_quality_score = stats[ sample['SampleID'] ]['pf_qscore']
             u.time = func.now()
