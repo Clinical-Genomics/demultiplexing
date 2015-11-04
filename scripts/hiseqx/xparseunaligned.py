@@ -316,10 +316,10 @@ def main(argv):
             project_id_of[ project_name ] = p.project_id
 
     samples = get_samples(demux_dir)
-    sample_id_of = {} # sane sample name: sample id
     stats = xstats.parse(demux_dir)
     for sample in samples.values():
-        if not Sample.exists(sample['SampleID'], sample['index']):
+        sample_id = Sample.exists(sample['SampleID'], sample['index'])
+        if not sample_id:
             s = Sample()
             s.project_id = project_id_of[ sample['Project'] ]
             s.samplename = sample['SampleID']
@@ -328,7 +328,7 @@ def main(argv):
 
             SQL.add(s)
             SQL.flush()
-            sample_id_of[ sanitize_sample(sample['SampleID']) ] = s.sample_id
+            sample_id = s.sample_id
 
         if not Unaligned.exists(s.sample_id, demux_id, sample['Lane']):
             u = Unaligned()
