@@ -330,9 +330,9 @@ def main(argv):
             SQL.flush()
             sample_id = s.sample_id
 
-        if not Unaligned.exists(s.sample_id, demux_id, sample['Lane']):
+        if not Unaligned.exists(sample_id, demux_id, sample['Lane']):
             u = Unaligned()
-            u.sample_id = s.sample_id
+            u.sample_id = sample_id
             u.demux_id = demux_id
             u.lane = sample['Lane']
             u.yield_mb = round(int(stats[ sample['SampleID'] ]['pf_yield']) / 1000000, 2)
