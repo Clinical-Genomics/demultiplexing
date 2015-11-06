@@ -38,12 +38,8 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
     PROJECT_ID=${PROJECT_DIR##Project_}  # remove prefix Project_
     META_FILENAME=${OUTDIR}/${PROJECT_DIR}/${FC}/meta-${PROJECT_ID}-${FC}.txt 
 
-    echo $PROJECT_DIR
-
     # loop over all samples of a project
     for SAMPLE_DIR in $(find ${INDIR}/*/${PROJECT_DIR}/ -name 'Sample_*' -exec basename {} \; | sort | uniq); do
-
-        echo $SAMPLE_DIR
 
         SAMPLE_ID=${SAMPLE_DIR##Sample_} # remove prefix Sample_
         SANE_SAMPLE_ID=${SAMPLE_ID%%_*}  # remove all after _
@@ -53,8 +49,6 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
 
         # loop over all fastq files of a sample
         for FASTQ_FILE_PATH in $(cd ${INDIR} && ls */${PROJECT_DIR}/${SAMPLE_DIR}/*.fastq.gz); do
-
-            echo $FASTQ_FILE_PATH
 
             # BE AWARE
             # If a sample is in mulitple lanes, it will show up multiple times here!
@@ -67,15 +61,14 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
 
             # create a filename that's namespaced on FC, tile and included the barcode
             IFS='_' read -ra F_PARTS <<< "${FASTQ_FILE}" # split the fastq file name on '_'
-            echo ${F_PARTS[@]}
             FASTQ_FILE_INDEX="${F_PARTS[0]}_${SAMPLE_BARCODE}_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
             SAMPLE_FILE_NAME=${FC_TILE}_${FASTQ_FILE_INDEX}
-            echo "ln-s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}"
+            echo "ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}"
             
             # link
-            #if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_ID}/${SAMPLE_FILE_NAME} ]]; then
+            if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME} ]]; then
                 ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}
-            #fi
+            fi
         done
     done
 
