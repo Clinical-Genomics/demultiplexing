@@ -39,14 +39,8 @@ SCRIPT_DIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
 /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
 
-# link to OUTBOX
-log "bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}/"
-bash ${SCRIPT_DIR}/xgetfastq.bash ${DEMUXDIR}/
-
-# link to MIP_ANALYSIS
-FC=$(echo ${DEMUXDIR} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC"
-/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatefastqlinks.py $FC
+# create the Unaligned directory structure
+/home/hiseq.clinical/miniconda/env/prod/bin/python ${SCRIPT_DIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
 
 # calculate Undetermined stats
 log "bash ${SCRIPT_DIR}/xundetermined.bash ${DEMUXDIR}/"
