@@ -7,7 +7,7 @@
 
 VERSION=3.31.0
 RUNDIR=$1 # full path to run dir
-OUTDIR="/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})"
+OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log

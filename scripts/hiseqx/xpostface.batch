@@ -2,7 +2,7 @@
 #SBATCH -t 00:05:00
 #SBATCH -c 1
 #SBATCH -A prod001
-#SBATCH -J Xdem
+#SBATCH -J xpostface
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
 #SBATCH --mail-type=END
@@ -40,12 +40,18 @@ log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatest
 /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPT_DIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
 
 # create the Unaligned directory structure
-/home/hiseq.clinical/miniconda/env/prod/bin/python ${SCRIPT_DIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
+log "bash ${SCRIPT_DIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log"
+bash ${SCRIPT_DIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
 
 # calculate Undetermined stats
 log "bash ${SCRIPT_DIR}/xundetermined.bash ${DEMUXDIR}/"
 bash ${SCRIPT_DIR}/xundetermined.bash ${DEMUXDIR}/
 
+# make sure we signal the rest of the pipeline all processing is done now
+log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
+date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
+
 SUBJECT=$(basename ${DEMUXDIR})
 # send an email on completion
+log "mail -s 'X run ${SUBJECT} COMPLETE!' ${MAILTO} < ${DEMUXDIR}/stats.txt"
 mail -s "X run ${SUBJECT} COMPLETE!" ${MAILTO} < ${DEMUXDIR}/stats.txt
