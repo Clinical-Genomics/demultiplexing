@@ -341,7 +341,7 @@ def main(argv):
             u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
             u.readcounts = stats[ sample['SampleID'] ]['pf_clusters']
             u.raw_clusters_per_lane_pct = stats[ sample['SampleID'] ]['raw_clusters_pc']
-            u.perfect_indexreads_pct = stats[ sample['SampleID'] ]['perfect_barcodes'] / stats[ sample['SampleID'] ]['barcodes'] * 100
+            u.perfect_indexreads_pct = round(stats[ sample['SampleID'] ]['perfect_barcodes'] / stats[ sample['SampleID'] ]['barcodes'] * 100, 5)
             u.q30_bases_pct = stats[ sample['SampleID'] ]['pf_Q30']
             u.mean_quality_score = stats[ sample['SampleID'] ]['pf_qscore']
             u.time = func.now()
