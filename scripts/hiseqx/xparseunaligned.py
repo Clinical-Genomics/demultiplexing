@@ -315,7 +315,9 @@ def main(argv):
 
             SQL.add(p)
             SQL.flush()
-            project_id_of[ project_name ] = p.project_id
+	    project_id = p.project_id
+
+        project_id_of[ project_name ] = project_id
 
     samples = get_samples(demux_dir)
     stats = xstats.parse(demux_dir)
