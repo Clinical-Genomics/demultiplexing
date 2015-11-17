@@ -176,5 +176,4 @@ log "Done copying output"
 
 rm -r ${TMPDIR}/Xout/
 rm -r ${TMPDIR}/*
-rm -r ${CP_BACK_COMPLETE_DIR}
 log "Done removing temp files"
