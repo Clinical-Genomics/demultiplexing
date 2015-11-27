@@ -48,7 +48,7 @@ bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateuna
 
 # add the run to clinstatsdb
 log "python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log"
-python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log
+/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log
 
 # calculate Undetermined stats
 log "bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/"
