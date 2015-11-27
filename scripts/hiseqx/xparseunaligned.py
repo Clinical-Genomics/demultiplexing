@@ -13,7 +13,7 @@ from clinstatsdb.db import SQL
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '3.33.1'
+__version__ = '3.33.2'
 
 logger = logging.getLogger(__name__)
 

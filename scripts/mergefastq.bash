@@ -6,6 +6,8 @@
 # * cat 1 file / readdirection, 1 file for each lane.
 # * move old files out of the way.
 
+set -e # abort on errr
+
 DEMUX_DIR=$1
 
 [[ -z ${DEMUX_DIR} ]] && echo "USAGE: $0 <path to demux run dir>" && exit 1
