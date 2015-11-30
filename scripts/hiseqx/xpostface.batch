@@ -14,7 +14,6 @@
 
 VERSION=3.33.3
 DEMUXDIR=$1 # absolute path to the DEMUX/rundir
-MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,daniel.backman@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -57,8 +56,3 @@ bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/
 # make sure we signal the rest of the pipeline all processing is done now
 log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
 date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
-
-SUBJECT=$(basename ${DEMUXDIR})
-# send an email on completion
-log "mail -s 'X run ${SUBJECT} COMPLETE!' ${MAILTO} < ${DEMUXDIR}/stats.txt"
-mail -s "X run ${SUBJECT} COMPLETE!" ${MAILTO} < ${DEMUXDIR}/stats.txt
