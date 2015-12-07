@@ -17,6 +17,14 @@ date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 
+# transform SampleSheet from Mac to Unix
+cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
+grep -qs $'\r' ${BASE}/SampleSheet.csv
+if [[ $? -eq 0 ]]; then
+    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+    cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+fi
+
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
   runfc=$(echo ${BASE} | awk 'BEGIN {FS="_"} {print substr($4,2,9)}')
