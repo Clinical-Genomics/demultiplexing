@@ -18,11 +18,21 @@ PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 
 # transform SampleSheet from Mac to Unix
-cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-grep -qs $'\r' ${BASE}/SampleSheet.csv
-if [[ $? -eq 0 ]]; then
-    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
-    cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
+  cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
+  grep -qs $'\r\n' ${BASE}/SampleSheet.csv
+  if [[ $? -eq 0 ]]; then
+      echo 'DOS formatted SampleSheet detected. Converting...'
+      sed -i 's/\r//' ${BASE}/SampleSheet.csv
+      cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+  else
+      grep -qs $'\r' ${BASE}/SampleSheet.csv
+      if [[ $? -eq 0 ]]; then
+          echo 'MAC formatted SampleSheet detected. Converting...'
+          sed -i 's/\r/\n/' ${BASE}/SampleSheet.csv
+          cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+      fi
+  fi
 fi
 
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
@@ -146,7 +156,6 @@ echo [${NOW}] [${RUN}] --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 >
 echo [${NOW}] [${RUN}] --input-dir ${BASE}Data/Intensities/BaseCalls >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${PROJECTLOG}
 nohup make -j 8 > nohup.${NOW}.out 2>&1
-
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}
