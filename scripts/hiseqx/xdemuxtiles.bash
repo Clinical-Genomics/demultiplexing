@@ -44,8 +44,10 @@ SCRIPTDIR=$(dirname $(readlink -nm $0))
 
 log "demuxtiles.bash VERSION ${VERSION}"
 
+# get the flowcell name
+FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
     log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv"
     wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/${FC}.csv
 
@@ -81,7 +83,7 @@ for lane in "${lanes[@]}"; do
     log "starting lane ${lane} tile ${tile}"
 
     tile_qs=( ${tile} )
-    JOB_TITLE="Xdem-l${lane}t${tile_qs[0]}"
+    JOB_TITLE="Xdem-l${lane}t${tile_qs[0]}-${FC}"
     log "sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile}"
     RS=$(sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
@@ -106,7 +108,7 @@ fi
 log "Running ${RUNNING_JOBIDS[@]}"
 log "Demux ${DEMUX_JOBIDS[@]}"
 log "Remaining ${REMAINING_JOBIDS[@]}"
-JOB_TITLE="xdem-xpostface"
+JOB_TITLE="xdem-xpostface-${FC}"
 log "sbatch -J 'Xdem-postface' --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
 sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/
 
