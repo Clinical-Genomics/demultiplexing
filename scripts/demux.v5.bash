@@ -91,6 +91,9 @@ if [ $BASEMASKBYPASS ]; then
   elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
     USEBASEMASK=Y126,I6nn,n8,Y126
     UNALDIR=Unaligned10
+  elif [ $BASEMASKBYPASS == '--sr51d8' ]; then
+    USEBASEMASK=Y51,I8,I8
+    UNALDIR=Unaligned11
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -106,6 +109,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--hod8 High Output run with dual8 index"
     >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
     >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
+    >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index"
   fi
 else
   
