@@ -11,6 +11,11 @@ echo "Version $VERSION"
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
 MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,daniel.backman@scilifelab.se,nipt@karolinska.se,valtteri.wirta@scilifelab.se
+NIPTCONF=/home/clinical/.niptrc
+
+if [[ -r $NIPTCONF ]]; then
+    . $NIPTCONF
+fi
 
 #######
 # RUN #
@@ -40,7 +45,7 @@ for RUN in $(ls ${NIPTRUNS}); do
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%_} # remove possible ending _
 
         RESULTS_FILE_NAME=$(basename ${NIPTOUT}/${RUN}_*/*_NIPT_RESULTS.csv)
-        RESULTS_FILE_NAME="${INVESTIGATOR_NAME}_${RESULTS_FILE_NAME}"
+        RESULTS_FILE_NAME="${INVESTIGATOR_NAME}_NIPT_RESULTS.csv"
 
         # gather following files in a dir
         # tar them
@@ -63,6 +68,17 @@ for RUN in $(ls ${NIPTRUNS}); do
         tar -czf ${RESULTS_FILE} *
         cd -
         mail -s "Results ${SUBJECT}" -a ${OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+
+        # FTP the results file
+        NOW=$(date +"%Y%m%d%H%M%S")
+        lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${OUTDIR}/${RESULTS_FILE_NAME}; get ${RESULTS_FILE_NAME} ${OUTDIR}/retrieval.$$; bye"
+        if [[ -f ${OUTDIR}/retrieval.$$ ]]; then
+             echo [${NOW}] [${RUN}] "ERROR: FTP upload of ${RESULTS_FILE_NAME} did not work!"
+        else
+             echo [${NOW}] [${RUN}] FTP upload of ${RESULTS_FILE_NAME} did not work!
+        fi
+
+        # clean up
         rm -Rf ${OUTDIR}
 
         date +'%Y%m%d%H%M%S' > ${NIPTRUNS}/${RUN}/delivery.txt
