@@ -4,7 +4,7 @@
 #      Create the Unaligned/Project* folder structure like for an HiSeq2500 run.
 #
 
-VERSION=3.34.2
+VERSION=3.35.0
 
 # DEMUX/RUN DIR
 INDIR=$1
