@@ -12,9 +12,9 @@ for run in ${runs[@]}; do
       if [ ! -f ${UNABASE}${run}/started.txt ]; then
         echo [${NOW}] ${run} is finished but demultiplexing has not started
         demuxproccount=$(ps aux | grep HISEQ | grep grep -v | wc | awk '{print $1}')
-        if [[ "${demuxproccount}" < 15 ]]; then
+        if [[ "${demuxproccount}" -lt 15 ]]; then
           echo [${NOW}] ${run} starting demultiplexing  
-          /home/clinical/SCRIPTS/demux.v5.bash ${RAWBASE}${run} &
+          bash /home/clinical/SCRIPTS/demux.v5.bash ${RAWBASE}${run} &
         else  
           echo [${NOW}] ${run} did not start demultiplexing other processes running
         fi
