@@ -71,12 +71,15 @@ for RUN in $(ls ${NIPTRUNS}); do
 
         # FTP the results file
         NOW=$(date +"%Y%m%d%H%M%S")
-        lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${OUTDIR}/${RESULTS_FILE_NAME}; get ${RESULTS_FILE_NAME} ${OUTDIR}/retrieval.$$; bye"
-        if [[ -f ${OUTDIR}/retrieval.$$ ]]; then
-             echo [${NOW}] [${RUN}] "ERROR: FTP upload of ${RESULTS_FILE_NAME} did not work!"
-        else
-             echo [${NOW}] [${RUN}] FTP upload of ${RESULTS_FILE_NAME} did not work!
-        fi
+        lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${OUTDIR}/${RESULTS_FILE_NAME}; bye"
+
+        # waiting until the day SLL installs a proper FTP server
+        #lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${OUTDIR}/${RESULTS_FILE_NAME}; get ${RESULTS_FILE_NAME} ${OUTDIR}/retrieval.$$; bye"
+        #if [[ -f ${OUTDIR}/retrieval.$$ ]]; then
+        #     echo "[${NOW}] [${RUN}] SUCCESS: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
+        #else
+        #     echo "[${NOW}] [${RUN}] ERROR: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
+        #fi
 
         # clean up
         rm -Rf ${OUTDIR}
