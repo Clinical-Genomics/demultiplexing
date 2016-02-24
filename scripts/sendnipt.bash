@@ -60,6 +60,9 @@ for RUN in $(ls ${NIPTRUNS}); do
         cp ${NIPTOUT}/${RUN}_*/*_MISINDEXED_RESULTS.csv ${OUTDIR}
         cp ${NIPTOUT}/${RUN}_*/*_NIPT_RESULTS.csv ${OUTDIR}/${RESULTS_FILE_NAME}
         cp ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt ${OUTDIR}
+
+        # make MB's life easier and cp the SampleSheet to the output folder
+        cp ${NIPTRUNS}/${RUN}/SampleSheet.csv ${NIPTOUT}/${RUN}_*/
         
         SUBJECT="${INVESTIGATOR_NAME}_${EXPERIMENT_NAME}"
         RESULTS_FILE="results_${SUBJECT}.tgz"
