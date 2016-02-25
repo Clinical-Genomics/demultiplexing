@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.33.4
+VERSION=3.35.4
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -16,6 +16,14 @@ mkdir -p ${UNALIGNEDBASE}${RUN}
 date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
+
+# transform SampleSheet from Mac to Unix
+cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
+grep -qs $'\r' ${BASE}/SampleSheet.csv
+if [[ $? -eq 0 ]]; then
+    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+    cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+fi
 
 if [ ! -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   echo [${NOW}] [${RUN}] SampleSheet not found! Exits . . . >> ${logfile}

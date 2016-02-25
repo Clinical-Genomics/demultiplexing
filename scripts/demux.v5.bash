@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.33.4
+VERSION=3.35.4
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -16,6 +16,24 @@ mkdir -p ${UNALIGNEDBASE}${RUN}
 date > ${UNALIGNEDBASE}${RUN}/started.txt
 PROJECTLOG=${UNALIGNEDBASE}${RUN}/projectlog.${NOW}.txt
 echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
+
+# transform SampleSheet from Mac to Unix
+if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
+  cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
+  grep -qs $'\r\n' ${BASE}/SampleSheet.csv
+  if [[ $? -eq 0 ]]; then
+      echo 'DOS formatted SampleSheet detected. Converting...'
+      sed -i 's/\r//' ${BASE}/SampleSheet.csv
+      cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+  else
+      grep -qs $'\r' ${BASE}/SampleSheet.csv
+      if [[ $? -eq 0 ]]; then
+          echo 'MAC formatted SampleSheet detected. Converting...'
+          sed -i 's/\r/\n/' ${BASE}/SampleSheet.csv
+          cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
+      fi
+  fi
+fi
 
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
@@ -73,6 +91,9 @@ if [ $BASEMASKBYPASS ]; then
   elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
     USEBASEMASK=Y126,I6nn,n8,Y126
     UNALDIR=Unaligned10
+  elif [ $BASEMASKBYPASS == '--sr51d8' ]; then
+    USEBASEMASK=Y51,I8,I8
+    UNALDIR=Unaligned11
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
@@ -88,6 +109,7 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--hod8 High Output run with dual8 index"
     >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
     >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
+    >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index"
   fi
 else
   
@@ -138,7 +160,6 @@ echo [${NOW}] [${RUN}] --use-bases-mask ${USEBASEMASK} --fastq-cluster-count 0 >
 echo [${NOW}] [${RUN}] --input-dir ${BASE}Data/Intensities/BaseCalls >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}]  --output-dir ${UNALIGNEDBASE}${RUN}/${UNALDIR} >> ${PROJECTLOG}
 nohup make -j 8 > nohup.${NOW}.out 2>&1
-
 
 NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}

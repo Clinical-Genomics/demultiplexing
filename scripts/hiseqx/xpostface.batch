@@ -12,7 +12,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.33.4
+VERSION=3.35.4
 DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
 #############
@@ -46,8 +46,9 @@ log "bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcrea
 bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
 
 # add the run to clinstatsdb
-log "python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log"
-/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log
+# relies on permanent ssh tunnel at 3308, which is not present on the nodes - now gets executed in the checkfornewdemux.sh script
+#log "python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log"
+#/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xparseunaligned.py ${DEMUXDIR} &> ${DEMUXDIR}/LOG/xparseunaligned.`date +'%Y%m%d%H%M%S'`.log
 
 # calculate Undetermined stats
 log "bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to send run results
 
-VERSION=3.33.4
+VERSION=3.35.4
 echo "Version $VERSION"
 
 ##########
@@ -11,6 +11,11 @@ echo "Version $VERSION"
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
 MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,daniel.backman@scilifelab.se,nipt@karolinska.se,valtteri.wirta@scilifelab.se
+NIPTCONF=/home/clinical/.niptrc
+
+if [[ -r $NIPTCONF ]]; then
+    . $NIPTCONF
+fi
 
 #######
 # RUN #
@@ -40,30 +45,45 @@ for RUN in $(ls ${NIPTRUNS}); do
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%_} # remove possible ending _
 
         RESULTS_FILE_NAME=$(basename ${NIPTOUT}/${RUN}_*/*_NIPT_RESULTS.csv)
-        RESULTS_FILE_NAME="${INVESTIGATOR_NAME}_${RESULTS_FILE_NAME}"
+        RESULTS_FILE_NAME="${INVESTIGATOR_NAME}_NIPT_RESULTS.csv"
 
         # gather following files in a dir
         # tar them
         # mail!
         
-        OUTDIR=`mktemp -d`
+        TMP_OUTDIR=`mktemp -d`
         
-        cp -R ${NIPTRUNS}/${RUN}/InterOp ${OUTDIR}
-        cp ${NIPTRUNS}/${RUN}/runParameters.xml ${OUTDIR}
-        cp ${NIPTRUNS}/${RUN}/SampleSheet.csv ${OUTDIR}
-        cp ${NIPTRUNS}/${RUN}/RunInfo.xml ${OUTDIR}
-        cp ${NIPTOUT}/${RUN}_*/*_MISINDEXED_RESULTS.csv ${OUTDIR}
-        cp ${NIPTOUT}/${RUN}_*/*_NIPT_RESULTS.csv ${OUTDIR}/${RESULTS_FILE_NAME}
-        cp ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt ${OUTDIR}
-        
+        cp -R ${NIPTRUNS}/${RUN}/InterOp ${TMP_OUTDIR}
+        cp ${NIPTRUNS}/${RUN}/runParameters.xml ${TMP_OUTDIR}
+        cp ${NIPTRUNS}/${RUN}/SampleSheet.csv ${TMP_OUTDIR}
+        cp ${NIPTRUNS}/${RUN}/RunInfo.xml ${TMP_OUTDIR}
+        cp ${OUTDIR}/*_MISINDEXED_RESULTS.csv ${TMP_OUTDIR}
+        cp ${OUTDIR}/*_NIPT_RESULTS.csv ${TMP_OUTDIR}/${RESULTS_FILE_NAME}
+        cp ${OUTDIR}/REPORT.Complete.txt ${TMP_OUTDIR}
+
         SUBJECT="${INVESTIGATOR_NAME}_${EXPERIMENT_NAME}"
         RESULTS_FILE="results_${SUBJECT}.tgz"
 
-        cd ${OUTDIR}
+        cd ${TMP_OUTDIR}
         tar -czf ${RESULTS_FILE} *
         cd -
-        mail -s "Results ${SUBJECT}" -a ${OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
-        rm -Rf ${OUTDIR}
+        mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+
+        # FTP the results file
+        NOW=$(date +"%Y%m%d%H%M%S")
+        lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
+
+        # waiting until the day SLL installs a proper FTP server
+        #lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; get ${RESULTS_FILE_NAME} ${TMP_OUTDIR}/retrieval.$$; bye"
+        #if [[ -f ${TMP_OUTDIR}/retrieval.$$ ]]; then
+        #     echo "[${NOW}] [${RUN}] SUCCESS: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
+        #else
+        #     echo "[${NOW}] [${RUN}] ERROR: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
+        #fi
+
+        # clean up
+        echo "rm -Rf ${TMP_OUTDIR}"
+        #rm -Rf ${TMP_OUTDIR}
 
         date +'%Y%m%d%H%M%S' > ${NIPTRUNS}/${RUN}/delivery.txt
     fi
