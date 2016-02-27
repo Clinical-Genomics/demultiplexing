@@ -58,17 +58,20 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 
     log "Downloaded sample sheet:"
     log_file ${RUNDIR}/${FC}.csv
-
-    # Downloaded samplesheet has following headers:
-    #FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-
-    # Needs to be changed to this:
-    #[Data]
-    #FCID,Lane,SampleID,SampleRef,Index,SampleName,Control,Recipe,Operator,Project
-
-    echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-    sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
+    
+    cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
 fi
+
+# Downloaded samplesheet has following headers:
+#FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+
+# Needs to be changed to this:
+#[Data]
+#FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
+
+cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
+echo '[Data]' > ${RUNDIR}/SampleSheet.csv
+sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
 
 log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv
