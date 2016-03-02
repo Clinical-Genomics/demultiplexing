@@ -7,15 +7,34 @@ import os
 from glob import glob
 import logging
 import socket
+import yaml
+from os.path import expanduser
 
 from sqlalchemy import func
-from clinstatsdb.db import SQL
+from clinstatsdb.db.store import connect
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '3.35.4'
+__version__ = '3.36.2'
 
 logger = logging.getLogger(__name__)
+
+class Config:
+
+    def __init__(self):
+        with open(expanduser("~/.clinical/databases.yaml"), 'r') as ymlfile:
+            self.config = yaml.load(ymlfile)
+
+    def __getitem__(self, key):
+        """Simple array-based getter.
+
+        Args:
+            key (str): Gets the value for this key in the YAML file.
+
+        Returns (str, dict): returns the structure underneat this key.
+
+        """
+        return self.config[key]
 
 def gather_supportparams(run_dir):
     """Aggregates all the support params:
@@ -248,7 +267,10 @@ def main(argv):
     setup_logging(level='DEBUG')
     demux_dir = argv[0]
 
-    if not Version.latest():
+    config = Config()
+    SQL = connect(config['clinstats']['connection_string'])
+
+    if not Version.check(config['clinstats']['name'], config['clinstats']['version']):
         logger.error('Wrong database!')
         exit(1)
 

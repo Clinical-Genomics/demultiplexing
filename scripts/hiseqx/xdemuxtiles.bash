@@ -5,7 +5,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.35.4
+VERSION=3.36.2
 RUNDIR=$1 # full path to run dir
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 LOGDIR="${OUTDIR}/LOG"
@@ -58,17 +58,25 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 
     log "Downloaded sample sheet:"
     log_file ${RUNDIR}/${FC}.csv
-
-    # Downloaded samplesheet has following headers:
-    #FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-
-    # Needs to be changed to this:
-    #[Data]
-    #FCID,Lane,SampleID,SampleRef,Index,SampleName,Control,Recipe,Operator,Project
-
-    echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-    sed  -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/${FC}.csv >> ${RUNDIR}/SampleSheet.csv
+    
+    cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
 fi
+
+# Downloaded samplesheet has following headers:
+#FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+
+# Needs to be changed to this:
+#[Data]
+#FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
+
+# copy the samplesheet
+cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
+# add the [Data] header
+echo '[Data]' > ${RUNDIR}/SampleSheet.csv
+# as we don't know if this is a rerun or an unprocessed run, remove the [Data] header, if any
+grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
+# convert the column headers, remove the second index
+sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
 
 log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv
