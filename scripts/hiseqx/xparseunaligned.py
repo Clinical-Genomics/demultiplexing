@@ -208,17 +208,8 @@ def sanitize_sample(sample):
     """
     return sample.split('_')[0].rstrip('BF')
 
-def get_samples(demux_dir):
-    """TODO: Docstring for get_samples.
-
-    Args:
-        demux_dir (TODO): TODO
-
-    Returns: TODO
-
-    """
-
-    samples = {} # sample_name: index
+def get_sample_sheet(demux_dir):
+    sample_sheet = []
     samplesheet_file_name = glob("{demux_dir}/SampleSheet.csv".format(demux_dir=demux_dir))[0]
     with open(samplesheet_file_name, 'r') as samplesheet_fh:
         lines = [ line.strip().split(',') for line in samplesheet_fh.readlines() ]
@@ -231,11 +222,9 @@ def get_samples(demux_dir):
                 continue
 
             entry = dict(zip(header, line))
+            sample_sheet.append(entry)
 
-            # ADM1003A4_dual90
-            samples[ entry['SampleID'] ] = entry
-
-    return samples
+    return sample_sheet
 
 def get_nr_samples_lane(sample_sheet):
     samples_lane = {}
@@ -243,7 +232,7 @@ def get_nr_samples_lane(sample_sheet):
         if line['Lane'] not in samples_lane:
              samples_lane[ line['Lane'] ] = 0
         samples_lane[ line['Lane'] ] += 1
-	
+
     return samples_lane
 
 def setup_logging(level='INFO'):
@@ -350,11 +339,11 @@ def main(argv):
 
         project_id_of[ project_name ] = project_id
 
-    samples = get_samples(demux_dir)
+    sample_sheet = get_sample_sheet(demux_dir)
     stats = xstats.parse(demux_dir)
     stats_sample = xstats.parse_samples(demux_dir)
-    nr_samples_lane = get_nr_samples_lane(samples.values())
-    for sample in samples.values():
+    nr_samples_lane = get_nr_samples_lane(sample_sheet)
+    for sample in sample_sheet:
         sample_id = Sample.exists(sample['SampleID'], sample['index'])
         if not sample_id:
             s = Sample()
