@@ -3,7 +3,7 @@
 # * create the stats-*.txt files
 # * sync the stats-*.txt files to rasta
 
-VERSION=3.36.2
+VERSION=3.36.3
 
 NOW=$(date +"%Y%m%d%H%M%S")
 UNALIGNEDBASE=/home/clinical/DEMUX/
@@ -39,6 +39,8 @@ if [ $BASEMASKBYPASS ]; then
     UNALDIR=Unaligned9
   elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
     UNALDIR=Unaligned10
+  elif [ $BASEMASKBYPASS == '--sr51d8' ]; then
+    UNALDIR=Unaligned11
   else
     >&2 echo "'$BASEMASKBYPASS' not recognized!"
     >&2 echo "Available options are:"
