@@ -341,7 +341,7 @@ def main(argv):
 
     sample_sheet = get_sample_sheet(demux_dir)
     stats = xstats.parse(demux_dir)
-    stats_sample = xstats.parse_samples(demux_dir)
+    stats_samples = xstats.parse_samples(demux_dir)
     nr_samples_lane = get_nr_samples_lane(sample_sheet)
     for sample in sample_sheet:
         sample_id = Sample.exists(sample['SampleID'], sample['index'])
@@ -362,13 +362,15 @@ def main(argv):
             u.demux_id = demux_id
             u.lane = sample['Lane']
             if nr_samples_lane[ sample['Lane'] ] > 1: # pooled!
-                u.yield_mb = round(int(stats_sample[ sample['SampleID'] ]['pf_yield']) / 1000000, 2)
-                u.passed_filter_pct = stats_sample[ sample['SampleID'] ]['pf_yield_pc']
-                u.readcounts = stats_sample[ sample['SampleID'] ]['pf_clusters']
-                u.raw_clusters_per_lane_pct = stats_sample[ sample['SampleID'] ]['raw_clusters_pc']
-                u.perfect_indexreads_pct = round(stats_sample[ sample['SampleID'] ]['perfect_barcodes'] / stats_sample[ sample['SampleID'] ]['barcodes'] * 100, 5)
-                u.q30_bases_pct = stats_sample[ sample['SampleID'] ]['pf_Q30']
-                u.mean_quality_score = stats_sample[ sample['SampleID'] ]['pf_qscore']
+                stats_sample = stats_samples[ sample['Lane'] ][ sample['SampleID'] ]
+
+                u.yield_mb = round(int(stats_sample['pf_yield']) / 1000000, 2)
+                u.passed_filter_pct = stats_sample['pf_yield_pc']
+                u.readcounts = stats_sample['pf_clusters']
+                u.raw_clusters_per_lane_pct = stats_sample['raw_clusters_pc']
+                u.perfect_indexreads_pct = round(stats_sample['perfect_barcodes'] / stats_sample['barcodes'] * 100, 5)
+                u.q30_bases_pct = stats_sample['pf_Q30']
+                u.mean_quality_score = stats_sample['pf_qscore']
             else:
                 u.yield_mb = round(int(stats[ sample['SampleID'] ]['pf_yield']) / 1000000, 2)
                 u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
