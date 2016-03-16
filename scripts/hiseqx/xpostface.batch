@@ -36,7 +36,7 @@ SCRIPTDIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 # remove copy control files
 rm -Rf ${DEMUXDIR}/copybackcomplete/
 
-# create the stats file
+# create the stats file per lane
 # needs python 2.7+ !
 log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
 /home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt

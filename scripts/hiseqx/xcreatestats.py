@@ -183,10 +183,9 @@ def main(argv):
                 total_lane_summary[lane][ key ] += stat
 
     # print me a pretty report
-    print('\t'.join(('Sample', 'Flowcell', 'Lane', 'PF_clusters', 'YieldMB', 'Q30', 'Q30_read1', 'Q30_read2', 'MeanQScore', 'Undetermined')))
+    print('\t'.join(('Flowcell', 'Lane', 'PF_clusters', 'YieldMB', 'Q30', 'Q30_read1', 'Q30_read2', 'MeanQScore', 'Undetermined')))
     for lane, summary in total_lane_summary.items():
         print('\t'.join( [
-            summary['samplename'],
             summary['flowcell'],
             lane,
             str(summary['pf_clusters']),
