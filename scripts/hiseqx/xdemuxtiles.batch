@@ -163,10 +163,10 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             done
         done
     done
-
-    # we're done copying, release the lock
-    rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 done
+
+# we're done copying, release the lock
+rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 
 log "Done copying output"
 
