@@ -15,7 +15,7 @@ from clinstatsdb.db.store import connect
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '3.37.0'
+__version__ = '3.37.1'
 
 logger = logging.getLogger(__name__)
 
@@ -335,7 +335,7 @@ def main(argv):
 
             SQL.add(p)
             SQL.flush()
-	    project_id = p.project_id
+            project_id = p.project_id
 
         project_id_of[ project_name ] = project_id
 
