@@ -150,19 +150,19 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
 
             log "cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}"
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
-
-            # Copy the undetermined indexes
-            # This works as we only expect one sample/lane! So no files get overwritten.
-            # Make sure we only get the file listing and not the path/file
-            for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
-                # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
-                if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${SAMPLE_OUTDIR}/${UNDETERMINED} ]]; then
-                    log "cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}"
-                    cp ${TMPOUT_DIR}/${UNDETERMINED} ${SAMPLE_OUTDIR}/${UNDETERMINED}
-                fi
-            done
         done
     done
+done
+
+# Copy the undetermined indexes
+UNDETERMINED_OUTDIR=${OUTDIR}/${TILE_DIR}
+mkdir ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
+for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
+    # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
+    if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${UNDETERMINED_OUTDIR}/${UNDETERMINED} ]]; then
+        log "cp ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}"
+        cp ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}
+    fi
 done
 
 # we're done copying, release the lock

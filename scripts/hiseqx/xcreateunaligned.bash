@@ -36,7 +36,6 @@ rm -Rf ${INDIR}/Unaligned/
 # loop over all projects
 for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort | uniq); do
     PROJECT_ID=${PROJECT_DIR##Project_}  # remove prefix Project_
-    META_FILENAME=${OUTDIR}/${PROJECT_DIR}/${FC}/meta-${PROJECT_ID}-${FC}.txt 
 
     # loop over all samples of a project
     for SAMPLE_DIR in $(find ${INDIR}/*/${PROJECT_DIR}/ -name 'Sample_*' -exec basename {} \; | sort | uniq); do
@@ -64,14 +63,18 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
             FASTQ_FILE_INDEX="${F_PARTS[0]}_${SAMPLE_BARCODE}_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
             SAMPLE_FILE_NAME=${FC_TILE}_${FASTQ_FILE_INDEX}
             echo "ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}"
-            
+
             # link
             if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME} ]]; then
                 ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}
             fi
+
+            # link undetermined
+            UNDETERMINED_FILE_NAME="${FC_TILE}_Undetermined_${SAMPLE_BARCODE}_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
+            if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${UNDETERMINED_FILE_NAME} ]]; then
+                ORIGINAL_UNDETERMINED_FILE_NAME="Undetermined_*_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
+                ln -s ${INDIR}/${TILE}/${ORIGINAL_UNDETERMINED_FILE_NAME} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${UNDETERMINED_FILE_NAME}
+            fi
         done
     done
-
-    # cp stats file
-    #cp ${INDIR}/stats.txt ${OUTDIR}/${PROJECT_DIR}/${FC}/stats-${PROJECT_ID}-${FC}.txt
 done

@@ -7,5 +7,5 @@ LANE=$2
 LOGDIR=${RUNDIR}/LOG/
 [[ ! -e ${LOGDIR} ]] && mkdir ${LOGDIR}
 
-echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
-zgrep ^@ST ${RUNDIR}/l${LANE}t*/*/*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
+echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
+zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
