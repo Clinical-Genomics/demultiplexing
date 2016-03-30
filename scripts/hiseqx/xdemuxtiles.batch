@@ -152,6 +152,10 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
         done
     done
+    
+    # we're done copying, release the lock
+    rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
+
 done
 
 # Copy the undetermined indexes
@@ -164,9 +168,6 @@ for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
         cp ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}
     fi
 done
-
-# we're done copying, release the lock
-rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 
 log "Done copying output"
 
