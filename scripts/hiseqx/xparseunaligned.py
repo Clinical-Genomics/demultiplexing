@@ -15,7 +15,7 @@ from clinstatsdb.db.store import connect
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '3.37.2'
+__version__ = '3.37.3'
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +62,9 @@ def gather_supportparams(run_dir):
     rs = {} # result set
 
     # get some info from bcl2 fastq
-    logfilenames = glob(os.path.join(run_dir, 'LOG', 'Xdem-l1t11-*.log')) # should yield one result
+    logfilenames = glob(os.path.join(run_dir, 'LOG', 'Xdem-l?t??-*.log')) # should yield one result
     if len(logfilenames) == 0:
-        logger.error('No log files found! Looking for %s', os.path.join(run_dir, 'LOG', 'Xdem-l1t11-*.log'))
+        logger.error('No log files found! Looking for %s', os.path.join(run_dir, 'LOG', 'Xdem-l?t??-*.log'))
         exit(1)
 
     with open(logfilenames[0], 'r') as logfile:
