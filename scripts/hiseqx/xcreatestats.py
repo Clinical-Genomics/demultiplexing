@@ -98,19 +98,19 @@ def calc_undetermined(rundir):
     sizes = {}
     all_files = glob.glob(rundir + '/l*/Project*/Sample*/*fastq.gz')
     for f in all_files:
-        sample_name = re.search(r'Sample_(.*)/', f).group(1)
-        if sample_name not in sizes:
-            sizes[ sample_name ] = { 'size_of': 0, 'u_size_of': 0 }
-        sizes[ sample_name ]['size_of'] += os.path.getsize(f)
+        lane = re.search(r'l(.*)t(11|21)/', f).group(1)
+        if lane not in sizes:
+            sizes[ lane ] = { 'size_of': 0, 'u_size_of': 0 }
+        sizes[ lane ]['size_of'] += os.path.getsize(f)
 
-    und_files = glob.glob(rundir + '/l*/Project*/Sample*/Undet*fastq.gz')
+    und_files = glob.glob(rundir + '/l*/Undet*fastq.gz')
     for f in und_files:
-        sample_name = re.search(r'Sample_(.*)/', f).group(1)
-        sizes[ sample_name ]['u_size_of'] += os.path.getsize(f)
+        lane = re.search(r'l(.*)t(11|21)/', f).group(1)
+        sizes[ lane ]['u_size_of'] += os.path.getsize(f)
 
     proc_undetermined = {}
-    for sample_name, size in sizes.items():
-        proc_undetermined[ sample_name ] = float(size['u_size_of']) / size['size_of'] * 100
+    for lane, size in sizes.items():
+        proc_undetermined[ lane ] = float(size['u_size_of']) / size['size_of'] * 100
 
     return proc_undetermined
 
@@ -194,7 +194,7 @@ def main(argv):
             str(round(summary['pf_read1_q30'] / summary['pf_read1_yield'] * 100, 2)),
             str(round(summary['pf_read2_q30'] / summary['pf_read2_yield'] * 100, 2)),
             str(round(summary['pf_qscore_sum'] / summary['pf_yield'], 2)),
-            str(round(proc_undetermined[ summary['samplename'] ], 2)) if summary['samplename'] in proc_undetermined else '#NA'
+            str(round(proc_undetermined[ lane ], 2)) if lane in proc_undetermined else '#NA'
         ]))
 
 if __name__ == '__main__':
