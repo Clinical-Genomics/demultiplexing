@@ -135,12 +135,12 @@ with db.dbconnect(pars['CLINICALDBHOST'], pars['CLINICALDBPORT'], pars['STATSDB'
 
   Samplesheet = open(samplesheet)
   SampleSheet = Samplesheet.read()
-   for line in Samplesheet.readlines():
-     print "LINE", line
-     if re.match(",", line):
-       SampleSheet += line
-     line = line.strip()
-     print line
+  for line in Samplesheet.readlines():
+    print "LINE", line
+    if re.match(",", line):
+      SampleSheet += line
+    line = line.strip()
+    print line
   Samplesheet.close()
 
   print Idstring, Program, Systempid, Systemos, Systemperlv, Systemperlexe
