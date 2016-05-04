@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to send run results
 
+set -u
+
 VERSION=3.39.0
 echo "Version $VERSION"
 
@@ -83,7 +85,7 @@ for RUN in $(ls ${NIPTRUNS}); do
 
         # clean up
         echo "rm -Rf ${TMP_OUTDIR}"
-        #rm -Rf ${TMP_OUTDIR}
+        rm -Rf ${TMP_OUTDIR}
 
         date +'%Y%m%d%H%M%S' > ${NIPTRUNS}/${RUN}/delivery.txt
     fi
