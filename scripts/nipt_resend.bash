@@ -39,3 +39,6 @@ cp ${OUTDIR}/*_NIPT_RESULTS.csv ${TMP_OUTDIR}/${RESULTS_FILE_NAME}
 NOW=$(date +"%Y%m%d%H%M%S")
 echo "lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e 'cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye'"
 lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
+
+rm -Rf ${TMP_OUTDIR}/${RESULTS_FILE_NAME}
+rmdir ${TMP_OUTDIR}
