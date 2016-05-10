@@ -12,7 +12,7 @@ echo "Version $VERSION"
 
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
-MAILTO=kenny.billiau@scilifelab.se,emma.sernstad@scilifelab.se,daniel.backman@scilifelab.se,nipt@karolinska.se,valtteri.wirta@scilifelab.se
+MAILTO=bioinfo.clinical@scilifelab.se,nipt@karolinska.se
 NIPTCONF=/home/clinical/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
