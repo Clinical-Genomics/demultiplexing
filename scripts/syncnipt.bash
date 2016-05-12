@@ -21,7 +21,7 @@ for RUN in ${RUNS[@]}; do
   NOW=$(date +"%Y%m%d%H%M%S")
   if [[ ! -e ${NIPTBASE}${RUN} ]]; then
     # simple NIPT detection
-    grep -qs Description,NIPTv1 ${RUNBASE}${RUN}/SampleSheet.csv
+    grep -qs Description,cfDNAHiSeqv1.0 ${RUNBASE}${RUN}/SampleSheet.csv
     if [[ $? -eq 0 ]]; then
       cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
 

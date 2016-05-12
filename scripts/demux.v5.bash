@@ -180,7 +180,7 @@ NOW=$(date +"%Y%m%d%H%M%S")
 #    copy the demultiplexed files to rasta
 
 # skip NIPT runs
-grep -qs Description,NIPTv1 ${UNALIGNEDBASE}${RUN}/SampleSheet.csv
+grep -qs Description,cfDNAHiSeqv1.0 ${UNALIGNEDBASE}${RUN}/SampleSheet.csv
 if [[ $? -ne 0 ]]; then
   echo [${NOW}] [${RUN}] copy to cluster [rsync -r -t -e ssh ${UNALIGNEDBASE}${RUN} rastapopoulos.scilifelab.se:/mnt/hds/proj/bioinfo/DEMUX/] >> ${PROJECTLOG}
   
