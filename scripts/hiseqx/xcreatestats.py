@@ -110,7 +110,7 @@ def calc_undetermined(rundir):
 
     proc_undetermined = {}
     for lane, size in sizes.items():
-        proc_undetermined[ lane ] = float(size['u_size_of']) / size['size_of'] * 100
+        proc_undetermined[ lane ] = float(size['u_size_of']) / (size['u_size_of'] + size['size_of']) * 100
 
     return proc_undetermined
 
