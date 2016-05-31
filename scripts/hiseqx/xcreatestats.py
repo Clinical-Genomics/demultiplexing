@@ -9,7 +9,7 @@ import glob
 import re
 import os
 
-__version__ = '3.39.3'
+__version__ = '3.39.4'
 
 def xpathsum(tree, xpath):
     """Sums all numbers found at these xpath nodes
@@ -110,7 +110,7 @@ def calc_undetermined(rundir):
 
     proc_undetermined = {}
     for lane, size in sizes.items():
-        proc_undetermined[ lane ] = float(size['u_size_of']) / size['size_of'] * 100
+        proc_undetermined[ lane ] = float(size['u_size_of']) / (size['u_size_of'] + size['size_of']) * 100
 
     return proc_undetermined
 
