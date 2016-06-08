@@ -38,10 +38,7 @@ fi
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
   runfc=$(echo ${BASE} | awk 'BEGIN {FS="_"} {print substr($4,2,9)}')
-#  echo runfc ${runfc} fcinfile ${fcinfile}  
   if [ ! ${runfc} == ${fcinfile} ]; then 
-#    echo Flowcell ID is correct, continues . . .
-#  else
     echo [${NOW}] [${RUN}] Wrong Flowcell ID in SampleSheet. Exits . . . >> ${logfile}
     echo [${NOW}] [${RUN}] Wrong Flowcell ID in SampleSheet. Exits . . . >> ${PROJECTLOG}
     exit
@@ -53,6 +50,38 @@ else
 fi
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
+
+SAMPLE_INDEX=( $(cat ${BASE}/SampleSheet.csv | sed -n "2p" | sed -e 's/,/\n/g' ) )
+SAMPLE_INDEX=( $( echo ${SAMPLE_INDEX[4]} | sed -e 's/-/\n/g' ) )
+LEN_SAMPLE_INDEX1=${#SAMPLE_INDEX[0]}
+LEN_SAMPLE_INDEX2=${#SAMPLE_INDEX[1]}
+
+# Determine index length of run
+indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+LEN_Y1=$(grep \<Read1\> ${BASE}/runParameters.xml | sed 's/<\/Read1>\r//' | sed 's/    <Read1>//')
+LEN_Y2=$(grep \<Read2\> ${BASE}/runParameters.xml | sed 's/<\/Read2>\r//' | sed 's/    <Read2>//')
+
+# Determine Basemask
+# http://stackoverflow.com/a/5349772/322188
+I1n=$(head -c $(( ${indexread1count} - ${LEN_SAMPLE_INDEX1} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
+I1="I${LEN_SAMPLE_INDEX1}${I1n}"
+I2=''
+
+if [[ ${indexread2count} -gt 0 ]]; then # dual
+    if [[ ${LEN_SAMPLE_INDEX2} -gt 0 ]]; then
+        I2="I${LEN_SAMPLE_INDEX2}"
+    fi
+    I2n=$(head -c $(( ${indexread2count} - ${LEN_SAMPLE_INDEX2} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
+    I2=",${I2}${I2n}"
+fi
+
+Y1=Y${LEN_Y1}
+if [[ ${LEN_Y2} -gt 0 ]]; then
+    Y2=,Y${LEN_Y2}
+fi
+
+BASEMASK="${Y1},${I1}${I2}${Y2}"
 
 if [ $BASEMASKBYPASS ]; then
   if [ $BASEMASKBYPASS == '--d8' ]; then
@@ -114,35 +143,6 @@ if [ $BASEMASKBYPASS ]; then
     >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
     >&2 echo "--hos6 High Output run with single 6 index"
     >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index"
-  fi
-else
-  
-  ######   uses windows end-of-line/return setting [=FUCKING stupid!]
-  ######
-  indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
-  indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
-  
-  #echo ${indexread1count}
-  #echo ${indexread2count}
-  
-  #  start to assume standard singel index
-  if [ "${indexread2count}" == 8 ]; then
-  #  this is not true if second index equals 8
-    USEBASEMASK=Y101,I8,I8,Y101
-    UNALDIR=Unaligned1
-    echo  ${indexread2count} == "8" ix2
-  else
-    echo  ${indexread2count} == 8 NOT ix2
-    if [ "${indexread1count}" == 8 ]; then
-      echo ${indexread1count} == 8
-  #  not if first index equals 8 either
-        USEBASEMASK=Y101,I8,Y101
-        UNALDIR=Unaligned2
-    else 
-      echo ${indexread1count} == 8 NOT ix1
-      USEBASEMASK=Y101,I6n,Y101
-      UNALDIR=Unaligned
-    fi
   fi
 fi
 
