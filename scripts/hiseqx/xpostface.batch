@@ -3,6 +3,7 @@
 #SBATCH -c 1
 #SBATCH -A prod001
 #SBATCH -J xpostface
+#SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
 #SBATCH --mail-type=END

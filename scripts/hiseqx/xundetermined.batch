@@ -1,4 +1,12 @@
 #!/bin/bash
+#SBATCH -A prod001
+#SBATCH -t 10:00:00
+#SBATCH -c 1
+#SBATCH --qos=high
+#SBATCH --mail-user=kenny.billiau@scilifelab.se
+#SBATCH --mail-type=ERROR
+#SBATCH -e /mnt/hds/proj/bioinfo/LOG/undetermined-%j.err
+#SBATCH -o /mnt/hds/proj/bioinfo/LOG/undetermined-%j.out
 
 VERSION=3.40.0
 RUNDIR=$1

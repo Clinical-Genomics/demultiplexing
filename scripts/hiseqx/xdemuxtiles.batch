@@ -3,6 +3,7 @@
 #SBATCH -c 16
 #SBATCH -A prod001
 #SBATCH -J Xdem
+#SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-%j.err
 #SBATCH --mail-type=END
@@ -152,7 +153,7 @@ for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
             cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
         done
     done
-    
+
     # we're done copying, release the lock
     rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
 
