@@ -23,6 +23,23 @@ def get_sample_sheet(demux_dir):
 
     return sample_sheet
 
+def get_reads(logfile, index=None):
+    """ Gets the amount of reads for index
+
+    Args:
+        logfile (path): path to log file that holds requested index
+        index (str): the index to corrolate
+
+    returns (int): reads for index
+
+    """
+    with open(logfile, 'r') as log:
+        for line in log:
+            line = line.strip(' \n')
+            line = line.split(' ')
+            if len(line) > 1 and line[1] == index:
+                return line[0]
+
 def main(logfile, index):
     """TODO: Docstring for main.
 
@@ -31,13 +48,23 @@ def main(logfile, index):
         index (str): the index to corrolate
 
     """
+
+    #import ipdb; ipdb.set_trace()
     # get lane number
     logfilename = os.path.basename(logfile)
     lane = logfilename.split('.')[0]
-    # get run dir
+
+    # get fully qualified run dir
     rundir = os.path.dirname(os.path.dirname(logfile))
+
+    # get run name
+    runname = os.path.basename(rundir)
+
     # get samplesheet
     samplesheet = get_sample_sheet(rundir)
+
+    # get the # reads
+    reads = get_reads(logfile, index)
 
     # get the samples with that lane
     lane_sample = []
@@ -48,7 +75,13 @@ def main(logfile, index):
             if '_' in line['SampleID']:
                 lane_index.append(line['SampleID'].split('_')[1])
 
-    print(','.join(lane_index))
+    outline = []
+    outline.extend(runname.split('_'))
+    outline.extend(['LOG', lane, reads, index])
+    outline.extend([','.join(lane_sample)])
+    outline.extend([','.join(lane_index)])
+
+    print(' '.join(outline))
 
 
 if __name__ == "__main__":
