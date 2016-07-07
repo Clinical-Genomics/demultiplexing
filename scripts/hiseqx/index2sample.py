@@ -3,11 +3,22 @@
 
 import os
 import sys
+import re
+from urllib import urlretrieve
 from glob import glob
+
+def download_sample_sheet(demux_dir):
+    filename = demux_dir + '/SampleSheet.csv'
+    run_name = os.path.basename(demux_dir)
+    flowcell = run_name.split('_')[-1][1:]
+    (dl_filename, headers) = urlretrieve('http://tools.scilifelab.se/samplesheet/{}.csv'.format(flowcell), filename)
 
 def get_sample_sheet(demux_dir):
     sample_sheet = []
-    samplesheet_file_name = glob("{demux_dir}/SampleSheet.csv".format(demux_dir=demux_dir))[0]
+
+    samplesheet_file_name = demux_dir + "/SampleSheet.csv"
+    if not os.path.exists(samplesheet_file_name):
+        download_sample_sheet(demux_dir)
     with open(samplesheet_file_name, 'r') as samplesheet_fh:
         lines = [ line.strip().split(',') for line in samplesheet_fh.readlines() ]
         header = []
@@ -37,13 +48,31 @@ def get_reads(logfile, index=None):
         for line in log:
             line = line.strip(' \n')
             line = line.split(' ')
-            if len(line) > 1 and line[1] == index:
-                return line[0]
+            if len(line) > 1 and index in line[1]:
+                return line
+    return (0, index)
 
-def main(logfile, index):
-    """TODO: Docstring for main.
+def get_lane(logfilename):
+    """ Gets the lane number from the file name
 
     Args:
+        logfilename (string): name of the log file
+
+    Returns (int): lane number
+
+    """
+    # try the X syntax
+    lane = logfilename.split('.')[0]
+
+    if lane.isdigit():
+        return lane
+
+    return re.match(r'L(\d)', logfilename).group(1)
+
+def main(logfile, index):
+    """todo: docstring for main.
+
+    args:
         logfile (path): path to log file that holds requested index
         index (str): the index to corrolate
 
@@ -52,7 +81,7 @@ def main(logfile, index):
     #import ipdb; ipdb.set_trace()
     # get lane number
     logfilename = os.path.basename(logfile)
-    lane = logfilename.split('.')[0]
+    lane = get_lane(logfilename)
 
     # get fully qualified run dir
     rundir = os.path.dirname(os.path.dirname(logfile))
@@ -64,7 +93,7 @@ def main(logfile, index):
     samplesheet = get_sample_sheet(rundir)
 
     # get the # reads
-    reads = get_reads(logfile, index)
+    reads, found_index = get_reads(logfile, index)
 
     # get the samples with that lane
     lane_sample = []
@@ -77,12 +106,11 @@ def main(logfile, index):
 
     outline = []
     outline.extend(runname.split('_'))
-    outline.extend(['LOG', lane, reads, index])
+    outline.extend(['LOG', lane, reads, found_index])
     outline.extend([','.join(lane_sample)])
     outline.extend([','.join(lane_index)])
 
-    print(' '.join(outline))
-
+    print('\t'.join(outline))
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])
