@@ -110,7 +110,7 @@ def main(logfile, index):
     outline.extend([','.join(lane_sample)])
     outline.extend([','.join(lane_index)])
 
-    print('\t'.join(outline))
+    print(' '.join(outline))
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])
