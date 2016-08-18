@@ -17,3 +17,6 @@ LOGDIR=${RUNDIR}/LOG/
 
 echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
 zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
+
+# following line calcs undetermined for HiSeq2500
+#zgrep ^@HISEQ ${RUNDIR}/Unaligned5/Undetermined_indices/Sample_lane${LANE}/*R1*.fastq.gz | cut -d: -f 10 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
