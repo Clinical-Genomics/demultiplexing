@@ -50,7 +50,7 @@ def get_reads(logfile, index=None):
             line = line.split(' ')
             if len(line) > 1 and index in line[1]:
                 return line
-    return (0, index)
+    return ('0', index)
 
 def get_lane(logfilename):
     """ Gets the lane number from the file name
