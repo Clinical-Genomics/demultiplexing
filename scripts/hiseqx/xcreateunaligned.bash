@@ -60,6 +60,11 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
 
             # create a filename that's namespaced on FC, tile and included the barcode
             IFS='_' read -ra F_PARTS <<< "${FASTQ_FILE}" # split the fastq file name on '_'
+            F_NAME=${F_PARTS[0]}    # 175984
+            F_BARCODE=${F_PARTS[1]} # S1
+            F_LANE=${F_PARTS[2]}    # L001
+            F_READ=${F_PARTS[3]}    # R1
+            F_PART=${F_PARTS[4]}    # 001.fastq.gz
             FASTQ_FILE_INDEX="${F_PARTS[0]}_${SAMPLE_BARCODE}_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
             SAMPLE_FILE_NAME=${FC_TILE}_${FASTQ_FILE_INDEX}
             echo "ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}"
@@ -69,10 +74,21 @@ for PROJECT_DIR in $(find ${INDIR} -name 'Project_*' -exec basename {} \; | sort
                 ln -s ${INDIR}/${TILE}/${PROJECT_DIR}/${SAMPLE_DIR}/${FASTQ_FILE} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${SAMPLE_FILE_NAME}
             fi
 
+            # create similar structure as for HiSeq2500 for Undetermined indexes
+            ORIGINAL_UNDETERMINED_FILE_NAME="Undetermined_*_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
+            LANE=$((${F_LANE//L} + 0)) # L001 -> 1. Remove the L, convert to number
+            UNDETERMINED_DIR=${INDIR}/Unaligned/Undetermined_indices/Sample_lane${LANE}
+            if [[ ! -e ${UNDETERMINED_DIR} ]]; then
+                mkdir ${UNDETERMINED_DIR}
+            fi
+            UNDETERMINED_SAMPLE_FILE_NAME=${FC_TILE}_${F_NAME}_${F_LANE}_${F_READ}
+            if [[ ! -e ${UNDETERMINED_DIR}/${UNDETERMINED_SAMPLE_FILE_NAME} ]]; then
+                ln -s ${INDIR}/${TILE}/${ORIGINAL_UNDETERMINED_FILE_NAME} ${UNDETERMINED_DIR}/${UNDETERMINED_SAMPLE_FILE_NAME}
+            fi
+
             # link undetermined
             UNDETERMINED_FILE_NAME="${FC_TILE}_Undetermined_${SAMPLE_BARCODE}_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
             if [[ ! -e ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${UNDETERMINED_FILE_NAME} ]]; then
-                ORIGINAL_UNDETERMINED_FILE_NAME="Undetermined_*_${F_PARTS[2]}_${F_PARTS[3]}_${F_PARTS[4]}"
                 ln -s ${INDIR}/${TILE}/${ORIGINAL_UNDETERMINED_FILE_NAME} ${INDIR}/Unaligned/${PROJECT_DIR}/${SAMPLE_DIR}/${UNDETERMINED_FILE_NAME}
             fi
         done

@@ -35,7 +35,8 @@ def get_sample_sheet(demux_dir):
     return sample_sheet
 
 def get_reads(logfile, index=None):
-    """ Gets the amount of reads for index
+    """ Gets the amount of reads for index. If index is smaller than
+    listed indeces in logfile, only first hit is returned.
 
     Args:
         logfile (path): path to log file that holds requested index

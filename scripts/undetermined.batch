@@ -28,18 +28,24 @@ for UNALIGNED in {1..13}; do
         for DIRECTION in {1..2}; do
 
             LOGFILE=${LOGDIR}/L${LANE}_R${DIRECTION}_U${UNALIGNED}.index.stats.txt
-            FASTQFILES=${RUNDIR}/Unaligned${UNALIGNED}/Undetermined_indices/Sample_lane${LANE}/lane${LANE}_Undetermined_L00${LANE}_R${DIRECTION}_*.fastq.gz
 
             if [[ -e $LOGFILE ]]; then
                 continue
             fi
 
-            if [[ ! -e ${RUNDIR}/Unaligned${UNALIGNED}/Undetermined_indices/Sample_lane${LANE}/lane${LANE}_Undetermined_L00${LANE}_R${DIRECTION}_001.fastq.gz ]]; then
+            FASTQFILES=${RUNDIR}/Unaligned${UNALIGNED}/Undetermined_indices/Sample_lane${LANE}/*_Undetermined_L00${LANE}_R${DIRECTION}_*.fastq.gz
+
+            # get first file name
+            for FIRST_FASTQFILE in $FASTQFILES; do
+                break 
+            done
+
+            if [[ ! -e $FIRST_FASTQFILE ]]; then
                 continue
             fi
 
             ls -1 $FASTQFILES > $LOGFILE
-            zgrep ^@ $FASTQFILES | cut -d: -f 10 | sort | uniq -c | sort -nr >> $LOGFILE
+            zgrep ^@ $FASTQFILES | awk -F ':' '{print $NF}' | sort | uniq -c | sort -nr >> $LOGFILE
         done
     done
 done
