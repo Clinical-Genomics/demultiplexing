@@ -1,0 +1,47 @@
+#!/bin/bash
+#SBATCH -A prod001
+#SBATCH -t 10:00:00
+#SBATCH -c 1
+#SBATCH --qos=low
+#SBATCH --mail-user=kenny.billiau@scilifelab.se
+#SBATCH --mail-type=FAIL
+#SBATCH -e /mnt/hds/proj/bioinfo/LOG/undetermined-%j.err
+#SBATCH -o /mnt/hds/proj/bioinfo/LOG/undetermined-%j.out
+
+###########
+# Calc undetermined index freqs for all HiSeq2500
+###########
+
+set -e
+
+VERSION=3.41.0
+RUNDIR=${1?'Please provide demux dir'}
+
+LOGDIR=${RUNDIR}/LOG/
+[[ ! -e ${LOGDIR} ]] && mkdir ${LOGDIR}
+
+for UNALIGNED in {1..13}; do
+    if [[ $UNALIGNED == 13 ]]; then
+        unset UNALIGNED
+    fi
+    for LANE in {1..8}; do
+        for DIRECTION in {1..2}; do
+
+            LOGFILE=${LOGDIR}/L${LANE}_R${DIRECTION}_U${UNALIGNED}.index.stats.txt
+            FASTQFILES=${RUNDIR}/Unaligned${UNALIGNED}/Undetermined_indices/Sample_lane${LANE}/lane${LANE}_Undetermined_L00${LANE}_R${DIRECTION}_*.fastq.gz
+
+            if [[ -e $LOGFILE ]]; then
+                continue
+            fi
+
+            if [[ ! -e ${RUNDIR}/Unaligned${UNALIGNED}/Undetermined_indices/Sample_lane${LANE}/lane${LANE}_Undetermined_L00${LANE}_R${DIRECTION}_001.fastq.gz ]]; then
+                continue
+            fi
+
+            ls -1 $FASTQFILES > $LOGFILE
+            zgrep ^@ $FASTQFILES | cut -d: -f 10 | sort | uniq -c | sort -nr >> $LOGFILE
+        done
+    done
+done
+
+touch ${LOGDIR}/undetermined_finished
