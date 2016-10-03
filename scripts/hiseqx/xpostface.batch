@@ -13,7 +13,7 @@
 # PARAMS #
 ##########
 
-VERSION=3.42.2
+VERSION=3.42.3
 DEMUXDIR=$1 # absolute path to the DEMUX/rundir
 
 #############
