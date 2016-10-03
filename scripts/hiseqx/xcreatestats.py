@@ -188,7 +188,7 @@ def main(argv):
         print('\t'.join( [
             summary['flowcell'],
             lane,
-            str(summary['pf_clusters'] * 2), # times 2 because we want to have reads, not readpairs
+            str(summary['pf_clusters']),
             str(round(summary['pf_yield'] / 1000000, 0)),
             str(round(summary['pf_q30'] / summary['pf_yield'] * 100, 2)),
             str(round(summary['pf_read1_q30'] / summary['pf_read1_yield'] * 100, 2)),
