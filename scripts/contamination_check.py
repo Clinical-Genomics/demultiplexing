@@ -34,22 +34,26 @@ def get_sample_sheet(demux_dir):
 
     return sample_sheet
 
-def get_reads(logfile, index=None):
+def get_reads(logfile, index, length=0):
     """ Gets the amount of reads for index. If index is smaller than
     listed indeces in logfile, only first hit is returned.
 
     Args:
         logfile (path): path to log file that holds requested index
-        index (str): the index to corrolate
+        index (str): the index to correlate
 
     returns (int): reads for index
 
     """
+
+    if not length:
+        length = len(index)
+
     with open(logfile, 'r') as log:
         for line in log:
             line = line.strip(' \n')
             line = line.split(' ')
-            if len(line) > 1 and index in line[1]:
+            if len(line) > 1 and line[1].startswith(index, 0, length):
                 return line
     return ('0', index)
 

@@ -15,9 +15,7 @@ OUTPUT=$(mktemp)
 # 2500
 for LOG in ${DEMUX}/LOG/L*.txt; do
     python contamination_check.py ${LOG} CTTGTAAT 2> /dev/null >> $OUTPUT
-    python contamination_check.py ${LOG} CTTGTA   2> /dev/null
-    python contamination_check.py ${LOG} TTGTAA   2> /dev/null
-    python contamination_check.py ${LOG} TGTAAT   2> /dev/null
+#    python contamination_check.py ${LOG} CTTGTA   2> /dev/null
 done
 
 # X
