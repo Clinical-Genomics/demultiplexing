@@ -15,7 +15,7 @@ from clinstatsdb.db.store import connect
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '3.42.1'
+__version__ = '3.42.2'
 
 logger = logging.getLogger(__name__)
 
@@ -366,7 +366,7 @@ def main(argv):
 
                 u.yield_mb = round(int(stats_sample['pf_yield']) / 1000000, 2)
                 u.passed_filter_pct = stats_sample['pf_yield_pc']
-                u.readcounts = stats_sample['pf_clusters']
+                u.readcounts = stats_sample['pf_clusters'] * 2
                 u.raw_clusters_per_lane_pct = stats_sample['raw_clusters_pc']
                 u.perfect_indexreads_pct = round(stats_sample['perfect_barcodes'] / stats_sample['barcodes'] * 100, 5)
                 u.q30_bases_pct = stats_sample['pf_Q30']
@@ -374,7 +374,7 @@ def main(argv):
             else:
                 u.yield_mb = round(int(stats[ sample['SampleID'] ]['pf_yield']) / 1000000, 2)
                 u.passed_filter_pct = stats[ sample['SampleID'] ]['pf_yield_pc']
-                u.readcounts = stats[ sample['SampleID'] ]['pf_clusters']
+                u.readcounts = stats[ sample['SampleID'] ]['pf_clusters'] * 2
                 u.raw_clusters_per_lane_pct = stats[ sample['SampleID'] ]['raw_clusters_pc']
                 u.perfect_indexreads_pct = round(stats[ sample['SampleID'] ]['perfect_barcodes'] / stats[ sample['SampleID'] ]['barcodes'] * 100, 5)
                 u.q30_bases_pct = stats[ sample['SampleID'] ]['pf_Q30']
