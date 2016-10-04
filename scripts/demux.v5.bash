@@ -84,66 +84,38 @@ fi
 BASEMASK="${Y1},${I1}${I2}${Y2}"
 
 if [ $BASEMASKBYPASS ]; then
-  if [ $BASEMASKBYPASS == '--d8' ]; then
-    USEBASEMASK=Y101,I8,I8,Y101
-    UNALDIR=Unaligned1
-  elif [ $BASEMASKBYPASS == '--s8' ]; then
-    USEBASEMASK=Y101,I8,Y101
-    UNALDIR=Unaligned2
-  elif [ $BASEMASKBYPASS == '--s6s8' ]; then
-    USEBASEMASK=Y101,I6nn,Y101
-    UNALDIR=Unaligned3
-  elif [ $BASEMASKBYPASS == '--s6' ]; then
-    USEBASEMASK=Y101,I6n,Y101
-    UNALDIR=Unaligned
-  elif [ $BASEMASKBYPASS == '--s6d8' ]; then
-    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
-    UNALDIR=Unaligned4
-  elif [ $BASEMASKBYPASS == '--s8d8' ]; then
-    USEBASEMASK=Y101,I8,nnnnnnnn,Y101
-    UNALDIR=Unaligned5
-  elif [ $BASEMASKBYPASS == '--s8n' ]; then
-    USEBASEMASK=Y101,I8n,Y101
-    UNALDIR=Unaligned6
-  elif [ $BASEMASKBYPASS == '--s8nn9' ]; then
-    USEBASEMASK=Y101,I8n,n9,Y101
-    UNALDIR=Unaligned7
-  elif [ $BASEMASKBYPASS == '--ho' ]; then
-    USEBASEMASK=Y126,I8,Y126
-    UNALDIR=Unaligned
-  elif [ $BASEMASKBYPASS == '--hod8' ]; then
-    USEBASEMASK=Y126,I8,I8,Y126
-    UNALDIR=Unaligned8
-  elif [ $BASEMASKBYPASS == '--hos8d8' ]; then
-    USEBASEMASK=Y126,I8,n8,Y126
-    UNALDIR=Unaligned9
-  elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
-    USEBASEMASK=Y126,I6nn,n8,Y126
-    UNALDIR=Unaligned10
-  elif [ $BASEMASKBYPASS == '--sr51d8' ]; then
-    USEBASEMASK=Y51,I8,I8
-    UNALDIR=Unaligned11
-  elif [ $BASEMASKBYPASS == '--hos6' ]; then
-    USEBASEMASK=Y126,I6n,Y126
-    UNALDIR=Unaligned12
-  else
-    >&2 echo "'$BASEMASKBYPASS' not recognized!"
-    >&2 echo "Available options are:"
-    >&2 echo "--s6 single 6 index"
-    >&2 echo "--s6s8 single 6 advertised as single 8 index"
-    >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
-    >&2 echo "--s8 single 8 index"
-    >&2 echo "--d8 dual 8 index"
-    >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
-    >&2 echo "--s8n single 8 index advertised as single 9 index"
-    >&2 echo "--s8nn9 single 8 index advertised as dual 9 index"
-    >&2 echo "--ho High Output run"
-    >&2 echo "--hod8 High Output run with dual8 index"
-    >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
-    >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
-    >&2 echo "--hos6 High Output run with single 6 index"
-    >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index"
-  fi
+  case $BASEMASKBYPASS in
+    '--d8')      USEBASEMASK=Y101,I8,I8,Y101; UNALDIR=Unaligned1 ;;
+    '--s8')      USEBASEMASK=Y101,I8,Y101; UNALDIR=Unaligned2 ;;
+    '--s6s8')    USEBASEMASK=Y101,I6nn,Y101 ; UNALDIR=Unaligned3 ;;
+    '--s6')      USEBASEMASK=Y101,I6n,Y101 ; UNALDIR=Unaligned ;;
+    '--s6d8')    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101 ; UNALDIR=Unaligned4 ;;
+    '--s8d8')    USEBASEMASK=Y101,I8,nnnnnnnn,Y101 ; UNALDIR=Unaligned5 ;;
+    '--s8n')     USEBASEMASK=Y101,I8n,Y101 ; UNALDIR=Unaligned6
+    '--s8nn9')   USEBASEMASK=Y101,I8n,n9,Y101 ; UNALDIR=Unaligned7 ;;
+    '--ho')      USEBASEMASK=Y126,I8,Y126 ; UNALDIR=Unaligned ;;
+    '--hod8')    USEBASEMASK=Y126,I8,I8,Y126 ; UNALDIR=Unaligned8 ;;
+    '--hos8d8')  USEBASEMASK=Y126,I8,n8,Y126 ; UNALDIR=Unaligned9 ;;
+    '--hos6d8')  USEBASEMASK=Y126,I6nn,n8,Y126 ; UNALDIR=Unaligned10 ;;
+    '--sr51d8')  USEBASEMASK=Y51,I8,I8 ; UNALDIR=Unaligned11 ;;
+    '--hos6')    USEBASEMASK=Y126,I6n,Y126 ; UNALDIR=Unaligned12 ;;
+    *)    >&2 echo "'$BASEMASKBYPASS' not recognized!"
+          >&2 echo "Available options are:"
+          >&2 echo "--s6 single 6 index"
+          >&2 echo "--s6s8 single 6 advertised as single 8 index"
+          >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
+          >&2 echo "--s8 single 8 index"
+          >&2 echo "--d8 dual 8 index"
+          >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
+          >&2 echo "--s8n single 8 index advertised as single 9 index"
+          >&2 echo "--s8nn9 single 8 index advertised as dual 9 index"
+          >&2 echo "--ho High Output run"
+          >&2 echo "--hod8 High Output run with dual8 index"
+          >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
+          >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
+          >&2 echo "--hos6 High Output run with single 6 index"
+          >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index" ;;
+  esac
 fi
 
 #USEBASEMASK=
