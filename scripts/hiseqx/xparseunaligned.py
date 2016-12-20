@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 class Config:
 
-    def __init__(self):
-        with open(expanduser("~/.clinical/databases.yaml"), 'r') as ymlfile:
+    def __init__(self, config_file):
+        with open(config_file, 'r') as ymlfile:
             self.config = yaml.load(ymlfile)
 
     def __getitem__(self, key):
@@ -256,7 +256,13 @@ def main(argv):
     setup_logging(level='DEBUG')
     demux_dir = argv[0]
 
-    config = Config()
+    try:
+        config_file = argv[1]
+    except IndexError:
+        config_file = expanduser("~/.clinical/databases.yaml")
+
+    config = Config(config_file)
+
     SQL = connect(config['clinstats']['connection_string'])
 
     if not Version.check(config['clinstats']['name'], config['clinstats']['version']):
