@@ -8,7 +8,7 @@
 #SBATCH -e /mnt/hds/proj/bioinfo/LOG/undetermined-%j.err
 #SBATCH -o /mnt/hds/proj/bioinfo/LOG/undetermined-%j.out
 
-VERSION=3.42.5
+VERSION=3.42.6
 RUNDIR=$1
 LANE=$2
 
