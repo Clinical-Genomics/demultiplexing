@@ -293,7 +293,7 @@ def main(argv):
         datasource.runname = new_datasource['runname']
         datasource.rundate = new_datasource['rundate']
         datasource.machine = new_datasource['machine']
-        datasource.servername = new_datasource['servername']
+        datasource.server = new_datasource['servername']
         datasource.document_path = new_datasource['document_path']
         datasource.document_type = 'xml'
         datasource.time = func.now()
