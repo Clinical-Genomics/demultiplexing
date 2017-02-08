@@ -355,6 +355,7 @@ def main(argv):
             s = Sample()
             s.project_id = project_id_of[ sample['Project'] ]
             s.samplename = sample['SampleID']
+            s.limsid = sample['SampleID'].split('_')[0]
             s.barcode = sample['index']
             s.time = func.now()
 

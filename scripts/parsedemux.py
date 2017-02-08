@@ -250,6 +250,7 @@ with db.dbconnect(pars['CLINICALDBHOST'], pars['CLINICALDBPORT'], pars['STATSDB'
   for row in rows:
     cols = row.findAll('td')
     samplename = unicode(cols[1].string).encode('utf8')
+    limsid = samplename.split('_')[0]
     barcode = unicode(cols[3].string).encode('utf8')
     project = unicode(cols[6].string).encode('utf8')
     getsamplequery = """ SELECT sample_id FROM sample WHERE samplename = '""" + samplename + """' 
@@ -257,7 +258,7 @@ with db.dbconnect(pars['CLINICALDBHOST'], pars['CLINICALDBPORT'], pars['STATSDB'
     indbsample = dbc.generalquery(getsamplequery)
     if not indbsample:
       print "Sample not yet added"
-      insertdict = { 'samplename': samplename, 'project_id': projects[project], 'barcode': barcode, 'time': now }
+      insertdict = { 'samplename': samplename, 'limsid': limsid, 'project_id': projects[project], 'barcode': barcode, 'time': now }
       outcome = dbc.sqlinsert('sample', insertdict)
       samples[samplename] = outcome['sample_id']
     else:
