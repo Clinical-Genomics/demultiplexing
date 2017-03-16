@@ -7,14 +7,35 @@ import re
 from itertools import chain
 from collections import OrderedDict
 
-class SampleSheet(object):
-    """Docstring for SampleSheet. """
+class SampleSheetValidationException(Exception):
+    def __init__(self, section, msg, line_nr):
+        self.section = section
+        self.msg = msg
+        self.line_nr = line_nr
+
+    def __str__(self):
+        return repr("Section {}#{}: {}".format(section_name, msg, line_nr))
+
+
+class Samplesheet(object):
+    """SampleSheet.
+
+    Stores the samplesheet in sections: self.section
+    e.g. [Data] section will be stored in self.section['[Data]']
+
+    The [Data] section is the actual samplesheet. It consists of a '[Data]' section marker,
+    a column header, and the rows of samplesheet data.
+
+    This will be split on line, with each line turned into a dictionary (column header as keys),
+    and stored into self.samplesheet.
+    """
 
     HEADER = '[Header]'
     DATA   = '[Data]'
 
-    def __init__(self, path):
-        self.parse(path)
+    def __init__(self, samplesheet_path):
+        self.samplesheet_path = samplesheet_path
+        self.parse(samplesheet_path)
 
     def _get_flowcell(self):
         # get the experiment name
@@ -30,35 +51,42 @@ class SampleSheet(object):
                 return line[1].split('_')[1]
         return None
 
-    def parse(self, path):
+    def parse(self, samplesheet_path, delim=','):
         """
-        Parses Samplesheets, with their fake csv format.
+        Parses a Samplesheet, with their fake csv format.
         Should be instancied with the samplesheet path as an argument.
-	Will create a dict for each section. Header: (lines)
+        Will create a dict for each section. Header: (lines)
         """
 
         name = 'None'
         self.section = OrderedDict()
-        with open(path) as csvfile:
+        with open(samplesheet_path) as csvfile:
             for line in csvfile.readlines():
                 line = line.strip()
                 if line.startswith('['):
                     name = line.split(',')[0]
                     self.section[name] = []
 
-                self.section[name].append(line.split(','))
+                self.section[name].append(line.split(delim))
 
-    def write(self):
-        """Writes a SampleSheet to disk
+        header = self.section[self.DATA][1]
+        self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][2:] ]
 
-        """
+    def lines(self):
+        for line in self.samplesheet:
+            yield line
+
+    def raw(self, delim=',', end='\n'):
+        """Reconstructs the sample sheet"""
+        rs = []
         for line in chain(*self.section.values()):
-            print(','.join(line))
+            rs.append(delim.join(line))
+        return end.join(rs)
 
     def massage(self):
         """Abuses the Investigator Name field to store information about the run.
 
-	Reshuffles the [Data] section so that it becomes a valid sample sheet.
+        Reshuffles the [Data] section so that it becomes a valid sample sheet.
         """
         # get the experiment name
         flowcell_id = self._get_flowcell()
@@ -71,18 +99,18 @@ class SampleSheet(object):
                 line[1] = '_'.join(investigator_name)
                 self.section[self.HEADER][i] = line
 
-    def massage_normal(self):
+    def to_demux(self, delim=',', end='\n'):
         """ Replaced the [Data] section with a demuxable [Data] section.
 
-        BE AWARE THIS IS DESTRUCTIVE!
+        This is non destructive and will only return a demuxable samplesheet.
 
-	Convert the Data section from
+        Convert the Data section from
             Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Project,Description,SampleType
         to
-	    FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-	"""
+            FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+        """
 
-	expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
         flowcell_id = self._get_flowcell()
@@ -94,7 +122,7 @@ class SampleSheet(object):
         data_lines.append(expected_header)
         for i, line in enumerate(self.section[self.DATA][2:]):
             data_line = dict(zip(header, line))
-            
+
             data_line['FCID'] = flowcell_id
             data_line['SampleID'] = data_line['Sample_ID']
             data_line['SampleRef'] = 'hg19'
@@ -110,11 +138,29 @@ class SampleSheet(object):
                 ordered_line.append(data_line[head])
             data_lines.append(ordered_line)
 
-        # remove all irrelevant sections
-        self.section[self.DATA] = data_lines
-        for key in self.section.keys():
-            if key == self.DATA: continue
-            self.section.pop(key, None)
+        rs = []
+        for line in data_lines:
+            rs.append(delim.join(line))
+        return end.join(rs)
+
+    def samples(self, column='SampleID'):
+        """ Return all samples in the samplesheet """
+        for line in self.samplesheet:
+            yield line[column]
+
+
+    def is_pooled_lane(self, lane, column='lane'):
+        """ Return True if lane contains multiple samples """
+        lane_count = 0 
+        lane = str(lane)
+        for line in self.samplesheet:
+            if line[column] == lane:
+                lane_count += 1 
+
+            if lane_count > 1:
+                return True
+
+        return False
 
     def validate(self):
         """TODO: Docstring for validate.
@@ -142,16 +188,6 @@ class SampleSheet(object):
         for section_name, section in self.section.items():
             rs = _validate_length(section)
             if type(rs) is tuple:
-                sys.exit('Section {}#{}: {}'.format(section_name, rs[1], rs[0]))
+                raise SampleSheetValidationException(section_name, rs[1], rs[0])
 
-def main(argv):
-    ss = SampleSheet(argv[0])
-    if 1 in argv:
-        ss.massage_normal()
-    else:
-        ss.massage()
-    ss.validate()
-    ss.write()
-
-if __name__ == '__main__':
-    main(sys.argv[1:])
+        return True
