@@ -3,6 +3,8 @@ import logging
 import click
 import yaml
 
+from .samplesheet import samplesheet
+
 log = logging.getLogger(__name__)
 
 __version__ = '3.42.7'
@@ -36,3 +38,5 @@ def setup_logging(level='INFO'):
 
     root_logger.addHandler(console)
     return root_logger
+
+demux.add_command(samplesheet)
