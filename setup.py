@@ -32,7 +32,7 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(
-    name='cgstats',
+    name='demux',
 
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
