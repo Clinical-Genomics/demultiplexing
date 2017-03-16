@@ -11,13 +11,14 @@ echo "Version $VERSION"
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/
-RUNS=$(ls ${RUNBASE})
+EMAILS=bioinfo.clinical@scilifelab.se
 
 #######
 # RUN #
 #######
 
-for RUN in ${RUNS[@]}; do
+for RUN in ${RUNBASE}/*; do
+  RUN=$(basename ${RUN})
   NOW=$(date +"%Y%m%d%H%M%S")
   if [[ ! -e ${NIPTBASE}${RUN} ]]; then
     # simple NIPT detection
@@ -36,6 +37,8 @@ for RUN in ${RUNS[@]}; do
       if [[ $? -ne 0 ]]; then
           NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
+          cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" $EMAILS
+ 
           continue
       fi
 
