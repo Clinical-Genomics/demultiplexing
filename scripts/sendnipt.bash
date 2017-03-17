@@ -12,7 +12,7 @@ echo "Version $VERSION"
 
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
-MAILTO=bioinfo.clinical@scilifelab.se,nipt@karolinska.se
+MAILTO=bioinfo.clinical@scilifelab.se,nipt.karolinska@sll.se
 MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
 NIPTCONF=/home/clinical/.niptrc
 
