@@ -14,7 +14,7 @@ class SampleSheetValidationException(Exception):
         self.line_nr = line_nr
 
     def __str__(self):
-        return repr("Section {}#{}: {}".format(section_name, msg, line_nr))
+        return repr("Section {}#{}: {}".format(self.section, self.msg, self.line_nr))
 
 
 class Samplesheet(object):
@@ -143,8 +143,14 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
+
     def samples(self, column='SampleID'):
         """ Return all samples in the samplesheet """
+        return self.column(column)
+
+
+    def column(self, column):
+        """ Return all values from a column in the samplesheet """
         for line in self.samplesheet:
             yield line[column]
 
@@ -186,7 +192,8 @@ class Samplesheet(object):
             return True
 
         for section_name, section in self.section.items():
-            rs = _validate_length(section)
+            validation_section = section[1:] # only validate the content, not the [Data] header
+            rs = _validate_length(validation_section)
             if type(rs) is tuple:
                 raise SampleSheetValidationException(section_name, rs[1], rs[0])
 

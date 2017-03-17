@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from demux.utils import Samplesheet
+from demux.utils import Samplesheet, SampleSheetValidationException
+import pytest
 
 def test_nipt_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/nipt_samplesheet.csv')
@@ -134,3 +135,47 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
 
     assert samplesheet.is_pooled_lane('1', column='Lane') == True
     assert samplesheet.is_pooled_lane('2', column='Lane') == True
+
+
+def test_x_samplesheet():
+    samplesheet = Samplesheet('tests/fixtures/x_samplesheet.csv')
+
+    assert samplesheet.raw() == """[Data]
+FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
+HC7H2ALXX,1,SVE2274A2_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
+HC7H2ALXX,2,SVE2274A4_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
+HC7H2ALXX,3,SVE2274A6_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
+HC7H2ALXX,4,SVE2274A7_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
+HC7H2ALXX,5,SVE2274A8_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
+HC7H2ALXX,6,SVE2274A9_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262
+HC7H2ALXX,7,SVE2274A10_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262
+HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
+
+
+    samplesheet_lines = [ line for line in samplesheet.lines() ]
+    assert samplesheet_lines == [
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '1', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A2_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '2', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A4_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '3', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A6_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '4', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A7_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '5', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A8_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '6', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A9_TCTCGCGC', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCTCGCGC'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '7', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A10_TCTCGCGC', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCTCGCGC'},
+        {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '8', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A11_TCTCGCGC', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCTCGCGC'}
+    ]
+
+    assert samplesheet.validate() == True
+
+    samples = [ sample for sample in samplesheet.samples() ]
+    assert samples == [ 'SVE2274A2_TCCGCGAA', 'SVE2274A4_TCCGCGAA', 'SVE2274A6_TCCGCGAA',
+                        'SVE2274A7_TCCGCGAA', 'SVE2274A8_TCCGCGAA', 'SVE2274A9_TCTCGCGC',
+                        'SVE2274A10_TCTCGCGC', 'SVE2274A11_TCTCGCGC']
+
+    assert samplesheet.is_pooled_lane(1, column='Lane') == False
+    assert samplesheet.is_pooled_lane(2, column='Lane') == False
+
+def test_x_faulty_samplesheet():
+    samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
+
+    with pytest.raises(SampleSheetValidationException):
+        samplesheet.validate()
