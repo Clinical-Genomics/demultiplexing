@@ -30,6 +30,7 @@ for RUN in ${RUNBASE}/*; do
       grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv
       if [[ $? -eq 0 ]]; then
           sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+          sed -i 's/\n\n/\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
       fi
 
       # validate
