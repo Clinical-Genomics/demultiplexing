@@ -22,15 +22,15 @@ for RUN in ${RUNBASE}/*; do
   NOW=$(date +"%Y%m%d%H%M%S")
   if [[ ! -e ${NIPTBASE}${RUN} ]]; then
     # simple NIPT detection
-    grep -qs Description,cfDNAHiSeqv1.0 ${RUNBASE}${RUN}/SampleSheet.csv
-    if [[ $? -eq 0 ]]; then
-      cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
+    if grep -qs Description,cfDNAHiSeqv1.0 ${RUNBASE}${RUN}/SampleSheet.csv; then
+      if [[ ! -e ${RUNBASE}${RUN}/SampleSheet.ori ]]; then
+        cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
+      fi
 
-      # transform SampleSheet from Mac to Unix
-      grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv
-      if [[ $? -eq 0 ]]; then
+      # transform SampleSheet from Mac/Windows to Unix
+      if grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv; then
           sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
-          sed -i 's/\n\n/\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+          sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
       fi
 
       # validate
