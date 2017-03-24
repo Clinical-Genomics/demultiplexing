@@ -173,9 +173,64 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
 
     assert samplesheet.is_pooled_lane(1, column='Lane') == False
     assert samplesheet.is_pooled_lane(2, column='Lane') == False
+    assert samplesheet.is_pooled_lane(3, column='Lane') == False
+    assert samplesheet.is_pooled_lane(4, column='Lane') == False
+    assert samplesheet.is_pooled_lane(5, column='Lane') == False
+    assert samplesheet.is_pooled_lane(6, column='Lane') == False
+    assert samplesheet.is_pooled_lane(7, column='Lane') == False
+    assert samplesheet.is_pooled_lane(8, column='Lane') == False
 
 def test_x_faulty_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
+
+def test_2500_samplesheet():
+    samplesheet = Samplesheet('tests/fixtures/2500_samplesheet.csv')
+
+    assert samplesheet.raw() == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+HB07NADXX,1,SIB911A1_sureselect4,hg19,TGACCA,959191,N,R1,NN,959191
+HB07NADXX,1,SIB911A2_sureselect5,hg19,ACAGTG,959191,N,R1,NN,959191
+HB07NADXX,1,SIB910A3_sureselect6,hg19,GCCAAT,454557,N,R1,NN,454557
+HB07NADXX,1,SIB914A2_sureselect2,hg19,CGATGT,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A11_sureselect11,hg19,GGCTAC,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A12_sureselect12,hg19,CTTGTA,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910
+HB07NADXX,2,SIB911A1_sureselect4,hg19,TGACCA,959191,N,R1,NN,959191
+HB07NADXX,2,SIB911A2_sureselect5,hg19,ACAGTG,959191,N,R1,NN,959191
+HB07NADXX,2,SIB910A3_sureselect6,hg19,GCCAAT,454557,N,R1,NN,454557
+HB07NADXX,2,SIB914A2_sureselect2,hg19,CGATGT,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A11_sureselect11,hg19,GGCTAC,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A12_sureselect12,hg19,CTTGTA,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
+
+    samplesheet_lines = [ line for line in samplesheet.lines() ]
+    assert samplesheet_lines == [
+        {'Control': 'N', 'Description': '959191', 'FCID': 'HB07NADXX', 'Index': 'ACAGTG', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB911A2_sureselect5', 'SampleProject': '959191', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '454557', 'FCID': 'HB07NADXX', 'Index': 'GCCAAT', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB910A3_sureselect6', 'SampleProject': '454557', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CGATGT', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A2_sureselect2', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GGCTAC', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A11_sureselect11', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CTTGTA', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A12_sureselect12', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GAAACC', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A15_sureselect15', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '959191', 'FCID': 'HB07NADXX', 'Index': 'TGACCA', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB911A1_sureselect4', 'SampleProject': '959191', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '959191', 'FCID': 'HB07NADXX', 'Index': 'ACAGTG', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB911A2_sureselect5', 'SampleProject': '959191', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '454557', 'FCID': 'HB07NADXX', 'Index': 'GCCAAT', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB910A3_sureselect6', 'SampleProject': '454557', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CGATGT', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A2_sureselect2', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GGCTAC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A11_sureselect11', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CTTGTA', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A12_sureselect12', 'SampleProject': '504910', 'SampleRef': 'hg19'},
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GAAACC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A15_sureselect15', 'SampleProject': '504910', 'SampleRef': 'hg19'} 
+    ]
+
+    assert samplesheet.validate() == True
+
+    samples = [ sample for sample in samplesheet.samples() ]
+    assert samples == [ 'SIB911A2_sureselect5', 'SIB910A3_sureselect6', 'SIB914A2_sureselect2',
+                        'SIB914A11_sureselect11', 'SIB914A12_sureselect12', 'SIB914A15_sureselect15',
+                        'SIB911A1_sureselect4', 'SIB911A2_sureselect5', 'SIB910A3_sureselect6',
+                        'SIB914A2_sureselect2', 'SIB914A11_sureselect11', 'SIB914A12_sureselect12',
+                        'SIB914A15_sureselect15' ]
+
+    assert samplesheet.is_pooled_lane(1, column='Lane') == True
+    assert samplesheet.is_pooled_lane(2, column='Lane') == True
+

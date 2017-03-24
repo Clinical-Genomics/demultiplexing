@@ -87,7 +87,7 @@ setup(
         'console_scripts': [
             'demux = demux.cli:demux',
         ],
-        'cgstats.subcommands.1': [
+        'demux.subcommands.1': [
         ],
     },
 )
