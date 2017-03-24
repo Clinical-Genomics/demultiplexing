@@ -28,7 +28,3 @@ def massage():
 def demux():
     """ Convert NIPT samplesheet to demux'able samplesheet """
     pass
-
-samplesheet.add_command(validate)
-samplesheet.add_command(massage)
-samplesheet.add_command(demux)

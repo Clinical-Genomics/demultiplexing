@@ -51,6 +51,11 @@ class Samplesheet(object):
                 return line[1].split('_')[1]
         return None
 
+    def _get_data_header(self):
+        if self.section[self.DATA][0][0].startswith('['):
+            return self.section[self.DATA][1]
+        return self.section[self.DATA][0]
+
     def parse(self, samplesheet_path, delim=','):
         """
         Parses a Samplesheet, with their fake csv format.
@@ -58,18 +63,20 @@ class Samplesheet(object):
         Will create a dict for each section. Header: (lines)
         """
 
-        name = 'None'
+        name = '[Data]'
         self.section = OrderedDict()
         with open(samplesheet_path) as csvfile:
             for line in csvfile.readlines():
                 line = line.strip()
                 if line.startswith('['):
-                    name = line.split(',')[0]
+                    name = line.split(delim)[0]
+
+                if name not in self.section:
                     self.section[name] = []
 
                 self.section[name].append(line.split(delim))
 
-        header = self.section[self.DATA][1]
+        header = self._get_data_header()
         self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][2:] ]
 
     def lines(self):
