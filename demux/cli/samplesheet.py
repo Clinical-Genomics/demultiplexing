@@ -20,7 +20,7 @@ def validate(samplesheet):
 @click.argument('samplesheet')
 def massage(samplesheet):
     """creates a NIPT ready SampleSheet"""
-    print(Samplesheet(samplesheet).massage().raw())
+    print(Samplesheet(samplesheet).massage())
 
 @samplesheet.command()
 @click.argument('samplesheet')

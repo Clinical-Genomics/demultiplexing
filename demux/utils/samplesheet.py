@@ -4,6 +4,7 @@
 from __future__ import print_function
 import sys
 import re
+from copy import deepcopy
 from itertools import chain
 from collections import OrderedDict
 
@@ -90,25 +91,30 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
-    def massage(self):
+    def massage(self, delim=',', end='\n'):
         """Abuses the Investigator Name field to store information about the run.
 
         Reshuffles the [Data] section so that it becomes a valid sample sheet.
 
-        THIS MESSES WITH THE RAW SAMPLESHEET CONTENT!
+        Returns a massaged SampleSheet.
         """
         # get the experiment name
         flowcell_id = self._get_flowcell()
 
-        for i, line in enumerate(self.section[self.HEADER]):
+        section_copy = deepcopy(self.section)
+
+        for i, line in enumerate(section_copy[self.HEADER]):
             if line[0] == 'Investigator Name':
                 investigator_name = re.split(' |_', line[1])
                 if investigator_name[-1] != flowcell_id:
                     investigator_name.append(flowcell_id)
                 line[1] = '_'.join(investigator_name)
-                self.section[self.HEADER][i] = line
+                section_copy[self.HEADER][i] = line
         
-        return self
+        rs = []
+        for line in chain(*section_copy.values()):
+            rs.append(delim.join(line))
+        return end.join(rs)
 
     def to_demux(self, delim=',', end='\n'):
         """ Replaced the [Data] section with a demuxable [Data] section.
