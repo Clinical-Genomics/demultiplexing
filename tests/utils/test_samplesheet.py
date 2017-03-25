@@ -94,9 +94,8 @@ Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Pro
 
     assert samplesheet.validate() == True
 
-    # ok, time to change the sample sheet a bit!
-    samplesheet.massage()
-    assert samplesheet.section[samplesheet.HEADER][2][1] == '9999999_666666_HFNC5BCXY'
+    massaged_samplesheet = samplesheet.massage()
+    assert massaged_samplesheet.split('\n')[2] == 'Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,'
 
     assert samplesheet.to_demux() == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
 HFNC5BCXY,1,test-1705166-05,hg19,CGATGT,Test,666666,R1,NN,666666
