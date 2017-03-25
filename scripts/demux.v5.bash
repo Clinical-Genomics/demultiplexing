@@ -20,18 +20,10 @@ echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 # transform SampleSheet from Mac to Unix
 if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
   cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-  grep -qs $'\r\n' ${BASE}/SampleSheet.csv
-  if [[ $? -eq 0 ]]; then
-      echo 'DOS formatted SampleSheet detected. Converting...'
-      sed -i 's/\r//' ${BASE}/SampleSheet.csv
-      cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
-  else
-      grep -qs $'\r' ${BASE}/SampleSheet.csv
-      if [[ $? -eq 0 ]]; then
-          echo 'MAC formatted SampleSheet detected. Converting...'
-          sed -i 's/\r/\n/' ${BASE}/SampleSheet.csv
-          cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
-      fi
+  if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
+    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+    sed -i '/^$/d' ${BASE}/SampleSheet.csv
+    cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
   fi
 fi
 
