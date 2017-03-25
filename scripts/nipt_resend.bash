@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to send run results
 
-VERSION=3.42.12
+VERSION=3.42.13
 echo "Version $VERSION"
 
 ##########
