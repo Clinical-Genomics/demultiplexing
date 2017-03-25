@@ -84,7 +84,7 @@ class Samplesheet(object):
             yield line
 
     def raw(self, delim=',', end='\n'):
-        """Reconstructs the sample sheet"""
+        """Reconstructs the sample sheet. """
         rs = []
         for line in chain(*self.section.values()):
             rs.append(delim.join(line))
@@ -94,6 +94,8 @@ class Samplesheet(object):
         """Abuses the Investigator Name field to store information about the run.
 
         Reshuffles the [Data] section so that it becomes a valid sample sheet.
+
+        THIS MESSES WITH THE RAW SAMPLESHEET CONTENT!
         """
         # get the experiment name
         flowcell_id = self._get_flowcell()
@@ -105,6 +107,8 @@ class Samplesheet(object):
                     investigator_name.append(flowcell_id)
                 line[1] = '_'.join(investigator_name)
                 self.section[self.HEADER][i] = line
+        
+        return self
 
     def to_demux(self, delim=',', end='\n'):
         """ Replaced the [Data] section with a demuxable [Data] section.
@@ -164,11 +168,11 @@ class Samplesheet(object):
 
     def is_pooled_lane(self, lane, column='lane'):
         """ Return True if lane contains multiple samples """
-        lane_count = 0 
+        lane_count = 0
         lane = str(lane)
         for line in self.samplesheet:
             if line[column] == lane:
-                lane_count += 1 
+                lane_count += 1
 
             if lane_count > 1:
                 return True
