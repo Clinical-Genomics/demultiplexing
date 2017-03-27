@@ -171,6 +171,12 @@ class Samplesheet(object):
         for line in self.samplesheet:
             yield line[column]
 
+    def lines_per_column(self, column, content):
+        """ Return all lines with the same column content
+        e.g. return all lines of column='Lane' content='1'  """
+        for line in self.samplesheet:
+            if line[column] == content:
+                yield line
 
     def is_pooled_lane(self, lane, column='lane'):
         """ Return True if lane contains multiple samples """

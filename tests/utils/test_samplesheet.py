@@ -135,6 +135,25 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
     assert samplesheet.is_pooled_lane('1', column='Lane') == True
     assert samplesheet.is_pooled_lane('2', column='Lane') == True
 
+    lines = [ line for line in samplesheet.lines_per_column('Lane', '1') ]
+    assert lines ==  [
+        {'index': 'CGATGT', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705166-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A002', 'Sample_Well': 'A2', 'Sample_Project': '', 'Library_nM': '69.07001045', 'Sample_Name': 'test-1705166-05'},
+        {'index': 'ACAGTG', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705169-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A005', 'Sample_Well': 'B2', 'Sample_Project': '', 'Library_nM': '62.27795193', 'Sample_Name': 'test-1705169-05'},
+        {'index': 'CAGATC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705170-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A007', 'Sample_Well': 'C2', 'Sample_Project': '', 'Library_nM': '58.51619645', 'Sample_Name': 'test-1705170-05'},
+        {'index': 'CTTGTA', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705183-06', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A012', 'Sample_Well': 'D2', 'Sample_Project': '', 'Library_nM': '49.11180773', 'Sample_Name': 'test-1705183-06'},
+        {'index': 'AGTCAA', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705225-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A013', 'Sample_Well': 'E2', 'Sample_Project': '', 'Library_nM': '80.66875653', 'Sample_Name': 'test-1705225-05'},
+        {'index': 'AGTTCC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705258-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A014', 'Sample_Well': 'F2', 'Sample_Project': '', 'Library_nM': '61.96447231', 'Sample_Name': 'test-1705258-05'},
+        {'index': 'GTCCGC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705259-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A018', 'Sample_Well': 'G2', 'Sample_Project': '', 'Library_nM': '86.20689655', 'Sample_Name': 'test-1705259-05'},
+        {'index': 'GTGAAA', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705266-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A019', 'Sample_Well': 'H2', 'Sample_Project': '', 'Library_nM': '54.44096134', 'Sample_Name': 'test-1705266-05'},
+        {'index': 'ATCACG', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705355-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A001', 'Sample_Well': 'A4', 'Sample_Project': '', 'Library_nM': '80.77324974', 'Sample_Name': 'test-1705355-05'},
+        {'index': 'TTAGGC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705387-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A003', 'Sample_Well': 'B4', 'Sample_Project': '', 'Library_nM': '81.19122257', 'Sample_Name': 'test-1705387-05'},
+        {'index': 'ACTTGA', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705388-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A008', 'Sample_Well': 'C4', 'Sample_Project': '', 'Library_nM': '79.41483804', 'Sample_Name': 'test-1705388-05'},
+        {'index': 'TAGCTT', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705398-06', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A010', 'Sample_Well': 'D4', 'Sample_Project': '', 'Library_nM': '66.24869383', 'Sample_Name': 'test-1705398-06'},
+        {'index': 'GTGGCC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705431-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A020', 'Sample_Well': 'E4', 'Sample_Project': '', 'Library_nM': '74.08568443', 'Sample_Name': 'test-1705431-05'},
+        {'index': 'CGTACG', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705432-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A022', 'Sample_Well': 'F4', 'Sample_Project': '', 'Library_nM': '79.83281087', 'Sample_Name': 'test-1705432-05'},
+        {'index': 'ACTGAT', 'Lane': '1', 'Description': '', 'Sample_ID': 'PCS-1724772-01', 'SampleType': 'Control', 'Sample_Plate': '', 'I7_Index_ID': 'A025', 'Sample_Well': 'G4', 'Sample_Project': '', 'Library_nM': '76.07105538', 'Sample_Name': 'PCS-1724772-01'}
+    ]
+
 
 def test_x_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_samplesheet.csv')
@@ -178,6 +197,12 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert samplesheet.is_pooled_lane(6, column='Lane') == False
     assert samplesheet.is_pooled_lane(7, column='Lane') == False
     assert samplesheet.is_pooled_lane(8, column='Lane') == False
+
+    lines = [ line for line in samplesheet.lines_per_column('Lane', '1') ]
+    assert lines == [ {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '1', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A2_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'} ]
+
+    lanes = [ lane for lane in samplesheet.column('Lane') ]
+    assert lanes == ['1', '2', '3', '4', '5', '6', '7', '8']
 
 def test_x_faulty_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
