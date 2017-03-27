@@ -22,9 +22,9 @@ if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
   cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
   if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
     sed -i 's//\n/g' ${BASE}/SampleSheet.csv
-    sed -i '/^$/d' ${BASE}/SampleSheet.csv
-    cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
   fi
+  sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
+  cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
 fi
 
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
