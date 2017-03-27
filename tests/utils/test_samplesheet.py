@@ -258,3 +258,5 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     assert samplesheet.is_pooled_lane(1, column='Lane') == True
     assert samplesheet.is_pooled_lane(2, column='Lane') == True
 
+    lanes = [ lane for lane in samplesheet.column('Lane') ]
+    assert lanes == ['1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2']
