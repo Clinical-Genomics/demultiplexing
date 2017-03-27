@@ -10,8 +10,8 @@ echo "Version $VERSION"
 
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
-NIPTOUTPATH=/srv/nipt_runs/
-EMAILS=bioinfo.clinical@scilifelab.se
+NIPTOUTPATH=/home/clinical/tmp/
+EMAILS=kenny.billiau@scilifelab.se
 
 #######
 # RUN #
@@ -30,12 +30,11 @@ for RUN in ${RUNBASE}/*; do
       # transform SampleSheet from Mac/Windows to Unix
       if grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv; then
           sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
-          sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
       fi
+      sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
 
       # validate
-      /home/clinical/SCRIPTS/validatenipt.py ${RUNBASE}${RUN}/SampleSheet.csv
-      if [[ $? -ne 0 ]]; then
+      if ! demux samplesheet validate ${RUNBASE}${RUN}/SampleSheet.csv; then
           NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
           cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" $EMAILS
@@ -44,7 +43,7 @@ for RUN in ${RUNBASE}/*; do
       fi
 
       # make SampleSheet NIPT ready
-      /home/clinical/SCRIPTS/massagenipt.py ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
+      demux samplesheet massage ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
       mv ${RUNBASE}${RUN}/SampleSheet.mas ${RUNBASE}${RUN}/SampleSheet.csv
       cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/Data/Intensities/BaseCalls/
 
