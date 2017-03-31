@@ -6,8 +6,7 @@ import sys
 import re
 from copy import deepcopy
 from collections import OrderedDict
-import os.path
-import os.sep
+import os
 
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
@@ -265,7 +264,7 @@ class MiSeqSamplesheet(Samplesheet):
 
         with open(samplesheet_path, 'r') as inputfile open(deplex_file 'w') as outputfile:
             outputfile.write(header_line)
-            in_body = False #Parsing head of body of document
+            in_body = False #Parsing head or body of document
             for line in inputfile.readlines():
                 if not in_body:
                     if line.startswith('Sample_ID'):
@@ -285,16 +284,16 @@ class MiSeqSamplesheet(Samplesheet):
                             if char in name:
                                 name = name.replace(char, '')
 
-                    output_string = ','.join([flowcell_id,\
-                                                '1',\
-                                                sample_name,\
-                                                'hg19',\
-                                                forward_index + '-' reverse_index,\
-                                                'ctmr',\
-                                                'N',\
-                                                'R1',\
-                                                'MS',\
-                                                project_name,\
+                    output_string = ','.join([flowcell_id,
+                                                '1',
+                                                sample_name,
+                                                'hg19',
+                                                forward_index + '-' reverse_index,
+                                                'ctmr',
+                                                'N',
+                                                'R1',
+                                                'MS',
+                                                project_name,
                                                 '\n'])
                     outputfile.write(output_string)
 
