@@ -6,6 +6,8 @@ import sys
 import re
 from copy import deepcopy
 from collections import OrderedDict
+import os.path
+import os.sep
 
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
@@ -242,6 +244,65 @@ class Samplesheet(object):
 
 
         return True
+
+
+class MiSeqSamplesheet(Samplesheet):
+
+    def __init__(self, samplesheet_path):
+        self.samplesheet_path = samplesheet_path
+        converted_sheet_path = self.convert_sheet_type(samplesheet_path)
+        self.parse(converted_sheet_path)
+
+    def convert_sheet_type(self, samplesheet_path):
+        """
+        Conver miseq to hiseq style samplesheet for demultiplexing.
+        """
+        dirname = os.path.dirname(samplesheet_path)
+        flowcell_id = dirname.split(os.sep)[-1].split('_')[-1] 
+        deplex_file = os.path.join(dirname, 'demultiplex_sheet.csv')
+        header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
+        forbidden_name_chars = [' ','-', '/']
+
+        with open(samplesheet_path, 'r') as inputfile open(deplex_file 'w') as outputfile:
+            outputfile.write(header_line)
+            in_body = False #Parsing head of body of document
+            for line in inputfile.readlines():
+                if not in_body:
+                    if line.startswith('Sample_ID'):
+                        in_body = True
+                    else:
+                        continue
+
+                elif in_body and len(line) > 1:
+                    content = line.split(',')
+                    sample_name = content[0]
+                    forward_index = content[5]
+                    reverse_index = content[7]
+                    project_name = content[4]
+
+                    for char in forbidden_name_chars:
+                        for name in [sample_name, project_name]:
+                            if char in name:
+                                name = name.replace(char, '')
+
+                    output_string = ','.join([flowcell_id,\
+                                                '1',\
+                                                sample_name,\
+                                                'hg19',\
+                                                forward_index + '-' reverse_index,\
+                                                'ctmr',\
+                                                'N',\
+                                                'R1',\
+                                                'MS',\
+                                                project_name,\
+                                                '\n'])
+                    outputfile.write(output_string)
+
+                else:
+                    #jump over blank lines
+                    continue
+
+        return deplex_file
 
 
 class HiSeq2500Samplesheet(Samplesheet):
