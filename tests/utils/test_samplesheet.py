@@ -386,3 +386,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     lanes_r = [ lane for lane in samplesheet.column_r('Lane') ]
     assert lanes == expected_lanes
     assert lanes_r == expected_lanes
+
+def test_miseq_samplesheet():
+    samplesheet = Samplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv', sheet_type='miseq')
+    assert samplesheet._get_flowcell() == '000000000-AY7H3'
