@@ -3,6 +3,7 @@
 import click
 import logging
 
+from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet
 
 @click.group()
@@ -27,3 +28,25 @@ def massage(samplesheet):
 def demux(samplesheet):
     """convert NIPT samplesheet to demux'able samplesheet """
     print(Samplesheet(samplesheet).to_demux())
+
+@samplesheet.command()
+@click.argument('flowcell')
+@click.option('-m', '--machine', type=click.Choice(['X', '2500']), help='machine type')
+@click.pass_context
+def fetch(context, flowcell, machine, delim=',', end='\n'):
+    """Fetch a samplesheet from LIMS"""
+    lims_api = ClinicalLims(**context.obj['lims'])
+    raw_samplesheet = lims_api.samplesheet(flowcell)
+
+    # this is how the data is keyed when it gets back from LIMS
+    lims_keys = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'index', 'Description', 'Control', 'Recipe', 'Operator', 'Project']
+
+    # ... this is the exact header we need for an X SampleSheet
+    header = lims_keys
+    if machine == '2500':
+        # ... for a HiSeq2500, the header looks slightly different
+        header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+
+    click.echo(delim.join(header))
+    for line in raw_samplesheet:
+        click.echo(delim.join([str(line[head]) for head in lims_keys]))
