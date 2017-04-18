@@ -35,6 +35,11 @@ def demux(samplesheet):
 @click.pass_context
 def fetch(context, flowcell, machine, delim=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
+
+    def get_project(project):
+        """ Only keeps the first part of the project name"""
+        return project.split(' ')[0]
+
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = lims_api.samplesheet(flowcell)
 
@@ -49,4 +54,8 @@ def fetch(context, flowcell, machine, delim=',', end='\n'):
 
     click.echo(delim.join(header))
     for line in raw_samplesheet:
+        # fix the project content
+        line['Project'] = get_project(line['Project']) 
+
+        # print it!
         click.echo(delim.join([str(line[head]) for head in lims_keys]))

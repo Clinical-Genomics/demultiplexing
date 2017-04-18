@@ -243,7 +243,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CGATGT', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A2_sureselect2', 'SampleProject': '504910', 'SampleRef': 'hg19'},
         {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GGCTAC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A11_sureselect11', 'SampleProject': '504910', 'SampleRef': 'hg19'},
         {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CTTGTA', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A12_sureselect12', 'SampleProject': '504910', 'SampleRef': 'hg19'},
-        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GAAACC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A15_sureselect15', 'SampleProject': '504910', 'SampleRef': 'hg19'} 
+        {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GAAACC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A15_sureselect15', 'SampleProject': '504910', 'SampleRef': 'hg19'}
     ]
 
     assert samplesheet.validate() == True
