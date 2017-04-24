@@ -3,7 +3,7 @@
 
 set -u
 
-VERSION=3.42.7
+VERSION=3.44.3
 echo "Version $VERSION"
 
 ##########
@@ -12,7 +12,8 @@ echo "Version $VERSION"
 
 NIPTRUNS=/home/clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
-MAILTO=bioinfo.clinical@scilifelab.se,nipt@karolinska.se
+MAILTO=bioinfo.clinical@scilifelab.se,nipt.karolinska@sll.se
+MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
 NIPTCONF=/home/clinical/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
@@ -69,19 +70,18 @@ for RUN in $(ls ${NIPTRUNS}); do
         cd ${TMP_OUTDIR}
         tar -czf ${RESULTS_FILE} *
         cd -
-        mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
 
-        # FTP the results file
-        NOW=$(date +"%Y%m%d%H%M%S")
-        lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
-
-        # waiting until the day SLL installs a proper FTP server
-        #lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; get ${RESULTS_FILE_NAME} ${TMP_OUTDIR}/retrieval.$$; bye"
-        #if [[ -f ${TMP_OUTDIR}/retrieval.$$ ]]; then
-        #     echo "[${NOW}] [${RUN}] SUCCESS: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
-        #else
-        #     echo "[${NOW}] [${RUN}] ERROR: ${RESULTS_FILE_NAME}" >> ${NIPTRUNS}/${RUN}/ftpdelivery.txt
-        #fi
+        IFS=_ read -ra RUN_PARTS <<< "${RUN}"
+        unset IFS
+        DATE=${RUN_PARTS[0]}
+        if [[ $DATE > 161121 ]]; then
+            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+            # FTP the results file
+            NOW=$(date +"%Y%m%d%H%M%S")
+            lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
+        else
+            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO_RERUN} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+        fi
 
         # clean up
         echo "rm -Rf ${TMP_OUTDIR}"

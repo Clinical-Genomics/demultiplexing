@@ -3,7 +3,7 @@
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
-VERSION=3.42.7
+VERSION=3.44.3
 
 logfile=/home/clinical/LOG/demux.hiseq-clinical-test.log.txt
 NOW=$(date +"%Y%m%d%H%M%S")
@@ -20,25 +20,20 @@ echo [${NOW}] [${RUN}] ${PROJECTLOG} created by $0 $VERSION >> ${PROJECTLOG}
 # transform SampleSheet from Mac to Unix
 if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
   cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-  grep -qs $'\r\n' ${BASE}/SampleSheet.csv
-  if [[ $? -eq 0 ]]; then
-      echo 'DOS formatted SampleSheet detected. Converting...'
-      sed -i 's/\r//' ${BASE}/SampleSheet.csv
-      cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
-  else
-      grep -qs $'\r' ${BASE}/SampleSheet.csv
-      if [[ $? -eq 0 ]]; then
-          echo 'MAC formatted SampleSheet detected. Converting...'
-          sed -i 's/\r/\n/' ${BASE}/SampleSheet.csv
-          cp ${BASE}/SampleSheet.csv ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv
-      fi
+  if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
+    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
   fi
+  sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
+  cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
 fi
 
 if [ -f ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv ]; then 
   fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}Data/Intensities/BaseCalls/SampleSheet.csv)
   runfc=$(echo ${BASE} | awk 'BEGIN {FS="_"} {print substr($4,2,9)}')
+#  echo runfc ${runfc} fcinfile ${fcinfile}  
   if [ ! ${runfc} == ${fcinfile} ]; then 
+#    echo Flowcell ID is correct, continues . . .
+#  else
     echo [${NOW}] [${RUN}] Wrong Flowcell ID in SampleSheet. Exits . . . >> ${logfile}
     echo [${NOW}] [${RUN}] Wrong Flowcell ID in SampleSheet. Exits . . . >> ${PROJECTLOG}
     exit
@@ -51,71 +46,96 @@ fi
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Setup correct, starts demuxing . . . >> ${PROJECTLOG}
 
-SAMPLE_INDEX=( $(cat ${BASE}/SampleSheet.csv | sed -n "2p" | sed -e 's/,/\n/g' ) )
-SAMPLE_INDEX=( $( echo ${SAMPLE_INDEX[4]} | sed -e 's/-/\n/g' ) )
-LEN_SAMPLE_INDEX1=${#SAMPLE_INDEX[0]}
-LEN_SAMPLE_INDEX2=${#SAMPLE_INDEX[1]}
-
-# Determine index length of run
-indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
-indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
-LEN_Y1=$(grep \<Read1\> ${BASE}/runParameters.xml | sed 's/<\/Read1>\r//' | sed 's/    <Read1>//')
-LEN_Y2=$(grep \<Read2\> ${BASE}/runParameters.xml | sed 's/<\/Read2>\r//' | sed 's/    <Read2>//')
-
-# Determine Basemask
-# http://stackoverflow.com/a/5349772/322188
-I1n=$(head -c $(( ${indexread1count} - ${LEN_SAMPLE_INDEX1} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
-I1="I${LEN_SAMPLE_INDEX1}${I1n}"
-I2=''
-
-if [[ ${indexread2count} -gt 0 ]]; then # dual
-    if [[ ${LEN_SAMPLE_INDEX2} -gt 0 ]]; then
-        I2="I${LEN_SAMPLE_INDEX2}"
-    fi
-    I2n=$(head -c $(( ${indexread2count} - ${LEN_SAMPLE_INDEX2} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
-    I2=",${I2}${I2n}"
-fi
-
-Y1=Y${LEN_Y1}
-if [[ ${LEN_Y2} -gt 0 ]]; then
-    Y2=,Y${LEN_Y2}
-fi
-
-BASEMASK="${Y1},${I1}${I2}${Y2}"
-
 if [ $BASEMASKBYPASS ]; then
-  case $BASEMASKBYPASS in
-    '--d8')      USEBASEMASK=Y101,I8,I8,Y101; UNALDIR=Unaligned1 ;;
-    '--s8')      USEBASEMASK=Y101,I8,Y101; UNALDIR=Unaligned2 ;;
-    '--s6s8')    USEBASEMASK=Y101,I6nn,Y101 ; UNALDIR=Unaligned3 ;;
-    '--s6')      USEBASEMASK=Y101,I6n,Y101 ; UNALDIR=Unaligned ;;
-    '--s6d8')    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101 ; UNALDIR=Unaligned4 ;;
-    '--s8d8')    USEBASEMASK=Y101,I8,nnnnnnnn,Y101 ; UNALDIR=Unaligned5 ;;
-    '--s8n')     USEBASEMASK=Y101,I8n,Y101 ; UNALDIR=Unaligned6
-    '--s8nn9')   USEBASEMASK=Y101,I8n,n9,Y101 ; UNALDIR=Unaligned7 ;;
-    '--ho')      USEBASEMASK=Y126,I8,Y126 ; UNALDIR=Unaligned ;;
-    '--hod8')    USEBASEMASK=Y126,I8,I8,Y126 ; UNALDIR=Unaligned8 ;;
-    '--hos8d8')  USEBASEMASK=Y126,I8,n8,Y126 ; UNALDIR=Unaligned9 ;;
-    '--hos6d8')  USEBASEMASK=Y126,I6nn,n8,Y126 ; UNALDIR=Unaligned10 ;;
-    '--sr51d8')  USEBASEMASK=Y51,I8,I8 ; UNALDIR=Unaligned11 ;;
-    '--hos6')    USEBASEMASK=Y126,I6n,Y126 ; UNALDIR=Unaligned12 ;;
-    *)    >&2 echo "'$BASEMASKBYPASS' not recognized!"
-          >&2 echo "Available options are:"
-          >&2 echo "--s6 single 6 index"
-          >&2 echo "--s6s8 single 6 advertised as single 8 index"
-          >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
-          >&2 echo "--s8 single 8 index"
-          >&2 echo "--d8 dual 8 index"
-          >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
-          >&2 echo "--s8n single 8 index advertised as single 9 index"
-          >&2 echo "--s8nn9 single 8 index advertised as dual 9 index"
-          >&2 echo "--ho High Output run"
-          >&2 echo "--hod8 High Output run with dual8 index"
-          >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
-          >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
-          >&2 echo "--hos6 High Output run with single 6 index"
-          >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index" ;;
-  esac
+  if [ $BASEMASKBYPASS == '--d8' ]; then
+    USEBASEMASK=Y101,I8,I8,Y101
+    UNALDIR=Unaligned1
+  elif [ $BASEMASKBYPASS == '--s8' ]; then
+    USEBASEMASK=Y101,I8,Y101
+    UNALDIR=Unaligned2
+  elif [ $BASEMASKBYPASS == '--s6s8' ]; then
+    USEBASEMASK=Y101,I6nn,Y101
+    UNALDIR=Unaligned3
+  elif [ $BASEMASKBYPASS == '--s6' ]; then
+    USEBASEMASK=Y101,I6n,Y101
+    UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--s6d8' ]; then
+    USEBASEMASK=Y101,I6nn,nnnnnnnn,Y101
+    UNALDIR=Unaligned4
+  elif [ $BASEMASKBYPASS == '--s8d8' ]; then
+    USEBASEMASK=Y101,I8,nnnnnnnn,Y101
+    UNALDIR=Unaligned5
+  elif [ $BASEMASKBYPASS == '--s8n' ]; then
+    USEBASEMASK=Y101,I8n,Y101
+    UNALDIR=Unaligned6
+  elif [ $BASEMASKBYPASS == '--s8nn9' ]; then
+    USEBASEMASK=Y101,I8n,n9,Y101
+    UNALDIR=Unaligned7
+  elif [ $BASEMASKBYPASS == '--ho' ]; then
+    USEBASEMASK=Y126,I8,Y126
+    UNALDIR=Unaligned
+  elif [ $BASEMASKBYPASS == '--hod8' ]; then
+    USEBASEMASK=Y126,I8,I8,Y126
+    UNALDIR=Unaligned8
+  elif [ $BASEMASKBYPASS == '--hos8d8' ]; then
+    USEBASEMASK=Y126,I8,n8,Y126
+    UNALDIR=Unaligned9
+  elif [ $BASEMASKBYPASS == '--hos6d8' ]; then
+    USEBASEMASK=Y126,I6nn,n8,Y126
+    UNALDIR=Unaligned10
+  elif [ $BASEMASKBYPASS == '--sr51d8' ]; then
+    USEBASEMASK=Y51,I8,I8
+    UNALDIR=Unaligned11
+  elif [ $BASEMASKBYPASS == '--hos6' ]; then
+    USEBASEMASK=Y126,I6n,Y126
+    UNALDIR=Unaligned12
+  else
+    >&2 echo "'$BASEMASKBYPASS' not recognized!"
+    >&2 echo "Available options are:"
+    >&2 echo "--s6 single 6 index"
+    >&2 echo "--s6s8 single 6 advertised as single 8 index"
+    >&2 echo "--s6d8 single 6 index advertised as dual 8 index"
+    >&2 echo "--s8 single 8 index"
+    >&2 echo "--d8 dual 8 index"
+    >&2 echo "--s8d8 single 8 index advertised as dual 8 index"
+    >&2 echo "--s8n single 8 index advertised as single 9 index"
+    >&2 echo "--s8nn9 single 8 index advertised as dual 9 index"
+    >&2 echo "--ho High Output run"
+    >&2 echo "--hod8 High Output run with dual8 index"
+    >&2 echo "--hos8d8 High Output run with single 8 index advertised as dual 8 index"
+    >&2 echo "--hos6d8 High Output run with single 6 index advertised as dual 8 index"
+    >&2 echo "--hos6 High Output run with single 6 index"
+    >&2 echo "--sr51d8 Single Read run (51cycles) with dual 8 index"
+  fi
+else
+  
+  ######   uses windows end-of-line/return setting [=FUCKING stupid!]
+  ######
+  indexread1count=$(grep IndexRead1 ${BASE}/runParameters.xml | sed 's/<\/IndexRead1>\r//' | sed 's/    <IndexRead1>//')
+  indexread2count=$(grep IndexRead2 ${BASE}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+  
+  #echo ${indexread1count}
+  #echo ${indexread2count}
+  
+  #  start to assume standard singel index
+  if [ "${indexread2count}" == 8 ]; then
+  #  this is not true if second index equals 8
+    USEBASEMASK=Y101,I8,I8,Y101
+    UNALDIR=Unaligned1
+    echo  ${indexread2count} == "8" ix2
+  else
+    echo  ${indexread2count} == 8 NOT ix2
+    if [ "${indexread1count}" == 8 ]; then
+      echo ${indexread1count} == 8
+  #  not if first index equals 8 either
+        USEBASEMASK=Y101,I8,Y101
+        UNALDIR=Unaligned2
+    else 
+      echo ${indexread1count} == 8 NOT ix1
+      USEBASEMASK=Y101,I6n,Y101
+      UNALDIR=Unaligned
+    fi
+  fi
 fi
 
 #USEBASEMASK=
@@ -141,6 +161,7 @@ NOW=$(date +"%Y%m%d%H%M%S")
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . . >> ${logfile}
 echo [${NOW}] [${RUN}] Demultiplexing finished,  adding stats to clinstatsdb . . .  >> ${PROJECTLOG}
 /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
+/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.scilifelabrc_aws >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] "/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py /home/clinical/DEMUX/${RUN}/ ${UNALDIR}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv" >> ${PROJECTLOG}
 echo [${NOW}] [${RUN}] /home/clinical/DEMUX/${RUN}/ /home/clinical/RUNS/${RUN}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
 

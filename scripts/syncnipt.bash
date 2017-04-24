@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
-VERSION=3.42.7
+VERSION=3.44.3
 echo "Version $VERSION"
 
 ##########
@@ -10,37 +10,40 @@ echo "Version $VERSION"
 
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
-NIPTOUTPATH=/srv/nipt_runs/
-RUNS=$(ls ${RUNBASE})
+NIPTOUTPATH=/home/clinical/tmp/
+EMAILS=kenny.billiau@scilifelab.se
 
 #######
 # RUN #
 #######
 
-for RUN in ${RUNS[@]}; do
+for RUN in ${RUNBASE}/*; do
+  RUN=$(basename ${RUN})
   NOW=$(date +"%Y%m%d%H%M%S")
   if [[ ! -e ${NIPTBASE}${RUN} ]]; then
     # simple NIPT detection
-    grep -qs Description,cfDNAHiSeqv1.0 ${RUNBASE}${RUN}/SampleSheet.csv
-    if [[ $? -eq 0 ]]; then
-      cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
-
-      # transform SampleSheet from Mac to Unix
-      grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv
-      if [[ $? -eq 0 ]]; then
-          sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+    if grep -qs Description,cfDNAHiSeqv1.0 ${RUNBASE}${RUN}/SampleSheet.csv; then
+      if [[ ! -e ${RUNBASE}${RUN}/SampleSheet.ori ]]; then
+        cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/SampleSheet.ori
       fi
 
+      # transform SampleSheet from Mac/Windows to Unix
+      if grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv; then
+          sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+      fi
+      sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
+
       # validate
-      /home/clinical/SCRIPTS/validatenipt.py ${RUNBASE}${RUN}/SampleSheet.csv
-      if [[ $? -ne 0 ]]; then
+      if ! demux samplesheet validate ${RUNBASE}${RUN}/SampleSheet.csv; then
           NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
+          cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" $EMAILS
+ 
           continue
       fi
 
       # make SampleSheet NIPT ready
-      /home/clinical/SCRIPTS/massagenipt.py ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
+      demux samplesheet massage ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
       mv ${RUNBASE}${RUN}/SampleSheet.mas ${RUNBASE}${RUN}/SampleSheet.csv
       cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/Data/Intensities/BaseCalls/
 
