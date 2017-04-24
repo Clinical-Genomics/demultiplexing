@@ -77,6 +77,8 @@ echo '[Data]' > ${RUNDIR}/SampleSheet.csv
 grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
 # convert the column headers, remove the second index
 sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
+# remove empty lines
+sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
 
 log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv
