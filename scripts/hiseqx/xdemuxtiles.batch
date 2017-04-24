@@ -31,6 +31,7 @@ log() {
 # INIT #
 ########
 
+log "On node: $(hostname)"
 log "starting, will use ${TMPDIR}"
 log "INDIR: ${INDIR}"
 log "OUTDIR: ${OUTDIR}"
