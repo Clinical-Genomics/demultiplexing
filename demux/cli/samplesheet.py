@@ -13,9 +13,10 @@ def samplesheet():
 
 @samplesheet.command()
 @click.argument('samplesheet')
-def validate(samplesheet):
+@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt']), help='sequencing type')
+def validate(samplesheet, application):
     """validates a samplesheet"""
-    Samplesheet(samplesheet).validate()
+    Samplesheet(samplesheet).validate(seq_type=application)
 
 @samplesheet.command()
 @click.argument('samplesheet')
@@ -41,16 +42,21 @@ def fetch(context, flowcell, machine, delim=',', end='\n'):
         return project.split(' ')[0]
 
     lims_api = ClinicalLims(**context.obj['lims'])
-    raw_samplesheet = lims_api.samplesheet(flowcell)
+    raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     # this is how the data is keyed when it gets back from LIMS
     lims_keys = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'index', 'Description', 'Control', 'Recipe', 'Operator', 'Project']
-
-    # ... this is the exact header we need for an X SampleSheet
     header = lims_keys
+
+    # ... fix some 2500 specifics
     if machine == '2500':
         # ... for a HiSeq2500, the header looks slightly different
         header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+
+    # ... fix some X specifics
+    if machine == 'X':
+        for i, line in enumerate(raw_samplesheet):
+            raw_samplesheet[i]['index'] = line['index'].split('-')[0]
 
     click.echo(delim.join(header))
     for line in raw_samplesheet:

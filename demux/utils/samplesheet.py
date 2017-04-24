@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys
 import re
 from copy import deepcopy
-from itertools import chain
 from collections import OrderedDict
 
 class SampleSheetValidationException(Exception):
@@ -16,6 +15,10 @@ class SampleSheetValidationException(Exception):
 
     def __str__(self):
         return repr("Section {}#{}: {}".format(self.section, self.msg, self.line_nr))
+
+
+class SampleSheetParsexception(Exception):
+    pass
 
 
 class Samplesheet(object):
@@ -29,13 +32,24 @@ class Samplesheet(object):
 
     This will be split on line, with each line turned into a dictionary (column header as keys),
     and stored into self.samplesheet.
+
+    e.g.:
+    self.section['[Data]'] = [
+        {'Flowcell': 'HHGGFFSS', 'SampleID': 'ADM1123A1', 'Index': 'ACTGACTG'}
+    ]
+
+    The original split line with the section marker, will be stored in self.section_markers = ['[Data]','','']
+
     """
 
+    # known sections
     HEADER = '[Header]'
     DATA   = '[Data]'
 
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
+        self.original_sheet = [] # all lines of hte samplesheet
+        self.section_markers = dict() # [Name]: line; does this section have a named section
         self.parse(samplesheet_path)
 
     def _get_flowcell(self):
@@ -53,8 +67,6 @@ class Samplesheet(object):
         return None
 
     def _get_data_header(self):
-        if self.section[self.DATA][0][0].startswith('['):
-            return self.section[self.DATA][1]
         return self.section[self.DATA][0]
 
     def parse(self, samplesheet_path, delim=','):
@@ -69,25 +81,33 @@ class Samplesheet(object):
         with open(samplesheet_path) as csvfile:
             for line in csvfile.readlines():
                 line = line.strip()
-                if line.startswith('['):
-                    name = line.split(delim)[0]
+                line = line.split(delim)
+                self.original_sheet.append(line)
+                if line[0].startswith('['):
+                    name = line[0]
+                    self.section_markers[name] = line
+                    continue # skip the actual section header
 
                 if name not in self.section:
                     self.section[name] = []
 
-                self.section[name].append(line.split(delim))
+                self.section[name].append(line)
+
+        if self.DATA not in self.section:
+            raise SampleSheetParsexception('No data found!')
 
         header = self._get_data_header()
-        self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][2:] ]
+        self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][1:] ]
 
     def lines(self):
+        """ Yields all lines of the [Data] section. """
         for line in self.samplesheet:
             yield line
 
     def raw(self, delim=',', end='\n'):
         """Reconstructs the sample sheet. """
         rs = []
-        for line in chain(*self.section.values()):
+        for line in self.original_sheet:
             rs.append(delim.join(line))
         return end.join(rs)
 
@@ -112,8 +132,11 @@ class Samplesheet(object):
                 section_copy[self.HEADER][i] = line
         
         rs = []
-        for line in chain(*section_copy.values()):
-            rs.append(delim.join(line))
+        for section_marker, section in section_copy.items():
+            if section_marker in self.section_markers:
+                rs.append(delim.join(self.section_markers[section_marker]))
+            for line in section:
+                rs.append(delim.join(line))
         return end.join(rs)
 
     def to_demux(self, delim=',', end='\n'):
@@ -133,11 +156,10 @@ class Samplesheet(object):
         flowcell_id = self._get_flowcell()
         project_id  = self._get_project_id()
 
-        header = self.section[self.DATA][1] # '0' is the section header, '1' is the csv header
+        header = self.section[self.DATA][0] # '0' is the csv header
         data_lines = [] # the new data section. Each line holds a dict with the right header keys
-        #data_lines.append(self.section[self.DATA][0])
         data_lines.append(expected_header)
-        for i, line in enumerate(self.section[self.DATA][2:]):
+        for i, line in enumerate(self.section[self.DATA][1:]):
             data_line = dict(zip(header, line))
 
             data_line['FCID'] = flowcell_id
@@ -191,33 +213,51 @@ class Samplesheet(object):
 
         return False
 
-    def validate(self):
+    def validate(self, seq_type):
         """TODO: Docstring for validate.
 
-        Returns: TODO
+        Args:
+            seq_type (str): 'wgs', 'wes', 'nipt'
 
         """
 
         def _validate_length(section):
-            """TODO: Docstring for function.
-
-            Args:
-                arg1 (TODO): TODO
-
-            Returns: TODO
-
-            """
-
             if len(section) > 2:
                 for i, line in enumerate(section[1:]):
                     if len(section[0]) != len(line):
                         return ('#fields != #fields in header', i)
             return True
 
-        for section_name, section in self.section.items():
-            validation_section = section[1:] # only validate the content, not the [Data] header
+        def _validate_uniq_index(samplesheet):
+            lanes = list(set(self.column('Lane')))
+            for lane in lanes:
+                if self.is_pooled_lane(lane, column='Lane'):
+                    sample_of = dict()
+                    for line in self.lines_per_column('Lane', lane):
+                        if 'index' in line:
+                            index = line['index']
+                        else:
+                            index = line['Index']
+                        if index not in sample_of:
+                            sample_of[index] = set()
+                        sample_of[index].add(line['SampleID'])
+
+                    for index, samples in sample_of.items():
+                        if len(samples) > 1:
+                            return ('Same index for {} on lane {}'.format(' , '.join(samples), lane), index)
+
+            return True        
+
+        if seq_type != 'nipt':
+            rs = _validate_uniq_index(self.samplesheet)
+            if type(rs) is tuple:
+                raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+
+        for section_marker, section in self.section.items():
+            validation_section = section[:] # only validate the content, not the [Data] header
             rs = _validate_length(validation_section)
             if type(rs) is tuple:
-                raise SampleSheetValidationException(section_name, rs[1], rs[0])
+                raise SampleSheetValidationException(section_marker, rs[1], rs[0])
+
 
         return True

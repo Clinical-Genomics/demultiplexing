@@ -92,7 +92,7 @@ Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Pro
         {'index': 'ACTGAT', 'Lane': '2', 'Description': '', 'Sample_ID': 'PCS-1724772-01', 'SampleType': 'Control', 'Sample_Plate': '', 'I7_Index_ID': 'A025', 'Sample_Well': 'G4', 'Sample_Project': '', 'Library_nM': '76.07105538', 'Sample_Name': 'PCS-1724772-01'}
     ]
 
-    assert samplesheet.validate() == True
+    assert samplesheet.validate(seq_type='nipt') == True
 
     massaged_samplesheet = samplesheet.massage()
     assert massaged_samplesheet.split('\n')[2] == 'Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,'
@@ -182,7 +182,7 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
         {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '8', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A11_TCTCGCGC', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCTCGCGC'}
     ]
 
-    assert samplesheet.validate() == True
+    assert samplesheet.validate(seq_type='wgs') == True
 
     samples = [ sample for sample in samplesheet.samples() ]
     assert samples == [ 'SVE2274A2_TCCGCGAA', 'SVE2274A4_TCCGCGAA', 'SVE2274A6_TCCGCGAA',
@@ -208,7 +208,13 @@ def test_x_faulty_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
 
     with pytest.raises(SampleSheetValidationException):
-        samplesheet.validate()
+        samplesheet.validate(seq_type='wgs')
+
+def test_2500_faulty_samplesheet():
+    samplesheet = Samplesheet('tests/fixtures/2500_faulty_samplesheet.csv')
+
+    with pytest.raises(SampleSheetValidationException):
+        samplesheet.validate(seq_type='wgs')
 
 def test_2500_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/2500_samplesheet.csv')
@@ -231,6 +237,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
 
     samplesheet_lines = [ line for line in samplesheet.lines() ]
     assert samplesheet_lines == [
+        {'Control': 'N', 'Description': '959191', 'FCID': 'HB07NADXX', 'Index': 'TGACCA', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB911A1_sureselect4', 'SampleProject': '959191', 'SampleRef': 'hg19'},
         {'Control': 'N', 'Description': '959191', 'FCID': 'HB07NADXX', 'Index': 'ACAGTG', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB911A2_sureselect5', 'SampleProject': '959191', 'SampleRef': 'hg19'},
         {'Control': 'N', 'Description': '454557', 'FCID': 'HB07NADXX', 'Index': 'GCCAAT', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB910A3_sureselect6', 'SampleProject': '454557', 'SampleRef': 'hg19'},
         {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'CGATGT', 'Lane': '1', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A2_sureselect2', 'SampleProject': '504910', 'SampleRef': 'hg19'},
@@ -246,17 +253,17 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         {'Control': 'N', 'Description': '504910', 'FCID': 'HB07NADXX', 'Index': 'GAAACC', 'Lane': '2', 'Operator': 'NN', 'Recipe': 'R1', 'SampleID': 'SIB914A15_sureselect15', 'SampleProject': '504910', 'SampleRef': 'hg19'}
     ]
 
-    assert samplesheet.validate() == True
+    assert samplesheet.validate(seq_type='wes') == True
 
     samples = [ sample for sample in samplesheet.samples() ]
-    assert samples == [ 'SIB911A2_sureselect5', 'SIB910A3_sureselect6', 'SIB914A2_sureselect2',
-                        'SIB914A11_sureselect11', 'SIB914A12_sureselect12', 'SIB914A15_sureselect15',
-                        'SIB911A1_sureselect4', 'SIB911A2_sureselect5', 'SIB910A3_sureselect6',
+    assert samples == [ 'SIB911A1_sureselect4', 'SIB911A2_sureselect5', 'SIB910A3_sureselect6',
                         'SIB914A2_sureselect2', 'SIB914A11_sureselect11', 'SIB914A12_sureselect12',
-                        'SIB914A15_sureselect15' ]
+                        'SIB914A15_sureselect15', 'SIB911A1_sureselect4', 'SIB911A2_sureselect5',
+                        'SIB910A3_sureselect6', 'SIB914A2_sureselect2', 'SIB914A11_sureselect11',
+                        'SIB914A12_sureselect12', 'SIB914A15_sureselect15' ]
 
     assert samplesheet.is_pooled_lane(1, column='Lane') == True
     assert samplesheet.is_pooled_lane(2, column='Lane') == True
 
     lanes = [ lane for lane in samplesheet.column('Lane') ]
-    assert lanes == ['1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2']
+    assert lanes == ['1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2']
