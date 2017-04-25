@@ -4,7 +4,7 @@ import click
 import logging
 
 from cglims.api import ClinicalLims, ClinicalSample
-from ..utils import Samplesheet
+from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet
 
 @click.group()
 def samplesheet():
@@ -15,26 +15,33 @@ def samplesheet():
 @click.argument('samplesheet')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt']), help='sequencing type')
 def validate(samplesheet, application):
-    """validates a samplesheet"""
-    Samplesheet(samplesheet).validate(seq_type=application)
+    """validate a samplesheet"""
+    if application == 'nipt':
+        NIPTSamplesheet(samplesheet).validate()
+    elif application == 'wes':
+        HiSeq2500Samplesheet(samplesheet).validate()
+    else:
+        Samplesheet(samplesheet).validate()
 
 @samplesheet.command()
 @click.argument('samplesheet')
 def massage(samplesheet):
-    """creates a NIPT ready SampleSheet"""
-    print(Samplesheet(samplesheet).massage())
+    """create a NIPT ready SampleSheet"""
+    click.echo(NIPTSamplesheet(samplesheet).massage())
 
 @samplesheet.command()
 @click.argument('samplesheet')
 def demux(samplesheet):
     """convert NIPT samplesheet to demux'able samplesheet """
-    print(Samplesheet(samplesheet).to_demux())
+    click.echo(NIPTSamplesheet(samplesheet).to_demux())
 
 @samplesheet.command()
 @click.argument('flowcell')
-@click.option('-m', '--machine', type=click.Choice(['X', '2500']), help='machine type')
+@click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
+@click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
+@click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
-def fetch(context, flowcell, machine, delim=',', end='\n'):
+def fetch(context, flowcell, application, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
     def get_project(project):
@@ -49,19 +56,19 @@ def fetch(context, flowcell, machine, delim=',', end='\n'):
     header = lims_keys
 
     # ... fix some 2500 specifics
-    if machine == '2500':
+    if application == 'wes':
         # ... for a HiSeq2500, the header looks slightly different
         header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
     # ... fix some X specifics
-    if machine == 'X':
+    if application == 'wgs':
         for i, line in enumerate(raw_samplesheet):
             raw_samplesheet[i]['index'] = line['index'].split('-')[0]
 
-    click.echo(delim.join(header))
+    click.echo(delimiter.join(header))
     for line in raw_samplesheet:
         # fix the project content
         line['Project'] = get_project(line['Project']) 
 
         # print it!
-        click.echo(delim.join([str(line[head]) for head in lims_keys]))
+        click.echo(delimiter.join([str(line[head]) for head in lims_keys]))

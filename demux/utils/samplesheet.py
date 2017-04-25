@@ -34,11 +34,16 @@ class Samplesheet(object):
     and stored into self.samplesheet.
 
     e.g.:
+
+    [Data],,
+    Flowcell,SampleID,Index
+    HHGGFFSS,ADM1123A1,ACTGACTG
+
     self.section['[Data]'] = [
-        {'Flowcell': 'HHGGFFSS', 'SampleID': 'ADM1123A1', 'Index': 'ACTGACTG'}
+        {'FCID': 'HHGGFFSS', 'SampleID': 'ADM1123A1', 'Index': 'ACTGACTG'}
     ]
 
-    The original split line with the section marker, will be stored in self.section_markers = ['[Data]','','']
+    The original split line with the section marker, will be stored in self.section_markers['[Data]'] = ['[Data]','','']
 
     """
 
@@ -46,25 +51,29 @@ class Samplesheet(object):
     HEADER = '[Header]'
     DATA   = '[Data]'
 
+    # for the [Data] section: provide a universal header line.
+    # The mapping is like this: universal: expected, e.g. for NIPT we have expected Sample_ID,
+    # which is mapped to the more universal 'sample_id': 'sample_id': 'Sample_ID'
+    # Universal keys follow the python variable naming rules:
+    # lowercase with words separated by underscores as necessary to improve readability.
+    # One can make one header map for each samplesheet type.
+    header_map = {
+            'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
+            'index': 'index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
+            'operator': 'Operator', 'project': 'Project'
+    }
+
+    def _get_flowcell(self):
+        for line in self.section[self.DATA]:
+            if 'Flowcell' in line:
+                return line['Flowcell']
+        return None
+
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
         self.original_sheet = [] # all lines of hte samplesheet
         self.section_markers = dict() # [Name]: line; does this section have a named section
         self.parse(samplesheet_path)
-
-    def _get_flowcell(self):
-        # get the experiment name
-        for line in self.section[self.HEADER]:
-            if line[0] == 'Experiment Name':
-                return line[1]
-        return None
-
-    def _get_project_id(self):
-        # get the experiment name
-        for line in self.section[self.HEADER]:
-            if line[0] == 'Investigator Name':
-                return line[1].split('_')[1]
-        return None
 
     def _get_data_header(self):
         return self.section[self.DATA][0]
@@ -111,6 +120,124 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
+    def samples(self, column='SampleID'):
+        """ Return all samples in the samplesheet """
+        return self.column(column)
+
+    def column(self, column):
+        """ Return all values from a column in the samplesheet """
+        for line in self.samplesheet:
+            yield line[column]
+
+    def cell(self, line, column):
+        """ return the contents of a column in a line. Look up
+        this contents with the header_map.
+        This makes it easy to have 
+        """
+
+        column_key = column
+        if column in self.header_map:
+            column_key = self.header_map[column]
+
+        return line[column_key]
+
+    def lines_per_column(self, column, content):
+        """ Return all lines with the same column content
+        e.g. return all lines of column='Lane' content='1'  """
+        for line in self.samplesheet:
+            if line[column] == content:
+                yield line
+
+    def is_pooled_lane(self, lane, column='lane'):
+        """ Return True if lane contains multiple samples """
+        lane_count = 0
+        lane = str(lane)
+        for line in self.samplesheet:
+            if line[column] == lane:
+                lane_count += 1
+
+            if lane_count > 1:
+                return True
+
+        return False
+
+    def validate(self):
+        """ General validation of a samplesheet """
+
+        def _validate_length(section):
+            if len(section) > 2:
+                for i, line in enumerate(section[1:]):
+                    if len(section[0]) != len(line):
+                        return ('#fields != #fields in header', i)
+            return True
+
+        def _validate_uniq_index(samplesheet):
+            lane_name = self.header_map['lane']
+            index_name = self.header_map['index']
+            sample_name = self.header_map['sample_id']
+
+            lanes = list(set(self.column(lane_name)))
+            for lane in lanes:
+                if self.is_pooled_lane(lane, column=lane_name):
+                    sample_of = dict()
+                    for line in self.lines_per_column(lane_name, lane):
+                        index = line[index_name]
+                        if index not in sample_of:
+                            sample_of[index] = set()
+                        sample_of[index].add(line[sample_name])
+
+                    for index, samples in sample_of.items():
+                        if len(samples) > 1:
+                            return ('Same index for {} on lane {}'.format(' , '.join(samples), lane), index)
+
+            return True
+
+        rs = _validate_uniq_index(self.samplesheet)
+        if type(rs) is tuple:
+            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+
+        for section_marker, section in self.section.items():
+            validation_section = section[:] # only validate the content, not the [Data] header
+            rs = _validate_length(validation_section)
+            if type(rs) is tuple:
+                raise SampleSheetValidationException(section_marker, rs[1], rs[0])
+
+
+        return True
+
+
+class HiSeq2500Samplesheet(Samplesheet):
+
+    header_map = {
+            'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
+            'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
+            'operator': 'Operator', 'project': 'Project'
+    }
+
+
+class NIPTSamplesheet(Samplesheet):
+
+    header_map = { 
+            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+            'description': 'Description', 'sample_type': 'SampleType', 'library_nm': 'Library_nM'
+    }
+
+    def _get_flowcell(self):
+        # get the experiment name
+        for line in self.section[self.HEADER]:
+            if line[0] == 'Experiment Name':
+                return line[1]
+        return None
+
+    def _get_project_id(self):
+        # get the experiment name
+        for line in self.section[self.HEADER]:
+            if line[0] == 'Investigator Name':
+                return line[1].split('_')[1]
+        return None
+
     def massage(self, delim=',', end='\n'):
         """Abuses the Investigator Name field to store information about the run.
 
@@ -130,7 +257,7 @@ class Samplesheet(object):
                     investigator_name.append(flowcell_id)
                 line[1] = '_'.join(investigator_name)
                 section_copy[self.HEADER][i] = line
-        
+
         rs = []
         for section_marker, section in section_copy.items():
             if section_marker in self.section_markers:
@@ -182,82 +309,3 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
-
-    def samples(self, column='SampleID'):
-        """ Return all samples in the samplesheet """
-        return self.column(column)
-
-
-    def column(self, column):
-        """ Return all values from a column in the samplesheet """
-        for line in self.samplesheet:
-            yield line[column]
-
-    def lines_per_column(self, column, content):
-        """ Return all lines with the same column content
-        e.g. return all lines of column='Lane' content='1'  """
-        for line in self.samplesheet:
-            if line[column] == content:
-                yield line
-
-    def is_pooled_lane(self, lane, column='lane'):
-        """ Return True if lane contains multiple samples """
-        lane_count = 0
-        lane = str(lane)
-        for line in self.samplesheet:
-            if line[column] == lane:
-                lane_count += 1
-
-            if lane_count > 1:
-                return True
-
-        return False
-
-    def validate(self, seq_type):
-        """TODO: Docstring for validate.
-
-        Args:
-            seq_type (str): 'wgs', 'wes', 'nipt'
-
-        """
-
-        def _validate_length(section):
-            if len(section) > 2:
-                for i, line in enumerate(section[1:]):
-                    if len(section[0]) != len(line):
-                        return ('#fields != #fields in header', i)
-            return True
-
-        def _validate_uniq_index(samplesheet):
-            lanes = list(set(self.column('Lane')))
-            for lane in lanes:
-                if self.is_pooled_lane(lane, column='Lane'):
-                    sample_of = dict()
-                    for line in self.lines_per_column('Lane', lane):
-                        if 'index' in line:
-                            index = line['index']
-                        else:
-                            index = line['Index']
-                        if index not in sample_of:
-                            sample_of[index] = set()
-                        sample_of[index].add(line['SampleID'])
-
-                    for index, samples in sample_of.items():
-                        if len(samples) > 1:
-                            return ('Same index for {} on lane {}'.format(' , '.join(samples), lane), index)
-
-            return True        
-
-        if seq_type != 'nipt':
-            rs = _validate_uniq_index(self.samplesheet)
-            if type(rs) is tuple:
-                raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
-
-        for section_marker, section in self.section.items():
-            validation_section = section[:] # only validate the content, not the [Data] header
-            rs = _validate_length(validation_section)
-            if type(rs) is tuple:
-                raise SampleSheetValidationException(section_marker, rs[1], rs[0])
-
-
-        return True
