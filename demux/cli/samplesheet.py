@@ -52,23 +52,22 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     # this is how the data is keyed when it gets back from LIMS
-    lims_keys = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'index', 'Description', 'Control', 'Recipe', 'Operator', 'Project']
-    header = lims_keys
+    lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'description', 'control', 'recipe', 'operator', 'project']
 
     # ... fix some 2500 specifics
     if application == 'wes':
-        # ... for a HiSeq2500, the header looks slightly different
-        header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+        header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
 
     # ... fix some X specifics
     if application == 'wgs':
+        header = [ Samplesheet.header_map[head] for head in lims_keys ]
         for i, line in enumerate(raw_samplesheet):
             raw_samplesheet[i]['index'] = line['index'].split('-')[0]
 
     click.echo(delimiter.join(header))
     for line in raw_samplesheet:
         # fix the project content
-        line['Project'] = get_project(line['Project']) 
+        line['project'] = get_project(line['project']) 
 
         # print it!
         click.echo(delimiter.join([str(line[head]) for head in lims_keys]))

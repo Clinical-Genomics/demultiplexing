@@ -60,7 +60,7 @@ class Samplesheet(object):
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project'
+            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
     }
 
     def _get_flowcell(self):
@@ -211,7 +211,7 @@ class HiSeq2500Samplesheet(Samplesheet):
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project'
+            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
     }
 
 
