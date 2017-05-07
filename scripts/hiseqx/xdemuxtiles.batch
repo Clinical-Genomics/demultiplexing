@@ -6,7 +6,7 @@
 #SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-%j.err
-#SBATCH --mail-type=END
+#SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=kenny.billiau@scilifelab.se
 
 ##########
@@ -26,6 +26,11 @@ log() {
     NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] $@
 }
+
+failed() {
+    cat ${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err | mail -s "ERROR demux in $(basename $INDIR)" kenny.billiau@scilifelab.se 
+}
+trap failed ERR
 
 ########
 # INIT #
