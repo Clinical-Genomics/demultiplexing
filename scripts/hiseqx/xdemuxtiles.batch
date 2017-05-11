@@ -168,7 +168,7 @@ done
 
 # Copy the undetermined indexes
 UNDETERMINED_OUTDIR=${OUTDIR}/${TILE_DIR}
-mkdir ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
+mkdir -p ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
 for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
     # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
     if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${UNDETERMINED_OUTDIR}/${UNDETERMINED} ]]; then

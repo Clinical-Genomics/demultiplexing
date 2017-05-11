@@ -54,7 +54,7 @@ mkdir -p $CP_COMPLETE_DIR
 log "demuxtiles.bash VERSION ${VERSION}"
 
 # get the flowcell name
-FC=$( basename $(dirname ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
