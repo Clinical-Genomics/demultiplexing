@@ -53,6 +53,9 @@ mkdir -p $CP_COMPLETE_DIR
 
 log "demuxtiles.bash VERSION ${VERSION}"
 
+# get the flowcell name
+FC=$( basename $(dirname ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv"
@@ -68,9 +71,6 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     
     cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
 fi
-
-# get the flowcell name
-FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 
 # notify we are ready to start!
 cat ${RUNDIR}/SampleSheet.csv | mail -s "DEMUX of $FC started" ${EMAIL}
