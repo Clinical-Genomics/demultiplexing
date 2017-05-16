@@ -3,7 +3,7 @@ import coloredlogs, logging
 import click
 import yaml
 
-from .samplesheet import samplesheet
+from .samplesheet import sheet
 
 log = logging.getLogger(__name__)
 
@@ -39,4 +39,4 @@ def setup_logging(level='INFO'):
     root_logger.addHandler(console)
     return root_logger
 
-demux.add_command(samplesheet)
+demux.add_command(sheet)

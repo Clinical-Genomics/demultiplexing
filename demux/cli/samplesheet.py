@@ -7,11 +7,11 @@ from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet
 
 @click.group()
-def samplesheet():
+def sheet():
     """Samplesheet commands"""
     pass
 
-@samplesheet.command()
+@sheet.command()
 @click.argument('samplesheet')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt']), help='sequencing type')
 def validate(samplesheet, application):
@@ -23,19 +23,19 @@ def validate(samplesheet, application):
     else:
         Samplesheet(samplesheet).validate()
 
-@samplesheet.command()
+@sheet.command()
 @click.argument('samplesheet')
 def massage(samplesheet):
     """create a NIPT ready SampleSheet"""
     click.echo(NIPTSamplesheet(samplesheet).massage())
 
-@samplesheet.command()
+@sheet.command()
 @click.argument('samplesheet')
 def demux(samplesheet):
     """convert NIPT samplesheet to demux'able samplesheet """
     click.echo(NIPTSamplesheet(samplesheet).to_demux())
 
-@samplesheet.command()
+@sheet.command()
 @click.argument('flowcell')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
