@@ -14,7 +14,7 @@ for run in ${runs[@]}; do
         demuxproccount=$(ps aux | grep HISEQ | grep grep -v | wc | awk '{print $1}')
         if [[ "${demuxproccount}" -lt 15 ]]; then
           echo [${NOW}] ${run} starting demultiplexing  
-          bash /home/clinical/SCRIPTS/demux.v5.bash ${RAWBASE}${run} &
+          bash /home/clinical/SCRIPTS/demux.bash ${RAWBASE}${run} &
         else  
           echo [${NOW}] ${run} did not start demultiplexing other processes running
         fi
