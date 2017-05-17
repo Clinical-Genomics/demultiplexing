@@ -100,6 +100,7 @@ fi
 
 # determine read2
 Y1=Y${LEN_Y1}
+Y2=
 if [[ ${LEN_Y2} -gt 0 ]]; then
     Y2=,Y${LEN_Y2}
 fi
