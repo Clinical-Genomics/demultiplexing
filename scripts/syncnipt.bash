@@ -10,7 +10,7 @@ echo "Version $VERSION"
 
 RUNBASE=/home/clinical/RUNS/
 NIPTBASE=/home/clinical/NIPT/
-NIPTOUTPATH=/home/clinical/tmp/
+NIPTOUTPATH=/srv/nipt_runs/
 EMAILS=kenny.billiau@scilifelab.se
 
 #######
