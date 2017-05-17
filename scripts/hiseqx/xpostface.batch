@@ -6,15 +6,18 @@
 #SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=bioinfo.clinical@scilifelab.se
+
+set -eu -o pipefail
 
 ##########
 # PARAMS #
 ##########
 
 VERSION=4.0.0
-DEMUXDIR=$1 # absolute path to the DEMUX/rundir
+DEMUXDIR=${1?'absolute path to the DEMUX/rundir'}
+EMAIL=bioinfo.clinical@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -24,6 +27,11 @@ log() {
     NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] $@
 }
+
+failed() {
+    echo "Error on line number $1." | mail -s "ERROR $0 in $(basename $DEMUXDIR)" ${EMAIL}
+}
+trap 'failed $LINENO' ERR
 
 ########
 # INIT #
@@ -58,3 +66,5 @@ bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/
 # make sure we signal the rest of the pipeline all processing is done now
 log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
 date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
+
+mail -s "$(basename ${DEMUXDIR}) finished demultiplexing" $EMAIL

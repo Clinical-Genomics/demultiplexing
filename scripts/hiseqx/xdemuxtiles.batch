@@ -6,8 +6,10 @@
 #SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-%j.err
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=kenny.billiau@scilifelab.se
+
+set -eu -o pipefail
 
 ##########
 # PARAMS #
@@ -17,6 +19,7 @@ INDIR=$1 # Run dir
 OUTDIR=$2 # Demux dir
 LANE=$3 # 1-8
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
+EMAIL=kenny.billiau@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -28,7 +31,7 @@ log() {
 }
 
 failed() {
-    cat ${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err | mail -s "ERROR demux in $(basename $INDIR)" kenny.billiau@scilifelab.se 
+    cat ${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err | mail -s "ERROR demultiplexing of $(basename $INDIR)" ${EMAIL}
 }
 trap failed ERR
 
@@ -167,7 +170,7 @@ done
 
 # Copy the undetermined indexes
 UNDETERMINED_OUTDIR=${OUTDIR}/${TILE_DIR}
-mkdir ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
+mkdir -p ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
 for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
     # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
     if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${UNDETERMINED_OUTDIR}/${UNDETERMINED} ]]; then

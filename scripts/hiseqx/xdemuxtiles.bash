@@ -1,16 +1,21 @@
 #!/bin/bash
 # demux Xrun in parts
 
+set -eu -o pipefail
+
 ##########
 # PARAMS #
 ##########
 
 VERSION=4.0.0
-RUNDIR=$1 # full path to run dir
+RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
+
+EMAIL=kenny.billiau@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
+SCRIPTDIR=$(dirname $(readlink -nm $0))
 
 #############
 # FUNCTIONS #
@@ -33,6 +38,11 @@ log_file() {
     done < $1
 }
 
+failed() {
+    cat ${PROJECTLOG} | mail -s "ERROR starting demux of $(basename $RUNDIR)" ${EMAIL}
+}
+trap failed ERR
+
 ########
 # MAIN #
 ########
@@ -40,13 +50,13 @@ log_file() {
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 mkdir -p $CP_COMPLETE_DIR
-SCRIPTDIR=$(dirname $(readlink -nm $0))
 
 log "demuxtiles.bash VERSION ${VERSION}"
 
 # get the flowcell name
-FC=$( basename `dirname ${RUNDIR}/SampleSheet.csv` | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 
+# get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv"
     wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/${FC}.csv
@@ -61,6 +71,9 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     
     cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
 fi
+
+# notify we are ready to start!
+cat ${RUNDIR}/SampleSheet.csv | mail -s "DEMUX of $FC started" ${EMAIL}
 
 # Downloaded samplesheet has following headers:
 #FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
