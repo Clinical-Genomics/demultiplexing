@@ -34,7 +34,7 @@ for RUN in ${RUNBASE}/*; do
       sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
 
       # validate
-      if ! demux samplesheet validate ${RUNBASE}${RUN}/SampleSheet.csv; then
+      if ! demux sheet validate -a nipt ${RUNBASE}${RUN}/SampleSheet.csv; then
           NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
           cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" $EMAILS
@@ -43,7 +43,7 @@ for RUN in ${RUNBASE}/*; do
       fi
 
       # make SampleSheet NIPT ready
-      demux samplesheet massage ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
+      demux sheet massage ${RUNBASE}${RUN}/SampleSheet.csv > ${RUNBASE}${RUN}/SampleSheet.mas
       mv ${RUNBASE}${RUN}/SampleSheet.mas ${RUNBASE}${RUN}/SampleSheet.csv
       cp ${RUNBASE}${RUN}/SampleSheet.csv ${RUNBASE}${RUN}/Data/Intensities/BaseCalls/
 
