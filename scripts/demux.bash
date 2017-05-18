@@ -137,6 +137,8 @@ if ! grep -qs Description,cfDNAHiSeqv1.0 ${DEMUX_DIR}/${RUN}/SampleSheet.csv; th
     set -e
     log "rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}"
     rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}
+    log "scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/"
+    scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/
 
     date > ${DEMUX_DIR}/${RUN}/copycomplete.txt
 
