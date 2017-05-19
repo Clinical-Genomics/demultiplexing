@@ -65,6 +65,7 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
             index = line['index'].split('-')[0]
             raw_samplesheet[i]['index'] = index
             raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
+        click.echo('[Data]')
 
     click.echo(delimiter.join(header))
     for line in raw_samplesheet:
