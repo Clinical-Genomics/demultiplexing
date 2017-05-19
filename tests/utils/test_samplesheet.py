@@ -129,14 +129,18 @@ HFNC5BCXY,2,test-1705431-05,hg19,GTGGCC,Test,666666,R1,NN,666666
 HFNC5BCXY,2,test-1705432-05,hg19,CGTACG,Test,666666,R1,NN,666666
 HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
 
-    samples = [ sample for sample in samplesheet.samples('Sample_ID') ]
-    assert samples == ['test-1705166-05', 'test-1705169-05', 'test-1705170-05', 'test-1705183-06', 'test-1705225-05', 'test-1705258-05', 'test-1705259-05', 'test-1705266-05', 'test-1705355-05', 'test-1705387-05', 'test-1705388-05', 'test-1705398-06', 'test-1705431-05', 'test-1705432-05', 'PCS-1724772-01', 'test-1705166-05', 'test-1705169-05', 'test-1705170-05', 'test-1705183-06', 'test-1705225-05', 'test-1705258-05', 'test-1705259-05', 'test-1705266-05', 'test-1705355-05', 'test-1705387-05', 'test-1705388-05', 'test-1705398-06', 'test-1705431-05', 'test-1705432-05', 'PCS-1724772-01']
+    expected_samples = ['test-1705166-05', 'test-1705169-05', 'test-1705170-05', 'test-1705183-06', 'test-1705225-05', 'test-1705258-05', 'test-1705259-05', 'test-1705266-05', 'test-1705355-05', 'test-1705387-05', 'test-1705388-05', 'test-1705398-06', 'test-1705431-05', 'test-1705432-05', 'PCS-1724772-01', 'test-1705166-05', 'test-1705169-05', 'test-1705170-05', 'test-1705183-06', 'test-1705225-05', 'test-1705258-05', 'test-1705259-05', 'test-1705266-05', 'test-1705355-05', 'test-1705387-05', 'test-1705388-05', 'test-1705398-06', 'test-1705431-05', 'test-1705432-05', 'PCS-1724772-01']
+    samples = [ sample for sample in samplesheet.samples() ]
+    samples_r = [ sample for sample in samplesheet.samples_r(column='Sample_ID') ]
+    assert samples == expected_samples
+    assert samples_r == expected_samples
 
-    assert samplesheet.is_pooled_lane('1', column='Lane') == True
-    assert samplesheet.is_pooled_lane('2', column='Lane') == True
+    assert samplesheet.is_pooled_lane('1') == True
+    assert samplesheet.is_pooled_lane('2') == True
+    assert samplesheet.is_pooled_lane_r('1', column='Lane') == True
+    assert samplesheet.is_pooled_lane_r('2', column='Lane') == True
 
-    lines = [ line for line in samplesheet.lines_per_column('Lane', '1') ]
-    assert lines ==  [
+    expectes_lines = [
         {'index': 'CGATGT', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705166-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A002', 'Sample_Well': 'A2', 'Sample_Project': '', 'Library_nM': '69.07001045', 'Sample_Name': 'test-1705166-05'},
         {'index': 'ACAGTG', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705169-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A005', 'Sample_Well': 'B2', 'Sample_Project': '', 'Library_nM': '62.27795193', 'Sample_Name': 'test-1705169-05'},
         {'index': 'CAGATC', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705170-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A007', 'Sample_Well': 'C2', 'Sample_Project': '', 'Library_nM': '58.51619645', 'Sample_Name': 'test-1705170-05'},
@@ -153,6 +157,10 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
         {'index': 'CGTACG', 'Lane': '1', 'Description': '', 'Sample_ID': 'test-1705432-05', 'SampleType': 'Test', 'Sample_Plate': '', 'I7_Index_ID': 'A022', 'Sample_Well': 'F4', 'Sample_Project': '', 'Library_nM': '79.83281087', 'Sample_Name': 'test-1705432-05'},
         {'index': 'ACTGAT', 'Lane': '1', 'Description': '', 'Sample_ID': 'PCS-1724772-01', 'SampleType': 'Control', 'Sample_Plate': '', 'I7_Index_ID': 'A025', 'Sample_Well': 'G4', 'Sample_Project': '', 'Library_nM': '76.07105538', 'Sample_Name': 'PCS-1724772-01'}
     ]
+    lines = [ line for line in samplesheet.lines_per_column('lane', '1') ]
+    lines_r = [ line for line in samplesheet.lines_per_column_r('Lane', '1') ]
+    assert lines == expectes_lines
+    assert lines_r == expectes_lines
 
 
 def test_x_samplesheet():
@@ -184,25 +192,43 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
 
     assert samplesheet.validate() == True
 
+    expected_samples = [ 'SVE2274A2_TCCGCGAA', 'SVE2274A4_TCCGCGAA', 'SVE2274A6_TCCGCGAA',
+                          'SVE2274A7_TCCGCGAA', 'SVE2274A8_TCCGCGAA', 'SVE2274A9_TCTCGCGC',
+                          'SVE2274A10_TCTCGCGC', 'SVE2274A11_TCTCGCGC']
     samples = [ sample for sample in samplesheet.samples() ]
-    assert samples == [ 'SVE2274A2_TCCGCGAA', 'SVE2274A4_TCCGCGAA', 'SVE2274A6_TCCGCGAA',
-                        'SVE2274A7_TCCGCGAA', 'SVE2274A8_TCCGCGAA', 'SVE2274A9_TCTCGCGC',
-                        'SVE2274A10_TCTCGCGC', 'SVE2274A11_TCTCGCGC']
+    samples_r = [ sample for sample in samplesheet.samples_r() ]
+    assert samples == expected_samples
+    assert samples_r == expected_samples
 
-    assert samplesheet.is_pooled_lane(1, column='Lane') == False
-    assert samplesheet.is_pooled_lane(2, column='Lane') == False
-    assert samplesheet.is_pooled_lane(3, column='Lane') == False
-    assert samplesheet.is_pooled_lane(4, column='Lane') == False
-    assert samplesheet.is_pooled_lane(5, column='Lane') == False
-    assert samplesheet.is_pooled_lane(6, column='Lane') == False
-    assert samplesheet.is_pooled_lane(7, column='Lane') == False
-    assert samplesheet.is_pooled_lane(8, column='Lane') == False
+    assert samplesheet.is_pooled_lane(1) == False
+    assert samplesheet.is_pooled_lane(2) == False
+    assert samplesheet.is_pooled_lane(3) == False
+    assert samplesheet.is_pooled_lane(4) == False
+    assert samplesheet.is_pooled_lane(5) == False
+    assert samplesheet.is_pooled_lane(6) == False
+    assert samplesheet.is_pooled_lane(7) == False
+    assert samplesheet.is_pooled_lane(8) == False
 
-    lines = [ line for line in samplesheet.lines_per_column('Lane', '1') ]
-    assert lines == [ {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '1', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A2_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'} ]
+    assert samplesheet.is_pooled_lane_r(1, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(2, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(3, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(4, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(5, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(6, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(7, column='Lane') == False
+    assert samplesheet.is_pooled_lane_r(8, column='Lane') == False
 
-    lanes = [ lane for lane in samplesheet.column('Lane') ]
-    assert lanes == ['1', '2', '3', '4', '5', '6', '7', '8']
+    expected_lines = [ {'Control': 'N', 'FCID': 'HC7H2ALXX', 'Lane': '1', 'Operator': 'NN', 'Project': '659262', 'Recipe': 'R1', 'SampleID': 'SVE2274A2_TCCGCGAA', 'SampleName': '659262', 'SampleRef': 'hg19', 'index': 'TCCGCGAA'} ]
+    lines = [ line for line in samplesheet.lines_per_column('lane', '1') ]
+    lines_r = [ line for line in samplesheet.lines_per_column_r('Lane', '1') ]
+    assert lines == expected_lines
+    assert lines_r == expected_lines
+
+    expected_lanes = ['1', '2', '3', '4', '5', '6', '7', '8']
+    lanes = [ lane for lane in samplesheet.column('lane') ]
+    lanes_r = [ lane for lane in samplesheet.column_r('Lane') ]
+    assert lanes == expected_lanes
+    assert lanes_r == expected_lanes
 
 def test_x_faulty_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
@@ -255,15 +281,24 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
 
     assert samplesheet.validate() == True
 
+    expected_samples = [ 'SIB911A1_sureselect4', 'SIB911A2_sureselect5', 'SIB910A3_sureselect6',
+                         'SIB914A2_sureselect2', 'SIB914A11_sureselect11', 'SIB914A12_sureselect12',
+                         'SIB914A15_sureselect15', 'SIB911A1_sureselect4', 'SIB911A2_sureselect5',
+                         'SIB910A3_sureselect6', 'SIB914A2_sureselect2', 'SIB914A11_sureselect11',
+                         'SIB914A12_sureselect12', 'SIB914A15_sureselect15' ]
     samples = [ sample for sample in samplesheet.samples() ]
-    assert samples == [ 'SIB911A1_sureselect4', 'SIB911A2_sureselect5', 'SIB910A3_sureselect6',
-                        'SIB914A2_sureselect2', 'SIB914A11_sureselect11', 'SIB914A12_sureselect12',
-                        'SIB914A15_sureselect15', 'SIB911A1_sureselect4', 'SIB911A2_sureselect5',
-                        'SIB910A3_sureselect6', 'SIB914A2_sureselect2', 'SIB914A11_sureselect11',
-                        'SIB914A12_sureselect12', 'SIB914A15_sureselect15' ]
+    samples_r = [ sample for sample in samplesheet.samples_r() ]
+    assert samples == expected_samples
+    assert samples_r == expected_samples
 
-    assert samplesheet.is_pooled_lane(1, column='Lane') == True
-    assert samplesheet.is_pooled_lane(2, column='Lane') == True
+    assert samplesheet.is_pooled_lane(1) == True
+    assert samplesheet.is_pooled_lane(2) == True
 
-    lanes = [ lane for lane in samplesheet.column('Lane') ]
-    assert lanes == ['1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2']
+    assert samplesheet.is_pooled_lane_r(1, column='Lane') == True
+    assert samplesheet.is_pooled_lane_r(2, column='Lane') == True
+
+    expected_lanes = ['1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2']
+    lanes = [ lane for lane in samplesheet.column('lane') ]
+    lanes_r = [ lane for lane in samplesheet.column_r('Lane') ]
+    assert lanes == expected_lanes
+    assert lanes_r == expected_lanes

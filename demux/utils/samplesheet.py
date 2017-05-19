@@ -78,6 +78,11 @@ class Samplesheet(object):
     def _get_data_header(self):
         return self.section[self.DATA][0]
 
+    def _get_header_key(self, key):
+        if key not in self.header_map:
+            raise KeyError("'{}' not in header_map!".format(key))
+        return self.header_map[key]
+
     def parse(self, samplesheet_path, delim=','):
         """
         Parses a Samplesheet, with their fake csv format.
@@ -120,28 +125,38 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
-    def samples(self, column='SampleID'):
+    def samples(self, column='sample_id'):
         """ Return all samples in the samplesheet """
         return self.column(column)
+
+    def samples_r(self, column='SampleID'):
+        """ Return all samples in the samplesheet based on the original header"""
+        return self.column_r(column)
 
     def column(self, column):
         """ Return all values from a column in the samplesheet """
         for line in self.samplesheet:
+            yield line[ self._get_header_key(column) ]
+
+    def column_r(self, column):
+        """ Return all values from a column in the samplesheet based on the original header"""
+        for line in self.samplesheet:
             yield line[column]
 
     def cell(self, line, column):
-        """ return the contents of a column in a line. Look up
-        this contents with the header_map.
-        This makes it easy to have 
-        """
+        """ return the contents of a column in a line """
 
-        column_key = column
-        if column in self.header_map:
-            column_key = self.header_map[column]
-
-        return line[column_key]
+        return line[ self._get_header_key(column) ]
 
     def lines_per_column(self, column, content):
+        """ Return all lines with the same column content
+        e.g. return all lines of column='Lane' content='1'  """
+        column = self._get_header_key(column)
+        for line in self.samplesheet:
+            if line[column] == content:
+                yield line
+
+    def lines_per_column_r(self, column, content):
         """ Return all lines with the same column content
         e.g. return all lines of column='Lane' content='1'  """
         for line in self.samplesheet:
@@ -150,6 +165,19 @@ class Samplesheet(object):
 
     def is_pooled_lane(self, lane, column='lane'):
         """ Return True if lane contains multiple samples """
+        lane_count = 0
+        lane = str(lane)
+        for line in self.samplesheet:
+            if line[ self._get_header_key(column) ] == lane:
+                lane_count += 1
+
+            if lane_count > 1:
+                return True
+
+        return False
+
+    def is_pooled_lane_r(self, lane, column='lane'):
+        """ Return True if lane contains multiple samples based on the orignal header """
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet:
@@ -172,19 +200,15 @@ class Samplesheet(object):
             return True
 
         def _validate_uniq_index(samplesheet):
-            lane_name = self.header_map['lane']
-            index_name = self.header_map['index']
-            sample_name = self.header_map['sample_id']
-
-            lanes = list(set(self.column(lane_name)))
+            lanes = list(set(self.column('lane')))
             for lane in lanes:
-                if self.is_pooled_lane(lane, column=lane_name):
+                if self.is_pooled_lane(lane, column='lane'):
                     sample_of = dict()
-                    for line in self.lines_per_column(lane_name, lane):
-                        index = line[index_name]
+                    for line in self.lines_per_column('lane', lane):
+                        index = self.cell(line, 'index')
                         if index not in sample_of:
                             sample_of[index] = set()
-                        sample_of[index].add(line[sample_name])
+                        sample_of[index].add(self.cell(line, 'sample_id'))
 
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
