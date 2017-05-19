@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=4.1.1
+VERSION=4.2.0
 echo "$0 VERSION $VERSION"
 
 RUNDIR=$1
