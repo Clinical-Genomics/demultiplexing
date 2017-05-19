@@ -11,6 +11,7 @@ VERSION=4.1.1
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 
+
 EMAIL=kenny.billiau@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
@@ -58,40 +59,11 @@ FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"
 
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv"
-    wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/${FC}.csv
-
-    if [[ $? > 0 ]]; then
-        log "wget FAILED with exit code: $?."
-        exit
-    fi
-
-    log "Downloaded sample sheet:"
-    log_file ${RUNDIR}/${FC}.csv
-    
-    cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
+    demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv
 fi
 
 # notify we are ready to start!
 cat ${RUNDIR}/SampleSheet.csv | mail -s "DEMUX of $FC started" ${EMAIL}
-
-# Downloaded samplesheet has following headers:
-#FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-
-# Needs to be changed to this:
-#[Data]
-#FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
-
-# copy the samplesheet
-cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
-# add the [Data] header
-echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-# as we don't know if this is a rerun or an unprocessed run, remove the [Data] header, if any
-grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
-# convert the column headers, remove the second index
-sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
-# remove empty lines
-sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
 
 log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv

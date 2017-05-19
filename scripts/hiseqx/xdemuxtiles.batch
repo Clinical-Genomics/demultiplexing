@@ -15,9 +15,9 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-INDIR=$1 # Run dir
-OUTDIR=$2 # Demux dir
-LANE=$3 # 1-8
+INDIR=${1?'Run dir'}
+OUTDIR=${2?'Demux dir'}
+LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=kenny.billiau@scilifelab.se
 
