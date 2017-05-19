@@ -33,6 +33,39 @@ failed() {
 }
 trap 'failed $LINENO' ERR
 
+get_online_quote() {
+    num_online_quotes=9999
+    rand_online=$[ ( $RANDOM % $num_online_quotes ) + 1 ]
+    # In HTML source, <dt> is unique to quote and </dd> is unique to author
+    # The field separators (FS) are either < or > which is [<>] in posix
+    # TODO: Wanted to print as "quote -- author n (mini-bio)", but MacOSX 'fmt' is blah 
+    quote=$(wget -q -O - "http://www.quotationspage.com/quote/$rand_online.html" |
+     grep -e "<dt>" -e "</dd>" | awk -F'[<>]' '{ 
+        if($2 ~ /dt/)
+        { print $3 } 
+        else if($4 ~ /b/)
+        { print "-- " $7} 
+     }')
+}
+
+getquote() {
+    i=1
+    # 5 Attempts at obtaining a quote.  Silently fail.
+    while [ $i -lt 5 ]
+    do
+        get_online_quote 
+        echo "$quote" | grep ERROR > /dev/null
+        if [ $? -eq 0 ]
+        then
+            get_online_quote
+            i=`expr $i + 1`
+        else
+            echo $quote
+            return
+        fi
+    done
+}
+
 ########
 # INIT #
 ########
@@ -67,4 +100,6 @@ bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/
 log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
 date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
 
-mail -s "$(basename ${DEMUXDIR}) finished demultiplexing" $EMAIL
+QUOTE=$(getquote)
+log "ssh rasta \"echo '${QUOTE}' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL\""
+ssh rasta "echo '${QUOTE}' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL"
