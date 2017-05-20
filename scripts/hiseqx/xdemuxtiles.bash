@@ -59,6 +59,7 @@ FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"
 
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
+    log "demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv"
     demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv
 fi
 
