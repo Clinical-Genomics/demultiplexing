@@ -6,6 +6,8 @@ import logging
 from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet
 
+log = logging.getLogger(__name__)
+
 @click.group()
 def sheet():
     """Samplesheet commands"""
@@ -50,6 +52,9 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
 
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
+    if len(raw_samplesheet) == 0:
+        log.error('No LIMS info found!')
+        exit(1)
 
     # this is how the data is keyed when it gets back from LIMS
     lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
