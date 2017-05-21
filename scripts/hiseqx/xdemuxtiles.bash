@@ -15,7 +15,6 @@ OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 EMAIL=kenny.billiau@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
-PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
 SCRIPTDIR=$(dirname $(readlink -nm $0))
 
 #############
@@ -27,7 +26,6 @@ join() { local IFS="$1"; shift; echo "$*"; }
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] $@
-    echo [${NOW}] $@ >> ${PROJECTLOG}
 }
 
 log_file() {
@@ -35,11 +33,11 @@ log_file() {
     while read -r line; do
         L=$(echo $line | sed -e "s/^/[${NOW}] /")
         echo $L
-        echo $L >> ${PROJECTLOG}
     done < $1
 }
 
 failed() {
+    PROJECTLOG=$(ls --tr1 ${OUTDIR}/projectlog.*.log | tail -1)
     cat ${PROJECTLOG} | mail -s "ERROR starting demux of $(basename $RUNDIR)" ${EMAIL}
 }
 trap failed ERR

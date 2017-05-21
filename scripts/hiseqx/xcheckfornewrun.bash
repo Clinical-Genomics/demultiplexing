@@ -12,6 +12,7 @@ set -u
 
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 RAWBASE=/mnt/hds2/proj/bioinfo/Runs/
+DEMUX_DIR=/mnt/hds/proj/bioinfo/DEMUX/
 runs=$(ls $RAWBASE)
 
 #############
@@ -44,7 +45,9 @@ for run in ${runs[@]}; do
 
         echo [${NOW}] ${run} starting demultiplexing
         date +'%Y%m%d%H%M%S' > ${RAWBASE}${run}/demuxstarted.txt
-        ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}${run}
+
+        PROJECTLOG=${DEMUX_DIR}/${run}/projectlog.$(date +'%Y%m%d%H%M%S').log
+        ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}${run} &>> ${PROJECTLOG}
     else
       echo [${NOW}] ${run} is finished and demultiplexing has already started
     fi
