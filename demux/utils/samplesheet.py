@@ -76,6 +76,13 @@ class Samplesheet(object):
         self.parse(samplesheet_path)
 
     def _get_data_header(self):
+        header_r = self._get_data_header_r()
+        header_map_r = dict((v,k) for k,v in self.header_map.iteritems())
+        header = [ header_map_r[k] for k in header_r ]
+
+        return header
+
+    def _get_data_header_r(self):
         return self.section[self.DATA][0]
 
     def _get_header_key(self, key):
@@ -113,20 +120,17 @@ class Samplesheet(object):
         header = self._get_data_header()
         self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][1:] ]
 
+        header_r = self._get_data_header_r()
+        self.samplesheet_r = [ dict(zip(header_r, line)) for line in self.section[self.DATA][1:] ]
+
     def lines(self):
         """ Yields all lines of the [Data] section. """
-        header_map_r = dict((v,k) for k,v in self.header_map.iteritems())
-        for line_r in self.samplesheet:
-            line = {}
-            for key_r in line_r.keys():
-                if key_r in header_map_r:
-                    key = header_map_r[key_r]
-                    line[key] = line_r[key_r]
+        for line in self.samplesheet:
             yield line
 
     def lines_r(self):
         """ Yields all lines of the [Data] section based on the original header """
-        for line in self.samplesheet:
+        for line in self.samplesheet_r:
             yield line
 
     def raw(self, delim=',', end='\n'):
@@ -147,11 +151,11 @@ class Samplesheet(object):
     def column(self, column):
         """ Return all values from a column in the samplesheet """
         for line in self.samplesheet:
-            yield line[ self._get_header_key(column) ]
+            yield line[column]
 
     def column_r(self, column):
         """ Return all values from a column in the samplesheet based on the original header"""
-        for line in self.samplesheet:
+        for line in self.samplesheet_r:
             yield line[column]
 
     def cell(self, line, column):
@@ -161,8 +165,7 @@ class Samplesheet(object):
 
     def lines_per_column(self, column, content):
         """ Return all lines with the same column content
-        e.g. return all lines of column='Lane' content='1'  """
-        column = self._get_header_key(column)
+        e.g. return all lines of column='lane' content='1'  """
         for line in self.samplesheet:
             if line[column] == content:
                 yield line
@@ -170,7 +173,7 @@ class Samplesheet(object):
     def lines_per_column_r(self, column, content):
         """ Return all lines with the same column content
         e.g. return all lines of column='Lane' content='1'  """
-        for line in self.samplesheet:
+        for line in self.samplesheet_r:
             if line[column] == content:
                 yield line
 
@@ -179,7 +182,7 @@ class Samplesheet(object):
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet:
-            if line[ self._get_header_key(column) ] == lane:
+            if line[column] == lane:
                 lane_count += 1
 
             if lane_count > 1:
@@ -191,7 +194,7 @@ class Samplesheet(object):
         """ Return True if lane contains multiple samples based on the orignal header """
         lane_count = 0
         lane = str(lane)
-        for line in self.samplesheet:
+        for line in self.samplesheet_r:
             if line[column] == lane:
                 lane_count += 1
 
@@ -216,10 +219,10 @@ class Samplesheet(object):
                 if self.is_pooled_lane(lane, column='lane'):
                     sample_of = dict()
                     for line in self.lines_per_column('lane', lane):
-                        index = self.cell(line, 'index')
+                        index = line['index']
                         if index not in sample_of:
                             sample_of[index] = set()
-                        sample_of[index].add(self.cell(line, 'sample_id'))
+                        sample_of[index].add(line['sample_id'])
 
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
