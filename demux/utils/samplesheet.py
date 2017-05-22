@@ -60,7 +60,7 @@ class Samplesheet(object):
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
+            'operator': 'Operator', 'project': 'Project'
     }
 
     def _get_flowcell(self):
@@ -115,6 +115,17 @@ class Samplesheet(object):
 
     def lines(self):
         """ Yields all lines of the [Data] section. """
+        header_map_r = dict((v,k) for k,v in self.header_map.iteritems())
+        for line_r in self.samplesheet:
+            line = {}
+            for key_r in line_r.keys():
+                if key_r in header_map_r:
+                    key = header_map_r[key_r]
+                    line[key] = line_r[key_r]
+            yield line
+
+    def lines_r(self):
+        """ Yields all lines of the [Data] section based on the original header """
         for line in self.samplesheet:
             yield line
 
@@ -235,7 +246,7 @@ class HiSeq2500Samplesheet(Samplesheet):
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
+            'operator': 'Operator', 'description': 'Description', 'project': 'SampleProject'
     }
 
 
