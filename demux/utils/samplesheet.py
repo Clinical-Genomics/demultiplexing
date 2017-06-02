@@ -266,10 +266,11 @@ class MiseqSamplesheet(Samplesheet):
     def to_demux(self, delim=',', end='\n'):
         """ Convert miseq to hiseq style samplesheet for demultiplexing. """
 
+        def clean(input):
+            forbidden_name_chars = ' -/'
+            return input.translate(None, forbidden_name_chars)
+
         header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
-        forbidden_name_chars = [' ','-', '/']
-
-
         expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
@@ -280,18 +281,16 @@ class MiseqSamplesheet(Samplesheet):
         data_lines.append(expected_header)
         for line in self.samplesheet:
             data_line = {}
-            project_id  = line['sample_project']
-
             data_line['FCID'] = flowcell_id
             data_line['Lane'] = '1'
-            data_line['SampleID'] = line['sample_id']
+            data_line['SampleID'] = clean(line['sample_id'])
             data_line['SampleRef'] = 'hg19'
-            data_line['Index'] = line['i7_index_id'] + '-' + line['i5_index_id']
+            data_line['Index'] = clean(line['index']) + '-' + clean(line['index2'])
             data_line['Description'] = line['description']
             data_line['Control'] = 'N'
             data_line['Recipe'] = 'R1'
             data_line['Operator'] = 'MS'
-            data_line['SampleProject'] = project_id
+            data_line['SampleProject'] = clean(line['sample_project'])
 
             ordered_line = []
             for head in expected_header:
