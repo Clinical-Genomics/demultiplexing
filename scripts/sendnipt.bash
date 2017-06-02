@@ -3,7 +3,7 @@
 
 set -u
 
-VERSION=4.4.1
+VERSION=4.5.0
 echo "Version $VERSION"
 
 ##########
