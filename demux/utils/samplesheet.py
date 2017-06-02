@@ -2,11 +2,10 @@
 # encoding: utf-8
 
 from __future__ import print_function
-import sys
 import re
 from copy import deepcopy
 from collections import OrderedDict
-import os
+from path import Path
 
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
@@ -245,63 +244,64 @@ class Samplesheet(object):
         return True
 
 
-class MiSeqSamplesheet(Samplesheet):
+class MiseqSamplesheet(Samplesheet):
 
-    def __init__(self, samplesheet_path):
-        self.samplesheet_path = samplesheet_path
-        converted_sheet_path = self.convert_sheet_type(samplesheet_path)
-        self.parse(converted_sheet_path)
+    header_map = { 
+            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+            'index2': 'index2', 'i5_index_id': 'I5_Index_ID', 'genome_folder': 'GenomeFolder',
+            'description': 'Description'
+    }
 
-    def convert_sheet_type(self, samplesheet_path):
-        """
-        Conver miseq to hiseq style samplesheet for demultiplexing.
-        """
-        dirname = os.path.dirname(samplesheet_path)
-        flowcell_id = dirname.split(os.sep)[-1].split('_')[-1] 
-        deplex_file = os.path.join(dirname, 'demultiplex_sheet.csv')
+    def __init__(self, samplesheet_path, flowcell=None):
+        Samplesheet.__init__(self, samplesheet_path)
+        if flowcell == None:
+            flowcell = Path(samplesheet_path).dirname().basename().split('_')[-1]
+        self.flowcell = flowcell
+
+    def _get_flowcell(self):
+        return self.flowcell
+
+    def to_demux(self, delim=',', end='\n'):
+        """ Convert miseq to hiseq style samplesheet for demultiplexing. """
+
         header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
         forbidden_name_chars = [' ','-', '/']
 
-        with open(samplesheet_path, 'r') as inputfile open(deplex_file 'w') as outputfile:
-            outputfile.write(header_line)
-            in_body = False #Parsing head or body of document
-            for line in inputfile.readlines():
-                if not in_body:
-                    if line.startswith('Sample_ID'):
-                        in_body = True
-                    else:
-                        continue
 
-                elif in_body and len(line) > 1:
-                    content = line.split(',')
-                    sample_name = content[0]
-                    forward_index = content[5]
-                    reverse_index = content[7]
-                    project_name = content[4]
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
-                    for char in forbidden_name_chars:
-                        for name in [sample_name, project_name]:
-                            if char in name:
-                                name = name.replace(char, '')
+        # get the experiment name
+        flowcell_id = self._get_flowcell()
 
-                    output_string = ','.join([flowcell_id,
-                                                '1',
-                                                sample_name,
-                                                'hg19',
-                                                forward_index + '-' reverse_index,
-                                                'ctmr',
-                                                'N',
-                                                'R1',
-                                                'MS',
-                                                project_name,
-                                                '\n'])
-                    outputfile.write(output_string)
+        header = self.section[self.DATA][0] # '0' is the csv header
+        data_lines = [] # the new data section. Each line holds a dict with the right header keys
+        data_lines.append(expected_header)
+        for line in self.samplesheet:
+            data_line = {}
+            project_id  = line['sample_project']
 
-                else:
-                    #jump over blank lines
-                    continue
+            data_line['FCID'] = flowcell_id
+            data_line['Lane'] = '1'
+            data_line['SampleID'] = line['sample_id']
+            data_line['SampleRef'] = 'hg19'
+            data_line['Index'] = line['i7_index_id'] + '-' + line['i5_index_id']
+            data_line['Description'] = line['description']
+            data_line['Control'] = 'N'
+            data_line['Recipe'] = 'R1'
+            data_line['Operator'] = 'MS'
+            data_line['SampleProject'] = project_id
 
-        return deplex_file
+            ordered_line = []
+            for head in expected_header:
+                ordered_line.append(data_line[head])
+            data_lines.append(ordered_line)
+
+        rs = []
+        for line in data_lines:
+            rs.append(delim.join(line))
+        return end.join(rs)
 
 
 class HiSeq2500Samplesheet(Samplesheet):
