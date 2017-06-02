@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import click
 import logging
 
 from cglims.api import ClinicalLims, ClinicalSample
-from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet
+from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
+
+log = logging.getLogger(__name__)
 
 @click.group()
 def sheet():
@@ -31,9 +34,18 @@ def massage(samplesheet):
 
 @sheet.command()
 @click.argument('samplesheet')
-def demux(samplesheet):
-    """convert NIPT samplesheet to demux'able samplesheet """
-    click.echo(NIPTSamplesheet(samplesheet).to_demux())
+@click.option('-a', '--application', type=click.Choice(['miseq', 'nipt']), help='sequencing type')
+@click.option('-f', '--flowcell', help='for miseq, please provide a flowcell id')
+def demux(samplesheet, application, flowcell):
+    if application == 'nipt':
+        """convert NIPT samplesheet to demux'able samplesheet """
+        click.echo(NIPTSamplesheet(samplesheet).to_demux())
+    elif application == 'miseq':
+        """convert MiSeq samplesheet to demux'able samplesheet """
+        click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
+    else:
+        log.error('no application provided!')
+        sys.exit(1)
 
 @sheet.command()
 @click.argument('flowcell')
@@ -50,6 +62,9 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
 
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
+    if len(raw_samplesheet) == 0:
+        log.error('No LIMS info found!')
+        sys.exit(1)
 
     # this is how the data is keyed when it gets back from LIMS
     lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
@@ -65,6 +80,7 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
             index = line['index'].split('-')[0]
             raw_samplesheet[i]['index'] = index
             raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
+        click.echo('[Data]')
 
     click.echo(delimiter.join(header))
     for line in raw_samplesheet:

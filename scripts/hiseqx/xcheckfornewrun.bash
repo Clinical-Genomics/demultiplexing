@@ -1,5 +1,8 @@
 #!/bin/bash
 
+shopt -s expand_aliases
+source ~/.bashrc
+
 set -e
 set -u
 
@@ -9,7 +12,8 @@ set -u
 
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 RAWBASE=/mnt/hds2/proj/bioinfo/Runs/
-runs=$(ls $RAWBASE)
+DEMUX_DIR=/mnt/hds/proj/bioinfo/DEMUX/
+EMAIL=kenny.billiau@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -17,35 +21,45 @@ runs=$(ls $RAWBASE)
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
+log() {
+    NOW=$(date +"%Y%m%d%H%M%S")
+    echo [${NOW}] $@
+}
+
+failed() {
+    echo "ERROR starting X demultiplexing" | mail -s "ERROR starting X demultiplexing" $EMAIL
+}
+trap failed ERR
+
 ########
 # MAIN #
 ########
 
-for run in ${runs[@]}; do
-  NOW=$(date +"%Y%m%d%H%M%S")
+for RUN in ${RAWBASE}/*; do
+    RUN=$(basename ${RUN}/)
+    FC=$( echo ${RUN} | awk 'BEGIN {FS="_"} {print substr($4,2,length($4))}')
 
-  read -a RUN_PARTS <<< ${run}
+    if [ -f ${RAWBASE}/${RUN}/RTAComplete.txt ]; then
+        if [ ! -f ${RAWBASE}/${RUN}/demuxstarted.txt ]; then
 
-  FC=$( echo ${run} | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+            # process FCs serially
+            FCS=( $(squeue --format=%j | grep Xdem | grep -v ${FC} | cut -d- -f 3 | sort | uniq) )
+            if [[ ${#FCS[@]} > 0 ]]; then
+                RUNNING_FCS=$(join , ${FCS[@]})
+                log "${RUN} ${RUNNING_FCS} are demuxing - Postpone demux!"
+                continue
+            fi
 
-  if [ -f ${RAWBASE}${run}/RTAComplete.txt ]; then
-    if [ ! -f ${RAWBASE}${run}/demuxstarted.txt ]; then
+            log "${RUN} starting demultiplexing"
+            date +'%Y%m%d%H%M%S' > ${RAWBASE}/${RUN}/demuxstarted.txt
 
-        # process FCs serially
-        FCS=( $(squeue --format=%j | grep Xdem | grep -v ${FC} | cut -d- -f 3 | sort | uniq) )
-        if [[ ${#FCS[@]} > 0 ]]; then
-            RUNNING_FCS=$(join , ${FCS[@]})
-            echo [$NOW] ${run} ${RUNNING_FCS} are demuxing - Postpone demux!
-            continue
+            mkdir ${DEMUX_DIR}/${RUN}/
+            PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
+            ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}/${RUN} &>> ${PROJECTLOG}
+        else
+            log "${RUN} is finished and demultiplexing has already started"
         fi
-
-        echo [${NOW}] ${run} starting demultiplexing
-        date +'%Y%m%d%H%M%S' > ${RAWBASE}${run}/demuxstarted.txt
-        ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}${run}
     else
-      echo [${NOW}] ${run} is finished and demultiplexing has already started
+        log "${RUN} is not finished yet"
     fi
-  else
-    echo [${NOW}] ${run} is not finished yet
-  fi
 done

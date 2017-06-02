@@ -7,14 +7,14 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-VERSION=4.1.0
+VERSION=4.5.1
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
+
 
 EMAIL=kenny.billiau@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
-PROJECTLOG=${OUTDIR}/projectlog.$(date +'%Y%m%d%H%M%S').log
 SCRIPTDIR=$(dirname $(readlink -nm $0))
 
 #############
@@ -26,7 +26,6 @@ join() { local IFS="$1"; shift; echo "$*"; }
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
     echo [${NOW}] $@
-    echo [${NOW}] $@ >> ${PROJECTLOG}
 }
 
 log_file() {
@@ -34,11 +33,11 @@ log_file() {
     while read -r line; do
         L=$(echo $line | sed -e "s/^/[${NOW}] /")
         echo $L
-        echo $L >> ${PROJECTLOG}
     done < $1
 }
 
 failed() {
+    PROJECTLOG=$(ls --tr1 ${OUTDIR}/projectlog.*.log | tail -1)
     cat ${PROJECTLOG} | mail -s "ERROR starting demux of $(basename $RUNDIR)" ${EMAIL}
 }
 trap failed ERR
@@ -58,40 +57,30 @@ FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"
 
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv"
-    wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/${FC}.csv
+    log "demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv"
+    set +e
+    if ! demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv; then
+        set -e
 
-    if [[ $? > 0 ]]; then
-        log "wget FAILED with exit code: $?."
-        exit
+        # ok, fetch it from the old place then
+        log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv"
+        wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv
+        # backup
+        cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
+        # add the [Data] header
+        echo '[Data]' > ${RUNDIR}/SampleSheet.csv
+        # as we don't know if this is a rerun or an unprocessed run, remove the [Data] header, if any
+        grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
+        # convert the column headers, remove the second index
+        sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
+        # remove empty lines
+        sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
     fi
-
-    log "Downloaded sample sheet:"
-    log_file ${RUNDIR}/${FC}.csv
-    
-    cp ${RUNDIR}/${FC}.csv ${RUNDIR}/SampleSheet.csv
+    set -e
 fi
 
 # notify we are ready to start!
 cat ${RUNDIR}/SampleSheet.csv | mail -s "DEMUX of $FC started" ${EMAIL}
-
-# Downloaded samplesheet has following headers:
-#FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-
-# Needs to be changed to this:
-#[Data]
-#FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
-
-# copy the samplesheet
-cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
-# add the [Data] header
-echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-# as we don't know if this is a rerun or an unprocessed run, remove the [Data] header, if any
-grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
-# convert the column headers, remove the second index
-sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
-# remove empty lines
-sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
 
 log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv

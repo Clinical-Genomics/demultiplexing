@@ -15,7 +15,7 @@ from clinstatsdb.db.store import connect
 from clinstatsdb.db.models import Supportparams, Version, Datasource, Flowcell, Demux, Project, Sample, Unaligned
 from clinstatsdb.utils import xstats
 
-__version__ = '4.1.0'
+__version__ = '4.5.1'
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def gather_supportparams(run_dir):
         logger.error('No log files found! Looking for %s', os.path.join(run_dir, 'LOG', 'Xdem-l?t??-*.log'))
         exit(1)
 
-    with open(logfilenames[0], 'r') as logfile:
+    with open(logfilenames[-1], 'r') as logfile:
         for line in logfile.readlines():
             if 'bcl2fastq v' in line:
                 rs['idstring'] = line.strip()
@@ -167,7 +167,7 @@ def gather_demux(demux_dir):
         logger.error('No log files found! Looking for %s', os.path.join(demux_dir, 'LOG', 'Xdem-l1t11-*.log'))
         exit(1)
 
-    with open(logfilenames[0], 'r') as logfile:
+    with open(logfilenames[-1], 'r') as logfile:
         for line in logfile.readlines():
 
             if '--use-bases-mask' in line:

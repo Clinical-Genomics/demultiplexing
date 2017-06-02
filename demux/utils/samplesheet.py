@@ -2,10 +2,10 @@
 # encoding: utf-8
 
 from __future__ import print_function
-import sys
 import re
 from copy import deepcopy
 from collections import OrderedDict
+from path import Path
 
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
@@ -60,7 +60,7 @@ class Samplesheet(object):
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
+            'operator': 'Operator', 'project': 'Project'
     }
 
     def _get_flowcell(self):
@@ -76,7 +76,19 @@ class Samplesheet(object):
         self.parse(samplesheet_path)
 
     def _get_data_header(self):
+        header_r = self._get_data_header_r()
+        header_map_r = dict((v,k) for k,v in self.header_map.iteritems())
+        header = [ header_map_r[k] for k in header_r ]
+
+        return header
+
+    def _get_data_header_r(self):
         return self.section[self.DATA][0]
+
+    def _get_header_key(self, key):
+        if key not in self.header_map:
+            raise KeyError("'{}' not in header_map!".format(key))
+        return self.header_map[key]
 
     def parse(self, samplesheet_path, delim=','):
         """
@@ -108,9 +120,17 @@ class Samplesheet(object):
         header = self._get_data_header()
         self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][1:] ]
 
+        header_r = self._get_data_header_r()
+        self.samplesheet_r = [ dict(zip(header_r, line)) for line in self.section[self.DATA][1:] ]
+
     def lines(self):
         """ Yields all lines of the [Data] section. """
         for line in self.samplesheet:
+            yield line
+
+    def lines_r(self):
+        """ Yields all lines of the [Data] section based on the original header """
+        for line in self.samplesheet_r:
             yield line
 
     def raw(self, delim=',', end='\n'):
@@ -120,31 +140,40 @@ class Samplesheet(object):
             rs.append(delim.join(line))
         return end.join(rs)
 
-    def samples(self, column='SampleID'):
+    def samples(self, column='sample_id'):
         """ Return all samples in the samplesheet """
         return self.column(column)
+
+    def samples_r(self, column='SampleID'):
+        """ Return all samples in the samplesheet based on the original header"""
+        return self.column_r(column)
 
     def column(self, column):
         """ Return all values from a column in the samplesheet """
         for line in self.samplesheet:
             yield line[column]
 
+    def column_r(self, column):
+        """ Return all values from a column in the samplesheet based on the original header"""
+        for line in self.samplesheet_r:
+            yield line[column]
+
     def cell(self, line, column):
-        """ return the contents of a column in a line. Look up
-        this contents with the header_map.
-        This makes it easy to have 
-        """
+        """ return the contents of a column in a line """
 
-        column_key = column
-        if column in self.header_map:
-            column_key = self.header_map[column]
-
-        return line[column_key]
+        return line[ self._get_header_key(column) ]
 
     def lines_per_column(self, column, content):
         """ Return all lines with the same column content
-        e.g. return all lines of column='Lane' content='1'  """
+        e.g. return all lines of column='lane' content='1'  """
         for line in self.samplesheet:
+            if line[column] == content:
+                yield line
+
+    def lines_per_column_r(self, column, content):
+        """ Return all lines with the same column content
+        e.g. return all lines of column='Lane' content='1'  """
+        for line in self.samplesheet_r:
             if line[column] == content:
                 yield line
 
@@ -153,6 +182,19 @@ class Samplesheet(object):
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet:
+            if line[column] == lane:
+                lane_count += 1
+
+            if lane_count > 1:
+                return True
+
+        return False
+
+    def is_pooled_lane_r(self, lane, column='lane'):
+        """ Return True if lane contains multiple samples based on the orignal header """
+        lane_count = 0
+        lane = str(lane)
+        for line in self.samplesheet_r:
             if line[column] == lane:
                 lane_count += 1
 
@@ -172,19 +214,15 @@ class Samplesheet(object):
             return True
 
         def _validate_uniq_index(samplesheet):
-            lane_name = self.header_map['lane']
-            index_name = self.header_map['index']
-            sample_name = self.header_map['sample_id']
-
-            lanes = list(set(self.column(lane_name)))
+            lanes = list(set(self.column('lane')))
             for lane in lanes:
-                if self.is_pooled_lane(lane, column=lane_name):
+                if self.is_pooled_lane(lane, column='lane'):
                     sample_of = dict()
-                    for line in self.lines_per_column(lane_name, lane):
-                        index = line[index_name]
+                    for line in self.lines_per_column('lane', lane):
+                        index = line['index']
                         if index not in sample_of:
                             sample_of[index] = set()
-                        sample_of[index].add(line[sample_name])
+                        sample_of[index].add(line['sample_id'])
 
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
@@ -206,12 +244,71 @@ class Samplesheet(object):
         return True
 
 
+class MiseqSamplesheet(Samplesheet):
+
+    header_map = { 
+            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+            'index2': 'index2', 'i5_index_id': 'I5_Index_ID', 'genome_folder': 'GenomeFolder',
+            'description': 'Description'
+    }
+
+    def __init__(self, samplesheet_path, flowcell=None):
+        Samplesheet.__init__(self, samplesheet_path)
+        if flowcell == None:
+            flowcell = Path(samplesheet_path).dirname().basename().split('_')[-1]
+        self.flowcell = flowcell
+
+    def _get_flowcell(self):
+        return self.flowcell
+
+    def to_demux(self, delim=',', end='\n'):
+        """ Convert miseq to hiseq style samplesheet for demultiplexing. """
+
+        def clean(input):
+            forbidden_name_chars = ' -/'
+            return input.translate(None, forbidden_name_chars)
+
+        header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+
+        # get the experiment name
+        flowcell_id = self._get_flowcell()
+
+        header = self.section[self.DATA][0] # '0' is the csv header
+        data_lines = [] # the new data section. Each line holds a dict with the right header keys
+        data_lines.append(expected_header)
+        for line in self.samplesheet:
+            data_line = {}
+            data_line['FCID'] = flowcell_id
+            data_line['Lane'] = '1'
+            data_line['SampleID'] = clean(line['sample_id'])
+            data_line['SampleRef'] = 'hg19'
+            data_line['Index'] = clean(line['index']) + '-' + clean(line['index2'])
+            data_line['Description'] = line['description']
+            data_line['Control'] = 'N'
+            data_line['Recipe'] = 'R1'
+            data_line['Operator'] = 'MS'
+            data_line['SampleProject'] = clean(line['sample_project'])
+
+            ordered_line = []
+            for head in expected_header:
+                ordered_line.append(data_line[head])
+            data_lines.append(ordered_line)
+
+        rs = []
+        for line in data_lines:
+            rs.append(delim.join(line))
+        return end.join(rs)
+
+
 class HiSeq2500Samplesheet(Samplesheet):
 
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
             'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project', 'description': 'Control'
+            'operator': 'Operator', 'description': 'Description', 'project': 'SampleProject'
     }
 
 
