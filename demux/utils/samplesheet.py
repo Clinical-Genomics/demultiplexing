@@ -2,10 +2,10 @@
 # encoding: utf-8
 
 from __future__ import print_function
-import sys
 import re
 from copy import deepcopy
 from collections import OrderedDict
+from path import Path
 
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
@@ -242,6 +242,66 @@ class Samplesheet(object):
 
 
         return True
+
+
+class MiseqSamplesheet(Samplesheet):
+
+    header_map = { 
+            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+            'index2': 'index2', 'i5_index_id': 'I5_Index_ID', 'genome_folder': 'GenomeFolder',
+            'description': 'Description'
+    }
+
+    def __init__(self, samplesheet_path, flowcell=None):
+        Samplesheet.__init__(self, samplesheet_path)
+        if flowcell == None:
+            flowcell = Path(samplesheet_path).dirname().basename().split('_')[-1]
+        self.flowcell = flowcell
+
+    def _get_flowcell(self):
+        return self.flowcell
+
+    def to_demux(self, delim=',', end='\n'):
+        """ Convert miseq to hiseq style samplesheet for demultiplexing. """
+
+        header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
+        forbidden_name_chars = [' ','-', '/']
+
+
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+
+        # get the experiment name
+        flowcell_id = self._get_flowcell()
+
+        header = self.section[self.DATA][0] # '0' is the csv header
+        data_lines = [] # the new data section. Each line holds a dict with the right header keys
+        data_lines.append(expected_header)
+        for line in self.samplesheet:
+            data_line = {}
+            project_id  = line['sample_project']
+
+            data_line['FCID'] = flowcell_id
+            data_line['Lane'] = '1'
+            data_line['SampleID'] = line['sample_id']
+            data_line['SampleRef'] = 'hg19'
+            data_line['Index'] = line['i7_index_id'] + '-' + line['i5_index_id']
+            data_line['Description'] = line['description']
+            data_line['Control'] = 'N'
+            data_line['Recipe'] = 'R1'
+            data_line['Operator'] = 'MS'
+            data_line['SampleProject'] = project_id
+
+            ordered_line = []
+            for head in expected_header:
+                ordered_line.append(data_line[head])
+            data_lines.append(ordered_line)
+
+        rs = []
+        for line in data_lines:
+            rs.append(delim.join(line))
+        return end.join(rs)
 
 
 class HiSeq2500Samplesheet(Samplesheet):
