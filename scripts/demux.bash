@@ -8,7 +8,7 @@ set -eu -o pipefail
 shopt -s expand_aliases
 source ./demux.functions
 
-VERSION=4.5.1
+VERSION=4.5.2
 
 ##########
 # PARAMS #
