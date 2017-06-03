@@ -7,16 +7,16 @@ get_basemask() {
     local LEN_SAMPLE_INDEX2=${#SAMPLE_INDEX[1]}
 
     ## determine index length of run
-    local LEN_Y1=$(grep '<Read Number="1"' ${RUNDIR}/runParameters.xml | sed 's/.*<Read Number="1" NumCycles="\([0-9]*\)".*/\1/')
-    local LEN_I1=$(grep '<Read Number="2"' ${RUNDIR}/runParameters.xml | sed 's/.*<Read Number="2" NumCycles="\([0-9]*\)".*/\1/')
+    local LEN_Y1=$(grep '<R.* Number="1"' ${RUNDIR}/runParameters.xml | sed 's/.*<R.* Number="1" NumCycles="\([0-9]*\)".*/\1/')
+    local LEN_I1=$(grep '<R.* Number="2"' ${RUNDIR}/runParameters.xml | sed 's/.*<R.* Number="2" NumCycles="\([0-9]*\)".*/\1/')
 
     local LEN_I2=
     local LEN_Y2=
-    if grep -qs '<Read Number="3".*IsIndexedRead="N"' ${RUNDIR}/runParameters.xml; then
-        LEN_Y2=$(grep '<Read Number="3"' ${RUNDIR}/runParameters.xml | sed 's/.*<Read Number="3" NumCycles="\([0-9]*\)".*/\1/')
+    if grep -qs '<R.* Number="3".*IsIndexedRead="N"' ${RUNDIR}/runParameters.xml; then
+        LEN_Y2=$(grep '<R.* Number="3"' ${RUNDIR}/runParameters.xml | sed 's/.*<R.* Number="3" NumCycles="\([0-9]*\)".*/\1/')
     else
-        LEN_I2=$(grep '<Read Number="3"' ${RUNDIR}/runParameters.xml | sed 's/.*<Read Number="3" NumCycles="\([0-9]*\)".*/\1/')
-        LEN_Y2=$(grep '<Read Number="4"' ${RUNDIR}/runParameters.xml | sed 's/.*<Read Number="4" NumCycles="\([0-9]*\)".*/\1/')
+        LEN_I2=$(grep '<R.* Number="3"' ${RUNDIR}/runParameters.xml | sed 's/.*<R.* Number="3" NumCycles="\([0-9]*\)".*/\1/')
+        LEN_Y2=$(grep '<R.* Number="4"' ${RUNDIR}/runParameters.xml | sed 's/.*<R.* Number="4" NumCycles="\([0-9]*\)".*/\1/')
     fi
 
     # determine index1 length
