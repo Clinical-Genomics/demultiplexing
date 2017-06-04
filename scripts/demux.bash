@@ -6,7 +6,7 @@
 set -eu -o pipefail
 
 shopt -s expand_aliases
-source ./demux.functions
+source /home/clinical/SCRIPTS/demux.functions
 
 VERSION=4.5.2
 
