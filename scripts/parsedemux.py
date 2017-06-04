@@ -79,11 +79,11 @@ with db.dbconnect(pars['CLINICALDBHOST'], pars['CLINICALDBPORT'], pars['STATSDB'
 
   h1fc = soup.find("h1")
   fcentry = unicode(h1fc.string).encode('utf8')
-  fc = fcentry.replace("Flowcell: ","")
 #print basedir
   baseparts = basedir.split("_")
   Flowcellpos = baseparts[len(baseparts)-1]
-  Flowcellpos = Flowcellpos.replace(fc+"/","") 
+  fc = Flowcellpos[1:].replace('/','')
+  Flowcellpos = Flowcellpos[0]
   dirs = basedir.split("/")
   runname = dirs[len(dirs)-2]
 #print Flowcellpos
