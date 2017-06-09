@@ -37,7 +37,7 @@ log_file() {
 }
 
 failed() {
-    PROJECTLOG=$(ls --tr1 ${OUTDIR}/projectlog.*.log | tail -1)
+    PROJECTLOG=$(ls -tr1 ${OUTDIR}/projectlog.*.log | tail -1)
     cat ${PROJECTLOG} | mail -s "ERROR starting demux of $(basename $RUNDIR)" ${EMAIL}
 }
 trap failed ERR

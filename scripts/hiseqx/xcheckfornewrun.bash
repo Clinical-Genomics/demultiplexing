@@ -53,7 +53,7 @@ for RUN in ${RAWBASE}/*; do
             log "${RUN} starting demultiplexing"
             date +'%Y%m%d%H%M%S' > ${RAWBASE}/${RUN}/demuxstarted.txt
 
-            mkdir ${DEMUX_DIR}/${RUN}/
+            mkdir -p ${DEMUX_DIR}/${RUN}/
             PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}/${RUN} &>> ${PROJECTLOG}
         else
