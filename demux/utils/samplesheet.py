@@ -77,7 +77,7 @@ class Samplesheet(object):
 
     def _get_data_header(self):
         header_r = self._get_data_header_r()
-        header_map_r = dict((v,k) for k,v in self.header_map.iteritems())
+        header_map_r = dict((v,k) for k,v in self.header_map.items())
         header = [ header_map_r[k] for k in header_r ]
 
         return header
