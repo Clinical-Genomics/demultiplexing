@@ -44,6 +44,13 @@ trap failed ERR
 # MAIN #
 ########
 
+set +e
+if ! grep -qs Description,cfDNAHiSeqv1.0 ${DEMUX_DIR}/${RUN}/SampleSheet.csv; then
+    log "${RUN} is NIPT - skipping"
+    exit 0
+fi
+set -e
+
 # init
 mkdir -p ${DEMUX_DIR}/${RUN}
 log "${PROJECTLOG} created by $0 $VERSION"
@@ -87,36 +94,29 @@ cd ${DEMUX_DIR}/${RUN}/${UNALDIR}
 nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1
 
 # Add stats
-log "/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py ${DEMUX_DIR}/${RUN}/ ${UNALDIR}/ ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv"
-/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py ${DEMUX_DIR}/${RUN}/ ${UNALDIR}/ ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv >> ${PROJECTLOG}
-/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/parsedemux.py ${DEMUX_DIR}/${RUN}/ ${UNALDIR}/ ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ~/.scilifelabrc_aws >> ${PROJECTLOG}
+
+log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/" >> ${PROJECT_LOG}
+cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECT_LOG}
 
 # create stats files
 FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 PROJs=$(ls ${DEMUX_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
 for PROJ in ${PROJs[@]};do
     prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "/home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} >> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt"
-    /home/hiseq.clinical/.virtualenv/mysql/bin/python /home/clinical/SCRIPTS/selectdemux.py ${prj} ${FC} > ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
+    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECT_LOG}
+    cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
-# skip NIPT runs
-set +e
-if ! grep -qs Description,cfDNAHiSeqv1.0 ${DEMUX_DIR}/${RUN}/SampleSheet.csv; then
-    set -e
-    log "rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}"
-    rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}
-    log "scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/"
-    scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/
+log "rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}"
+rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}
+log "scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/"
+scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/
+date > ${DEMUX_DIR}/${RUN}/copycomplete.txt
+log "scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}"
+scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}
+log "ssh ${DEST_SERVER} 'chmod g+w ${DEST_DIR}/${RUN}'"
+ssh ${DEST_SERVER} "chmod g+w ${DEST_DIR}/${RUN}"
+log "scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}"
+scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}
 
-    date > ${DEMUX_DIR}/${RUN}/copycomplete.txt
-
-    log "scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}"
-    scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}
-    log "ssh ${DEST_SERVER} 'chmod g+w ${DEST_DIR}/${RUN}'"
-    ssh ${DEST_SERVER} "chmod g+w ${DEST_DIR}/${RUN}"
-    log "scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}"
-    scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}
-
-    log "DEMUX transferred, script ends"
-fi
+log "DEMUX transferred, script ends"
