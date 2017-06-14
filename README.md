@@ -37,7 +37,7 @@ Commands:
 You can install `demultiplexing` from source:
 
 ```bash
-$ git clone https://github.com/Clinical-Genomics/demulitplexing && cd demultiplexing
+$ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
 $ pip install --editable .
 ```
 
@@ -50,5 +50,5 @@ username: apiuser
 password: somepassword
 ```
 
-[travis-img]: https://img.shields.io/travis/Clinical-Genomics/demultiplexing/develop.svg?style=flat-square
+[travis-img]: https://api.travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master?style=flat-square
 [travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
