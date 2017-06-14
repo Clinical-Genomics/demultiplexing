@@ -1,9 +1,11 @@
 #!/bin/bash
 
 shopt -s expand_aliases
-source ../scripts/demux.functions
+source scripts/demux.functions
 
-TEST_DIR=fixtures
+TEST_DIR=tests/fixtures
+
+PASSED=0
 
 OK() {
     echo "OK"
@@ -11,6 +13,7 @@ OK() {
 
 NOK() {
     echo "NOK"
+    PASSED=1
 }
 
 # test out basemask creation
@@ -29,3 +32,5 @@ echo -n '140303_D00410_0050_BH8ETTADXX Y101,I6nn,Y101 '
 
 echo -n '170530_M03284_0060_000000000-B59LF Y301,I8,I8,Y301 '
 [[ $(get_basemask ${TEST_DIR}/170530_M03284_0060_000000000-B59LF/) == 'Y301,I8,I8,Y301' ]] && echo $(OK) || echo $(NOK)
+
+exit ${PASSED}
