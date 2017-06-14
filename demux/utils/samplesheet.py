@@ -267,10 +267,8 @@ class MiseqSamplesheet(Samplesheet):
         """ Convert miseq to hiseq style samplesheet for demultiplexing. """
 
         def clean(input):
-            forbidden_name_chars = ' -/'
-            return input.translate(None, forbidden_name_chars)
+            return re.sub(r'[ _/]+', '', input)
 
-        header_line = "FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject\n"
         expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
