@@ -16,7 +16,7 @@ All workflow related scripts are written in `bash`. They will set up the right e
 
 All SampleSheet related actions are bundled in a python package enabling easier testing.
 
-```python
+```bash
 $ demux sheet --help
 Usage: demux sheet [OPTIONS] COMMAND [ARGS]...
 
