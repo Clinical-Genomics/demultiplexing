@@ -50,5 +50,5 @@ username: apiuser
 password: somepassword
 ```
 
-[travis-img]: https://api.travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master?style=flat-square
+[travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
 [travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
