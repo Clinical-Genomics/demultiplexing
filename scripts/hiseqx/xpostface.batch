@@ -78,11 +78,6 @@ SCRIPTDIR=/mnt/hds/proj/bioinfo/SCRIPTS/
 # remove copy control files
 rm -Rf ${DEMUXDIR}/copybackcomplete/
 
-# create the stats file per lane
-# needs python 2.7+ !
-log "/home/hiseq.clinical/miniconda/envs/prod/bin/python ${SCRIPTDIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt"
-python ${SCRIPTDIR}/xcreatestats.py ${DEMUXDIR} > ${DEMUXDIR}/stats.txt
-
 # create the Unaligned directory structure
 log "bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log"
 bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
