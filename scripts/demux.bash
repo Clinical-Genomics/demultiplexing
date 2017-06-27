@@ -6,6 +6,7 @@
 set -eu -o pipefail
 
 shopt -s expand_aliases
+source $HOME/.bashrc
 source /home/clinical/SCRIPTS/demux.functions
 
 VERSION=4.6.4
@@ -15,8 +16,8 @@ VERSION=4.6.4
 ##########
 
 BASE=${1?'please provide a run dir'}
+DEMUX_DIR=${2-/home/clinical/DEMUX/}
 EMAIL=kenny.billiau@scilifelab.se
-DEMUX_DIR=/home/clinical/DEMUX/
 DEST_SERVER=rastapopoulos
 DEST_DIR=/mnt/hds/proj/bioinfo/DEMUX/
 
@@ -40,21 +41,9 @@ failed() {
 }
 trap failed ERR
 
-########
-# MAIN #
-########
-
-set +e
-if ! grep -qs Description,cfDNAHiSeqv1.0 ${DEMUX_DIR}/${RUN}/SampleSheet.csv; then
-    log "${RUN} is NIPT - skipping"
-    exit 0
-fi
-set -e
-
-# init
-mkdir -p ${DEMUX_DIR}/${RUN}
-log "${PROJECTLOG} created by $0 $VERSION"
-date > ${DEMUX_DIR}/${RUN}/started.txt
+###########
+# PREMAIN #
+###########
 
 # transform SampleSheet from Mac to Unix
 if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
@@ -65,18 +54,18 @@ if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
         sed -i 's//\n/g' ${BASE}/SampleSheet.csv
     fi
     sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
-    cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
 fi
 
-## some sanity checking
-#if [[ -f ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ]]; then 
-#    fcinfile=$(awk 'BEGIN {FS=","} {fc=$1} END {print fc}' ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv)
-#    runfc=$( basename ${RUN} | awk 'BEGIN {FS="_"} {print $NF}')
-#    if [[ ! ${runfc} == ${fcinfile} ]]; then 
-#        log "Wrong Flowcell ID in SampleSheet. Exit . . ."
-#        exit 1
-#    fi
-#fi
+########
+# MAIN #
+########
+
+# init
+mkdir -p ${DEMUX_DIR}/${RUN}
+log "${PROJECTLOG} created by $0 $VERSION"
+date > ${BASE}/demuxstarted.txt
+cp ${BASE}/SampleSheet.csv ${DEMUX_DIR}/${RUN}/
+cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
 
 # here we go!
 log "Setup correct, starts demuxing . . ."
@@ -95,28 +84,17 @@ nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1
 
 # Add stats
 
-log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/" >> ${PROJECT_LOG}
-cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECT_LOG}
+log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/"
+cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECTLOG}
 
 # create stats files
 FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 PROJs=$(ls ${DEMUX_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
-for PROJ in ${PROJs[@]};do
+for PROJ in ${PROJs[@]}; do
     prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt" >> ${PROJECT_LOG}
+    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt"
     cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
-log "rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}"
-rsync -r -t -e ssh ${DEMUX_DIR}/${RUN} ${DEST_SERVER}:${DEST_DIR}
-log "scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/"
-scp ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv ${DEST_SERVER}:${DEST_DIR}/${RUN}/
-date > ${DEMUX_DIR}/${RUN}/copycomplete.txt
-log "scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}"
-scp ${DEMUX_DIR}/${RUN}/copycomplete.txt ${DEST_SERVER}:${DEST_DIR}/${RUN}
-log "ssh ${DEST_SERVER} 'chmod g+w ${DEST_DIR}/${RUN}'"
-ssh ${DEST_SERVER} "chmod g+w ${DEST_DIR}/${RUN}"
-log "scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}"
-scp ${PROJECTLOG} ${DEST_SERVER}:${DEST_DIR}/${RUN}
-
-log "DEMUX transferred, script ends"
+log "date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
+date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
