@@ -12,7 +12,7 @@ VERSION=3.4.3
 INDIR=${1-/home/clinical/DEMUX/}
 TARGET_SERVER=${2-rastapopoulos.scilifelab.se}
 TARGET_DIR=${3-/mnt/hds/proj/bioinfo/DEMUX/}
-EMAILS=${4-kenny.billiau@scilifelab.se}
+EMAILS=${4-}
 
 #############
 # FUNCTIONS #
@@ -47,10 +47,15 @@ for RUNDIR in ${INDIR}/*; do
 
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         log "${RUN} not copied"
+        log "rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
         rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
+        log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
-        column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} finished" ${EMAILS}
+        if [[ -n ${EMAILS} ]]; then
+            log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} finished' ${EMAILS}"
+            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} finished" ${EMAILS}
+        fi
         continue
     fi
 
