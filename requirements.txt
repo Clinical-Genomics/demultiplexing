@@ -1,5 +1,5 @@
 psutil
 path.py
 click
-yaml
+PyYAML
 cglims
