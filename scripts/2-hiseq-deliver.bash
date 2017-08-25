@@ -37,6 +37,10 @@ trap failed ERR
 # MAIN #
 ########
 
+if pgrep rsync; then
+    exit
+fi
+
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
 
@@ -46,7 +50,6 @@ for RUNDIR in ${INDIR}/*; do
     fi
 
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
-        log "${RUN} not copied"
         log "rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
         rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
