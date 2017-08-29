@@ -2,8 +2,8 @@
 
 shopt -s nullglob
 
-INDIR=${1-'/home/clinical/RUNS/'}
-DEMUXDIR=${2-'/home/clinical/DEMUX/'}
+INDIR=${1?'please provide a run dur'}
+DEMUXDIR=${2?'please provide a demux dir'}
 
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
