@@ -20,14 +20,9 @@ for RUNDIR in ${INDIR}/*; do
                 demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
-            echo [${NOW}] ${RUN} is finished but demultiplexing has not started
-            demuxproccount=$(ps aux | grep HISEQ | grep grep -v | wc | awk '{print $1}')
-            if [[ "${demuxproccount}" -lt 15 ]]; then
-                echo [${NOW}] ${RUN} starting demultiplexing
-                bash /home/clinical/SCRIPTS/demux.bash ${RUNDIR} ${DEMUXDIR} &
-            else
-                echo [${NOW}] ${RUN} did not start demultiplexing other processes running
-            fi
+            echo [${NOW}] ${RUN} starting demultiplexing
+            bash /home/clinical/SCRIPTS/demux.bash ${RUNDIR} ${DEMUXDIR} &
+            rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - started.txt exists
         fi
