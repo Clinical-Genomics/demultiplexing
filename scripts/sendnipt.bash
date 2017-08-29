@@ -10,11 +10,11 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-NIPTRUNS=/home/clinical/NIPT/
+NIPTRUNS=/home/hiseq.clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
 MAILTO=bioinfo.clinical@scilifelab.se,nipt.karolinska@sll.se
 MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
-NIPTCONF=/home/clinical/.niptrc
+NIPTCONF=/home/hiseq.clinical/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
     . $NIPTCONF
