@@ -37,10 +37,6 @@ trap failed ERR
 # MAIN #
 ########
 
-if pgrep rsync; then
-    exit
-fi
-
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
 
@@ -50,9 +46,9 @@ for RUNDIR in ${INDIR}/*; do
     fi
 
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
-        log "rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
+        log "rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
+        rsync -av --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
         if [[ -n ${EMAILS} ]]; then
