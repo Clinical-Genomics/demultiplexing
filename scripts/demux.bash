@@ -7,7 +7,7 @@ set -eu -o pipefail
 
 shopt -s expand_aliases
 source $HOME/.bashrc
-source /home/clinical/SCRIPTS/demux.functions
+source $HOME/SCRIPTS/demux.functions
 
 VERSION=4.9.2
 
@@ -18,8 +18,6 @@ VERSION=4.9.2
 BASE=${1?'please provide a run dir'}
 DEMUX_DIR=${2-/home/clinical/DEMUX/}
 EMAIL=kenny.billiau@scilifelab.se
-DEST_SERVER=rastapopoulos
-DEST_DIR=/mnt/hds/proj/bioinfo/DEMUX/
 
 RUN=$(basename ${BASE})
 RUN_DIR=$(dirname ${BASE})
