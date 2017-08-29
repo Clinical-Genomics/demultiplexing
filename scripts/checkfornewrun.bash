@@ -21,7 +21,7 @@ for RUNDIR in ${INDIR}/*; do
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
-            bash /home/clinical/SCRIPTS/demux.bash ${RUNDIR} ${DEMUXDIR} &
+            bash /home/hiseq.clinical/SCRIPTS/demux.bash ${RUNDIR} ${DEMUXDIR}
             rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - started.txt exists
