@@ -1,0 +1,4 @@
+NIPTSFTP_USER=username
+NIPTSFTP_PASSWORD=password
+NIPTSFTP_HOST=ftp.webserver.com
+

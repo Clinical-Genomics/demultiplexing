@@ -12,6 +12,10 @@ All workflow related scripts are written in `bash`. They will set up the right e
 * *nipt.bash: scripts enabling NIPT data processing.
 * hiseqx/x*.bash: scripts for demultiplexing Illumina HiSeqX data (bcl2fastq).
 
+## NIPT
+
+The NIPT scripts require a .niptrc file to be placed in the excuting user's `$HOME`. A template has been provided.
+
 ## python
 
 All SampleSheet related actions are bundled in a python package enabling easier testing.
