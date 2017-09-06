@@ -1,7 +1,7 @@
 #!/bin/bash
 # script to send run results
 
-set -u
+set -ue
 
 VERSION=4.9.3
 echo "Version $VERSION"
@@ -14,11 +14,23 @@ NIPTRUNS=/home/hiseq.clinical/NIPT/
 NIPTOUT=/srv/nipt_analysis_output/
 MAILTO=bioinfo.clinical@scilifelab.se,nipt.karolinska@sll.se
 MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
+MAILTO_ERR=kenny.billiau@scilifelab.se
 NIPTCONF=/home/hiseq.clinical/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
     . $NIPTCONF
+else
+    echo "NIPT config not found!" | mail -s "NIPT config not found on $(hostname)" ${MAILTO_ERR}
 fi
+
+#############
+# FUNCTIONS #
+#############
+
+failed() {
+    echo "Fail to send ${RUN}" | mail -s "ERROR sending NIPT $(hostname):${RUN}" ${MAILTO_ERR}
+}
+trap failed ERR
 
 #######
 # RUN #

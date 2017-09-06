@@ -1,6 +1,9 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
+set -eu
+shopt -s nullglob
+
 VERSION=4.9.3
 echo "Version $VERSION"
 
@@ -8,10 +11,20 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-RUNBASE=/home/clinical/RUNS/
+RUNBASE=/home/hiseq.clinical/RUNS/
 NIPTBASE=/home/hiseq.clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/
 EMAILS=kenny.billiau@scilifelab.se
+MAILTO_ERR=kenny.billiau@scilifelab.se
+
+#############
+# FUNCTIONS #
+#############
+
+failed() {
+    echo "Fail to sync ${RUN}" | mail -s "ERROR syncing NIPT $(hostname):${RUN}" ${MAILTO_ERR}
+}
+trap failed ERR
 
 #######
 # RUN #
