@@ -4,7 +4,7 @@
 set -eu
 shopt -s nullglob
 
-VERSION=4.9.4
+VERSION=4.9.5
 echo "Version $VERSION"
 
 ##########
