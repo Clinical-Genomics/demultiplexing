@@ -47,8 +47,10 @@ for RUNDIR in ${INDIR}/*; do
 
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
-        log "rsync -av ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
+        log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
         rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
+        log "rsync -a --checksum ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
+        rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
         if [[ -n ${EMAILS} ]]; then
