@@ -94,5 +94,8 @@ for PROJ in ${PROJs[@]}; do
     cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
+log "rm ${DEMUX_DIR}/${RUN}/copycomplete.txt"
+rm ${DEMUX_DIR}/${RUN}/copycomplete.txt
+
 log "date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
 date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
