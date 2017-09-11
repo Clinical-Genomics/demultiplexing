@@ -46,9 +46,7 @@ trap failed ERR
 # transform SampleSheet from Mac to Unix
 if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
     cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-    set +e
     if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
-        set -e
         sed -i 's//\n/g' ${BASE}/SampleSheet.csv
     fi
     sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
@@ -94,8 +92,8 @@ for PROJ in ${PROJs[@]}; do
     cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
-log "rm ${DEMUX_DIR}/${RUN}/copycomplete.txt"
-rm ${DEMUX_DIR}/${RUN}/copycomplete.txt
+log "rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt"
+rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
 
 log "date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
 date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
