@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 import re
+from time import strftime
 from copy import deepcopy
 from collections import OrderedDict
 from path import Path
@@ -266,13 +267,115 @@ class MiseqSamplesheet(Samplesheet):
     def to_demux(self, delim=',', end='\n'):
         """ Convert miseq to hiseq style samplesheet for demultiplexing. """
 
+        checked_indexes = {} # the indexes in the SampleSheet
+
         def clean(input):
             return re.sub(r'[ _/]+', '', input)
+
+        def check_index(index):
+            checked_indexes[index] = 1
+
+        def get_undetermined_indexes():
+
+            si5 = {
+                'TAGATCGC': 'S501',
+                'CTCTCTAT': 'S502',
+                'TATCCTCT': 'S503',
+                'AGAGTAGA': 'S504',
+                'GTAAGGAG': 'S505',
+                'ACTGCATA': 'S506',
+                'AAGGAGTA': 'S507',
+                'CTAAGCCT': 'S508',
+                'CGTCTAAT': 'S510',
+                'TCTCTCCG': 'S511',
+                'TCGACTAG': 'S513',
+                'TTCTAGCT': 'S515',
+                'CCTAGAGT': 'S516',
+                'GCGTAAGA': 'S517',
+                'CTATTAAG': 'S518',
+                'AAGGCTAT': 'S520',
+                'GAGCCTTA': 'S521',
+                'TTATGCGA': 'S522'
+                #'TAGATCGC': 'N501',
+                #'CTCTCTAT': 'N502',
+                #'TATCCTCT': 'N503',
+                #'AGAGTAGA': 'N504',
+                #'GTAAGGAG': 'N505',
+                #'ACTGCATA': 'N506',
+                #'AAGGAGTA': 'N507',
+                #'CTAAGCCT': 'N508',
+            }
+            ni7 = {
+                'TAAGGCGA': 'N701',
+                'CGTACTAG': 'N702',
+                'AGGCAGAA': 'N703',
+                'TCCTGAGC': 'N704',
+                'GGACTCCT': 'N705',
+                'TAGGCATG': 'N706',
+                'CTCTCTAC': 'N707',
+                'CAGAGAGG': 'N708',
+                'CGAGGCTG': 'N710',
+                'AAGAGGCA': 'N711',
+                'GTAGAGGA': 'N712',
+                'GCTCATGA': 'N714',
+                'ATCTCAGG': 'N715',
+                'ACTCGCTA': 'N716',
+                'GGAGCTAC': 'N718',
+                'GCGTAGTA': 'N719',
+                'CGGAGCCT': 'N720',
+                'TACGCTGC': 'N721',
+                'ATGCGCAG': 'N722',
+                'TAGCGCTC': 'N723',
+                'ACTGAGCG': 'N724',
+                'CCTAAGAC': 'N726',
+                'CGATCAGT': 'N727',
+                'TGCAGCTA': 'N728',
+                'TCGACGTC': 'N729'
+            }
+            di7 = {
+                'ATTACTCG': 'D701',
+                'TCCGGAGA': 'D702',
+                'CGCTCATT': 'D703',
+                'GAGATTCC': 'D704',
+                'ATTCAGAA': 'D705',
+                'GAATTCGT': 'D706',
+                'CTGAAGCT': 'D707',
+                'TAATGCGC': 'D708',
+                'CGGCTATG': 'D709',
+                'TCCGCGAA': 'D710',
+                'TCTCGCGC': 'D711',
+                'AGCGATAG': 'D712'
+            }
+            di5 = {
+                'TATAGCCT': 'D501',
+                'ATAGAGGC': 'D502',
+                'CCTATCCT': 'D503',
+                'GGCTCTGA': 'D504',
+                'AGGCGAAG': 'D505',
+                'TAATCTTA': 'D506',
+                'CAGGACGT': 'D507',
+                'GTACTGAC': 'D508'
+            }
+
+            # combine the D indexes
+            for di7_index in di7.keys():
+                for di5_index in di5.keys():
+                    d_index = di7_index + '-' + di5_index
+                    if d_index not in checked_indexes:
+                        yield d_index
+
+            # combine the other indexes
+            for ni7_index in ni7.keys():
+                for si5_index in si5.keys():
+                    ns_index = ni7_index + '-' + si5_index
+                    if ns_index not in checked_indexes:
+                        yield ns_index
 
         expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
         flowcell_id = self._get_flowcell()
+        cur_date = strftime('%y%m%d')
 
         header = self.section[self.DATA][0] # '0' is the csv header
         data_lines = [] # the new data section. Each line holds a dict with the right header keys
@@ -281,7 +384,7 @@ class MiseqSamplesheet(Samplesheet):
             data_line = {}
             data_line['FCID'] = flowcell_id
             data_line['Lane'] = '1'
-            data_line['SampleID'] = clean(line['sample_id'])
+            data_line['SampleID'] = cur_date + '-' + clean(line['sample_id'])
             data_line['SampleRef'] = 'hg19'
             data_line['Index'] = clean(line['index']) + '-' + clean(line['index2'])
             data_line['Description'] = line['description']
@@ -289,6 +392,27 @@ class MiseqSamplesheet(Samplesheet):
             data_line['Recipe'] = 'R1'
             data_line['Operator'] = 'MS'
             data_line['SampleProject'] = clean(line['sample_project'])
+
+            check_index(clean(line['index']) + '-' + clean(line['index2']))
+
+            ordered_line = []
+            for head in expected_header:
+                ordered_line.append(data_line[head])
+            data_lines.append(ordered_line)
+
+        # add the undetermined indexes
+        for i, undetermined_index in enumerate(get_undetermined_indexes()):
+            data_line = {}
+            data_line['FCID'] = flowcell_id
+            data_line['Lane'] = '1'
+            data_line['SampleID'] = cur_date + '-Undetermined' + str(i)
+            data_line['SampleRef'] = 'hg19'
+            data_line['Index'] = undetermined_index
+            data_line['Description'] = 'ctmr'
+            data_line['Control'] = 'N'
+            data_line['Recipe'] = 'R1'
+            data_line['Operator'] = 'script'
+            data_line['SampleProject'] = 'Undetermined'
 
             ordered_line = []
             for head in expected_header:
@@ -298,6 +422,7 @@ class MiseqSamplesheet(Samplesheet):
         rs = []
         for line in data_lines:
             rs.append(delim.join(line))
+
         return end.join(rs)
 
 
