@@ -362,14 +362,14 @@ class MiseqSamplesheet(Samplesheet):
                 for di5_index, di5_name in di5.items():
                     d_index = di7_index + '-' + di5_index
                     if d_index not in checked_indexes:
-                        yield str(di7_name + '-' + di5_name)
+                        yield d_index, str(di7_name + '-' + di5_name)
 
             # combine the other indexes
             for ni7_index, ni7_name in ni7.items():
                 for si5_index, si5_name in si5.items():
                     ns_index = ni7_index + '-' + si5_index
                     if ns_index not in checked_indexes:
-                        yield str(ni7_name + '-' + si5_name)
+                        yield ns_index, str(ni7_name + '-' + si5_name)
 
         expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
@@ -401,11 +401,11 @@ class MiseqSamplesheet(Samplesheet):
             data_lines.append(ordered_line)
 
         # add the undetermined indexes
-        for undetermined_index in get_undetermined_indexes():
+        for undetermined_index, undetermined_index_name in get_undetermined_indexes():
             data_line = {}
             data_line['FCID'] = flowcell_id
             data_line['Lane'] = '1'
-            data_line['SampleID'] = cur_date + '-' + undetermined_index
+            data_line['SampleID'] = cur_date + '-' + undetermined_index_name
             data_line['SampleRef'] = 'hg19'
             data_line['Index'] = undetermined_index
             data_line['Description'] = 'ctmr'
