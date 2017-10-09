@@ -401,11 +401,11 @@ class MiseqSamplesheet(Samplesheet):
             data_lines.append(ordered_line)
 
         # add the undetermined indexes
-        for i, undetermined_index in enumerate(get_undetermined_indexes()):
+        for undetermined_index in get_undetermined_indexes():
             data_line = {}
             data_line['FCID'] = flowcell_id
             data_line['Lane'] = '1'
-            data_line['SampleID'] = cur_date + '-Undetermined' + str(i)
+            data_line['SampleID'] = cur_date + '-' + undetermined_index
             data_line['SampleRef'] = 'hg19'
             data_line['Index'] = undetermined_index
             data_line['Description'] = 'ctmr'
