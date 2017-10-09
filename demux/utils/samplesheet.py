@@ -358,18 +358,18 @@ class MiseqSamplesheet(Samplesheet):
             }
 
             # combine the D indexes
-            for di7_index in di7.keys():
-                for di5_index in di5.keys():
+            for di7_index, di7_name in di7.items():
+                for di5_index, di5_name in di5.items():
                     d_index = di7_index + '-' + di5_index
                     if d_index not in checked_indexes:
-                        yield d_index
+                        yield str(di7_name + '-' + di5_name)
 
             # combine the other indexes
-            for ni7_index in ni7.keys():
-                for si5_index in si5.keys():
+            for ni7_index, ni7_name in ni7.items():
+                for si5_index, si5_name in si5.items():
                     ns_index = ni7_index + '-' + si5_index
                     if ns_index not in checked_indexes:
-                        yield ns_index
+                        yield str(ni7_name + '-' + si5_name)
 
         expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
 
