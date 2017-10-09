@@ -255,11 +255,14 @@ class MiseqSamplesheet(Samplesheet):
             'description': 'Description'
     }
 
-    def __init__(self, samplesheet_path, flowcell=None):
+    def __init__(self, samplesheet_path, flowcell=None, sequencing_date=None):
         Samplesheet.__init__(self, samplesheet_path)
         if flowcell == None:
             flowcell = Path(samplesheet_path).dirname().basename().split('_')[-1]
+        if sequencing_date == None:
+            sequencing_date = Path(samplesheet_path).dirname().basename().split('_')[0]
         self.flowcell = flowcell
+        self.sequencing_date = sequencing_date
 
     def _get_flowcell(self):
         return self.flowcell
@@ -375,7 +378,7 @@ class MiseqSamplesheet(Samplesheet):
 
         # get the experiment name
         flowcell_id = self._get_flowcell()
-        cur_date = strftime('%y%m%d')
+        cur_date = self.sequencing_date
 
         header = self.section[self.DATA][0] # '0' is the csv header
         data_lines = [] # the new data section. Each line holds a dict with the right header keys
