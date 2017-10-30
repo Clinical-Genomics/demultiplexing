@@ -79,6 +79,9 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     set -e
 fi
 
+# validate!
+demux sheet validate --application wgs ${RUNDIR}/SampleSheet.csv
+
 # notify we are ready to start!
 cat ${RUNDIR}/SampleSheet.csv | mail -s "DEMUX of $FC started" ${EMAIL}
 
