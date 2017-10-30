@@ -7,7 +7,7 @@
 VERSION=4.10.4
 
 # DEMUX/RUN DIR
-INDIR=$1
+INDIR=${1?'please provide DEMUX rundir'}
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
