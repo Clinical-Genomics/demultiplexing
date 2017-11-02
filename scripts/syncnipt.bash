@@ -4,7 +4,7 @@
 set -eu
 shopt -s nullglob
 
-VERSION=4.11.1
+VERSION=4.11.2
 echo "Version $VERSION"
 
 ##########
@@ -14,8 +14,7 @@ echo "Version $VERSION"
 RUNBASE=/home/hiseq.clinical/RUNS/
 NIPTBASE=/home/hiseq.clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/
-EMAILS=kenny.billiau@scilifelab.se
-MAILTO_ERR=kenny.billiau@scilifelab.se
+MAILTO_ERR=clinical-logwatch@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -50,7 +49,7 @@ for RUN in ${RUNBASE}/*; do
       if ! demux sheet validate -a nipt ${RUNBASE}${RUN}/SampleSheet.csv; then
           NOW=$(date +"%Y%m%d%H%M%S")
           echo [${NOW}] ${RUN} has badly formatted SampleSheet!
-          cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" $EMAILS
+          cat ${RUNBASE}${RUN}/SampleSheet.csv | mail -s "NIPT ${RUN} has a badly formatted SampleSheet!" ${MAILTO_ERR}
  
           continue
       fi
