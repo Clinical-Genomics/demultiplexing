@@ -5,7 +5,7 @@ import click
 import logging
 
 from cglims.api import ClinicalLims, ClinicalSample
-from ..utils import Samplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
+from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +25,8 @@ def validate(samplesheet, application):
         HiSeq2500Samplesheet(samplesheet).validate()
     elif application == 'miseq':
         MiseqSamplesheet(samplesheet).validate()
-    else:
-        Samplesheet(samplesheet).validate()
+    elif application == 'wgs':
+        HiSeqXSamplesheet(samplesheet).validate()
 
 @sheet.command()
 @click.argument('samplesheet')

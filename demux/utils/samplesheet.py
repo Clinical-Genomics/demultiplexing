@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-from __future__ import print_function
 import re
 from time import strftime
 from copy import deepcopy
@@ -249,6 +245,24 @@ class Samplesheet(object):
         return True
 
 
+class HiSeqXSamplesheet(Samplesheet):
+
+    def validate(self):
+        Samplesheet.validate(self)
+
+        def _validate_project_samplename():
+            for i, line in enumerate(self.lines()):
+                if line['project'] != line['sample_name']:
+                    # add i + 2 as it makes it easier to spot the 'wrong' line
+                    line_nr = i + 2
+                    msg = 'Project and SampleName cannot be different!'
+                    return (msg, line_nr)
+
+        rs = _validate_project_samplename()
+        if type(rs) is tuple:
+            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+
+
 class MiseqSamplesheet(Samplesheet):
 
     header_map = { 
@@ -434,7 +448,7 @@ class MiseqSamplesheet(Samplesheet):
         return end.join(rs)
 
     def validate(self):
-        #Samplesheet.validate(self)
+        Samplesheet.validate(self)
 
         def _validate_missing_index():
             """We know what indexes to expect in the samplesheet. Check which ones are missing
