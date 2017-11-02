@@ -15,7 +15,7 @@ class SampleSheetValidationException(Exception):
         self.line_nr = line_nr
 
     def __str__(self):
-        return repr("Section {}#{}: {}".format(self.section, self.msg, self.line_nr))
+        return repr("Section '{}', Line '{}': {}".format(self.section, self.msg, self.line_nr))
 
 
 class SampleSheetParsexception(Exception):
@@ -209,9 +209,13 @@ class Samplesheet(object):
 
         def _validate_length(section):
             if len(section) > 2:
-                for i, line in enumerate(section[1:]):
-                    if len(section[0]) != len(line):
-                        return ('#fields != #fields in header', i)
+                header = section[0]
+                lines = section[1:]
+                for i, line in enumerate(lines):
+                    if len(header) != len(line):
+                        msg = "'{}': #fields != #fields in header".format(line)
+                        # add i + 2 as it makes it easier to spot the 'wrong' line
+                        return (msg, i + 2)
             return True
 
         def _validate_uniq_index(samplesheet):
