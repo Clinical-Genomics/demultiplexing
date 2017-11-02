@@ -255,6 +255,87 @@ class MiseqSamplesheet(Samplesheet):
             'description': 'Description'
     }
 
+    si5 = {
+        'TAGATCGC': 'S501',
+        'CTCTCTAT': 'S502',
+        'TATCCTCT': 'S503',
+        'AGAGTAGA': 'S504',
+        'GTAAGGAG': 'S505',
+        'ACTGCATA': 'S506',
+        'AAGGAGTA': 'S507',
+        'CTAAGCCT': 'S508',
+        'CGTCTAAT': 'S510',
+        'TCTCTCCG': 'S511',
+        'TCGACTAG': 'S513',
+        'TTCTAGCT': 'S515',
+        'CCTAGAGT': 'S516',
+        'GCGTAAGA': 'S517',
+        'CTATTAAG': 'S518',
+        'AAGGCTAT': 'S520',
+        'GAGCCTTA': 'S521',
+        'TTATGCGA': 'S522'
+        #'TAGATCGC': 'N501',
+        #'CTCTCTAT': 'N502',
+        #'TATCCTCT': 'N503',
+        #'AGAGTAGA': 'N504',
+        #'GTAAGGAG': 'N505',
+        #'ACTGCATA': 'N506',
+        #'AAGGAGTA': 'N507',
+        #'CTAAGCCT': 'N508',
+    }
+    ni7 = {
+        'TAAGGCGA': 'N701',
+        'CGTACTAG': 'N702',
+        'AGGCAGAA': 'N703',
+        'TCCTGAGC': 'N704',
+        'GGACTCCT': 'N705',
+        'TAGGCATG': 'N706',
+        'CTCTCTAC': 'N707',
+        'CAGAGAGG': 'N708',
+        'CGAGGCTG': 'N710',
+        'AAGAGGCA': 'N711',
+        'GTAGAGGA': 'N712',
+        'GCTCATGA': 'N714',
+        'ATCTCAGG': 'N715',
+        'ACTCGCTA': 'N716',
+        'GGAGCTAC': 'N718',
+        'GCGTAGTA': 'N719',
+        'CGGAGCCT': 'N720',
+        'TACGCTGC': 'N721',
+        'ATGCGCAG': 'N722',
+        'TAGCGCTC': 'N723',
+        'ACTGAGCG': 'N724',
+        'CCTAAGAC': 'N726',
+        'CGATCAGT': 'N727',
+        'TGCAGCTA': 'N728',
+        'TCGACGTC': 'N729'
+    }
+    di7 = {
+        'ATTACTCG': 'D701',
+        'TCCGGAGA': 'D702',
+        'CGCTCATT': 'D703',
+        'GAGATTCC': 'D704',
+        'ATTCAGAA': 'D705',
+        'GAATTCGT': 'D706',
+        'CTGAAGCT': 'D707',
+        'TAATGCGC': 'D708',
+        'CGGCTATG': 'D709',
+        'TCCGCGAA': 'D710',
+        'TCTCGCGC': 'D711',
+        'AGCGATAG': 'D712'
+    }
+    di5 = {
+        'TATAGCCT': 'D501',
+        'ATAGAGGC': 'D502',
+        'CCTATCCT': 'D503',
+        'GGCTCTGA': 'D504',
+        'AGGCGAAG': 'D505',
+        'TAATCTTA': 'D506',
+        'CAGGACGT': 'D507',
+        'GTACTGAC': 'D508'
+    }
+
+
     def __init__(self, samplesheet_path, flowcell=None, sequencing_date=None):
         Samplesheet.__init__(self, samplesheet_path)
         if flowcell == None:
@@ -280,96 +361,16 @@ class MiseqSamplesheet(Samplesheet):
 
         def get_undetermined_indexes():
 
-            si5 = {
-                'TAGATCGC': 'S501',
-                'CTCTCTAT': 'S502',
-                'TATCCTCT': 'S503',
-                'AGAGTAGA': 'S504',
-                'GTAAGGAG': 'S505',
-                'ACTGCATA': 'S506',
-                'AAGGAGTA': 'S507',
-                'CTAAGCCT': 'S508',
-                'CGTCTAAT': 'S510',
-                'TCTCTCCG': 'S511',
-                'TCGACTAG': 'S513',
-                'TTCTAGCT': 'S515',
-                'CCTAGAGT': 'S516',
-                'GCGTAAGA': 'S517',
-                'CTATTAAG': 'S518',
-                'AAGGCTAT': 'S520',
-                'GAGCCTTA': 'S521',
-                'TTATGCGA': 'S522'
-                #'TAGATCGC': 'N501',
-                #'CTCTCTAT': 'N502',
-                #'TATCCTCT': 'N503',
-                #'AGAGTAGA': 'N504',
-                #'GTAAGGAG': 'N505',
-                #'ACTGCATA': 'N506',
-                #'AAGGAGTA': 'N507',
-                #'CTAAGCCT': 'N508',
-            }
-            ni7 = {
-                'TAAGGCGA': 'N701',
-                'CGTACTAG': 'N702',
-                'AGGCAGAA': 'N703',
-                'TCCTGAGC': 'N704',
-                'GGACTCCT': 'N705',
-                'TAGGCATG': 'N706',
-                'CTCTCTAC': 'N707',
-                'CAGAGAGG': 'N708',
-                'CGAGGCTG': 'N710',
-                'AAGAGGCA': 'N711',
-                'GTAGAGGA': 'N712',
-                'GCTCATGA': 'N714',
-                'ATCTCAGG': 'N715',
-                'ACTCGCTA': 'N716',
-                'GGAGCTAC': 'N718',
-                'GCGTAGTA': 'N719',
-                'CGGAGCCT': 'N720',
-                'TACGCTGC': 'N721',
-                'ATGCGCAG': 'N722',
-                'TAGCGCTC': 'N723',
-                'ACTGAGCG': 'N724',
-                'CCTAAGAC': 'N726',
-                'CGATCAGT': 'N727',
-                'TGCAGCTA': 'N728',
-                'TCGACGTC': 'N729'
-            }
-            di7 = {
-                'ATTACTCG': 'D701',
-                'TCCGGAGA': 'D702',
-                'CGCTCATT': 'D703',
-                'GAGATTCC': 'D704',
-                'ATTCAGAA': 'D705',
-                'GAATTCGT': 'D706',
-                'CTGAAGCT': 'D707',
-                'TAATGCGC': 'D708',
-                'CGGCTATG': 'D709',
-                'TCCGCGAA': 'D710',
-                'TCTCGCGC': 'D711',
-                'AGCGATAG': 'D712'
-            }
-            di5 = {
-                'TATAGCCT': 'D501',
-                'ATAGAGGC': 'D502',
-                'CCTATCCT': 'D503',
-                'GGCTCTGA': 'D504',
-                'AGGCGAAG': 'D505',
-                'TAATCTTA': 'D506',
-                'CAGGACGT': 'D507',
-                'GTACTGAC': 'D508'
-            }
-
             # combine the D indexes
-            for di7_index, di7_name in di7.items():
-                for di5_index, di5_name in di5.items():
+            for di7_index, di7_name in self.di7.items():
+                for di5_index, di5_name in self.di5.items():
                     d_index = di7_index + '-' + di5_index
                     if d_index not in checked_indexes:
                         yield d_index, str(di7_name + '-' + di5_name)
 
             # combine the other indexes
-            for ni7_index, ni7_name in ni7.items():
-                for si5_index, si5_name in si5.items():
+            for ni7_index, ni7_name in self.ni7.items():
+                for si5_index, si5_name in self.si5.items():
                     ns_index = ni7_index + '-' + si5_index
                     if ns_index not in checked_indexes:
                         yield ns_index, str(ni7_name + '-' + si5_name)
@@ -427,6 +428,37 @@ class MiseqSamplesheet(Samplesheet):
             rs.append(delim.join(line))
 
         return end.join(rs)
+
+    def validate(self):
+        #Samplesheet.validate(self)
+
+        def _validate_missing_index():
+            """We know what indexes to expect in the samplesheet. Check which ones are missing
+            or have been added."""
+
+            def is_readymade_index(index):
+                for di7_index, di7_name in self.di7.items():
+                    for di5_index, di5_name in self.di5.items():
+                        d_index = di7_index + '-' + di5_index
+                        if index == d_index:
+                            return index
+
+                # combine the other indexes
+                for ni7_index, ni7_name in self.ni7.items():
+                    for si5_index, si5_name in self.si5.items():
+                        ns_index = ni7_index + '-' + si5_index
+                        if index == ns_index:
+                            return index
+
+            for i, line in enumerate(self.lines()):
+                readymade_index = is_readymade_index(line['index'])
+
+                if not readymade_index:
+                    return ('Index {} not in readymade indexes!'.format(line['index']), i)
+
+        rs = _validate_missing_index()
+        if type(rs) is tuple:
+            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
 
 class HiSeq2500Samplesheet(Samplesheet):

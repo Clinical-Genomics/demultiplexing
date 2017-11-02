@@ -16,13 +16,15 @@ def sheet():
 
 @sheet.command()
 @click.argument('samplesheet')
-@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt']), help='sequencing type')
+@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt', 'miseq']), help='sequencing type')
 def validate(samplesheet, application):
     """validate a samplesheet"""
     if application == 'nipt':
         NIPTSamplesheet(samplesheet).validate()
     elif application == 'wes':
         HiSeq2500Samplesheet(samplesheet).validate()
+    elif application == 'miseq':
+        MiseqSamplesheet(samplesheet).validate()
     else:
         Samplesheet(samplesheet).validate()
 
