@@ -52,10 +52,11 @@ def demux(samplesheet, application, flowcell):
 @sheet.command()
 @click.argument('flowcell')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
+@click.option('-i', '--dualindex', is_flag=True, default=False, help='force X dual index')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
-def fetch(context, flowcell, application, delimiter=',', end='\n'):
+def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
     def get_project(project):
@@ -79,9 +80,10 @@ def fetch(context, flowcell, application, delimiter=',', end='\n'):
     if application == 'wgs':
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
         for i, line in enumerate(raw_samplesheet):
-            index = line['index'].split('-')[0]
-            raw_samplesheet[i]['index'] = index
-            raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
+            if not dualindex:
+                index = line['index'].split('-')[0]
+                raw_samplesheet[i]['index'] = index
+            #raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
         click.echo('[Data]')
 
     click.echo(delimiter.join(header))
