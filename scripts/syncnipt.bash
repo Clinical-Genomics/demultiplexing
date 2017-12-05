@@ -14,7 +14,7 @@ echo "Version $VERSION"
 RUNBASE=/home/hiseq.clinical/RUNS/
 NIPTBASE=/home/hiseq.clinical/NIPT/
 NIPTOUTPATH=/srv/nipt_runs/
-MAILTO_ERR=clinical-logwatch@scilifelab.se
+MAILTO_ERR=clinical-demux@scilifelab.se
 
 #############
 # FUNCTIONS #

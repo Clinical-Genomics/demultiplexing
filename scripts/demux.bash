@@ -17,7 +17,7 @@ VERSION=4.11.2
 
 BASE=${1?'please provide a run dir'}
 DEMUX_DIR=${2?'please provide a demux dir'}
-EMAIL=kenny.billiau@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 
 RUN=$(basename ${BASE})
 RUN_DIR=$(dirname ${BASE})
