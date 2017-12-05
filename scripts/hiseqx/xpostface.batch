@@ -7,7 +7,7 @@
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
 #SBATCH --mail-type=FAIL
-#SBATCH --mail-user=bioinfo.clinical@scilifelab.se
+#SBATCH --mail-user=clinical-demux@scilifelab.se
 
 set -eu -o pipefail
 
@@ -17,7 +17,7 @@ set -eu -o pipefail
 
 VERSION=4.11.2
 DEMUXDIR=${1?'absolute path to the DEMUX/rundir'}
-EMAIL=bioinfo.clinical@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 
 #############
 # FUNCTIONS #
