@@ -13,7 +13,7 @@ set -u
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 RAWBASE=/mnt/hds2/proj/bioinfo/Runs/
 DEMUX_DIR=/mnt/hds/proj/bioinfo/DEMUX/
-EMAIL=kenny.billiau@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 
 #############
 # FUNCTIONS #

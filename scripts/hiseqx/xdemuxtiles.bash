@@ -12,7 +12,7 @@ RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 
 
-EMAIL=kenny.billiau@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 SCRIPTDIR=$(dirname $(readlink -nm $0))
