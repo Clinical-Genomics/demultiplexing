@@ -18,6 +18,14 @@ class SampleSheetParsexception(Exception):
     pass
 
 
+class Line(dict):
+
+    @property
+    def dualindex(self, delim='-'):
+        if 'index2' in self:
+            return self['index'] + delim + self['index2']
+        return self['index']
+
 class Samplesheet(object):
     """SampleSheet.
 
@@ -56,7 +64,7 @@ class Samplesheet(object):
     # One can make one header map for each samplesheet type.
     header_map = {
             'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
-            'index': 'index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
+            'index': 'index', 'index2': 'index2', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
             'operator': 'Operator', 'project': 'Project'
     }
 
@@ -115,7 +123,7 @@ class Samplesheet(object):
             raise SampleSheetParsexception('No data found!')
 
         header = self._get_data_header()
-        self.samplesheet = [ dict(zip(header, line)) for line in self.section[self.DATA][1:] ]
+        self.samplesheet = [ Line(dict(zip(header, line))) for line in self.section[self.DATA][1:] ]
 
         header_r = self._get_data_header_r()
         self.samplesheet_r = [ dict(zip(header_r, line)) for line in self.section[self.DATA][1:] ]

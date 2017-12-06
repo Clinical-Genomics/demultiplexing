@@ -296,6 +296,10 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert lanes == expected_lanes
     assert lanes_r == expected_lanes
 
+    lines = list(samplesheet.lines())
+    assert lines[0].dualindex == 'TCCGCGAA'
+
+
 def test_x_faulty_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_faulty_samplesheet.csv')
 
@@ -386,6 +390,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     lanes_r = [ lane for lane in samplesheet.column_r('Lane') ]
     assert lanes == expected_lanes
     assert lanes_r == expected_lanes
+
 
 def test_miseq_samplesheet():
     samplesheet = MiseqSamplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv')
