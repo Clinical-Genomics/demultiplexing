@@ -28,7 +28,7 @@ fi
 #############
 
 failed() {
-    echo "Fail to send ${RUN}" | mail -s "ERROR sending NIPT $(hostname):${RUN}" ${MAILTO_ERR}
+    echo "Fail to send ${RUN}. Error on line nr: $(caller)" | mail -s "ERROR sending NIPT $(hostname):${RUN}" ${MAILTO_ERR}
 }
 trap failed ERR
 
