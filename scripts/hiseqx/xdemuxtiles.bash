@@ -55,13 +55,17 @@ log "demuxtiles.bash VERSION ${VERSION}"
 # get the flowcell name
 FC=$( basename $(basename ${RUNDIR}/) | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 
+# is this a dual-index FC?
+IS_DUAL=$(grep IndexRead2 ${RUNDIR}/runParameters.xml | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
+
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
-    log "demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv"
-    set +e
-    if ! demux sheet fetch -a wgs ${FC} > ${RUNDIR}/SampleSheet.csv; then
-        set -e
-
+    DUALINDEX_PARAM=
+    if [[ ${IS_DUAL} == '8' ]]; then
+        DUALINDEX_PARAM='--dualindex'
+    fi
+    log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    if ! demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv; then
         # ok, fetch it from the old place then
         log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv"
         wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv
@@ -76,7 +80,6 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
         # remove empty lines
         sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
     fi
-    set -e
 fi
 
 # validate!
