@@ -27,7 +27,7 @@ log() {
 }
 
 failed() {
-    echo "ERROR starting X demultiplexing" | mail -s "ERROR starting X demultiplexing" $EMAIL
+    echo "ERROR starting X demultiplexing: ${RUN} by $(called)" | mail -s "ERROR starting X demultiplexing" $EMAIL
 }
 trap failed ERR
 
@@ -56,7 +56,9 @@ for RUN in ${RAWBASE}/*; do
             mkdir -p ${DEMUX_DIR}/${RUN}/
             PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}/${RUN} &>> ${PROJECTLOG}
-            rm ${DEMUX_DIR}/${RUN}/delivery.txt
+            if [[ -e ${DEMUX_DIR}/${RUN}/delivery.txt ]]; then
+                rm ${DEMUX_DIR}/${RUN}/delivery.txt
+            fi
         else
             log "${RUN} is finished and demultiplexing has already started"
         fi
