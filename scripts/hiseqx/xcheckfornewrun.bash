@@ -27,7 +27,7 @@ log() {
 }
 
 failed() {
-    echo "ERROR starting X demultiplexing: ${RUN} by $(called)" | mail -s "ERROR starting X demultiplexing" $EMAIL
+    echo "ERROR starting X demultiplexing: ${RUN} by $(caller)" | mail -s "ERROR starting X demultiplexing" $EMAIL
 }
 trap failed ERR
 
