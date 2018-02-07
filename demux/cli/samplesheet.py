@@ -3,6 +3,7 @@
 import sys
 import click
 import logging
+import copy
 
 from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
@@ -79,6 +80,21 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
     # ... fix some X specifics
     if application == 'wgs':
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
+
+        # first do some 10X magic, if any
+        new_samplesheet = copy.deepcopy(raw_samplesheet)
+        for i, line in enumerate(raw_samplesheet):
+            index = line['index']
+            if len(index.split('-')) == 4:
+                for tenx_index in index.split('-'):
+                    tenx_line = copy.deepcopy(line)
+                    tenx_line['sample_id'] = '{}_{}'.format(line['sample_id'], tenx_index)
+                    tenx_line['index'] = tenx_index
+                    new_samplesheet.append(tenx_line)
+                del new_samplesheet[i]
+        raw_samplesheet = new_samplesheet
+
+        # do some single index stuff
         for i, line in enumerate(raw_samplesheet):
             if not dualindex:
                 index = line['index'].split('-')[0]
