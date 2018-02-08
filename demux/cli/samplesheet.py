@@ -82,7 +82,7 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
 
         # first do some 10X magic, if any
-        new_samplesheet = copy.deepcopy(raw_samplesheet)
+        new_samplesheet = []
         for i, line in enumerate(raw_samplesheet):
             index = line['index']
             if len(index.split('-')) == 4:
@@ -91,7 +91,8 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
                     tenx_line['sample_id'] = '{}_{}'.format(line['sample_id'], tenx_index)
                     tenx_line['index'] = tenx_index
                     new_samplesheet.append(tenx_line)
-                del new_samplesheet[i]
+            else:
+                new_samplesheet.append(line)
         raw_samplesheet = new_samplesheet
 
         # do some single index stuff
