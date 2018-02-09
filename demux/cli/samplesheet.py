@@ -60,6 +60,10 @@ def demux(samplesheet, application, flowcell):
 def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
+    def reverse_complement(dna):
+        complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+        return ''.join([complement[base] for base in dna[::-1]])
+
     def get_project(project):
         """ Only keeps the first part of the project name"""
         return project.split(' ')[0]
@@ -100,7 +104,12 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
             if not dualindex:
                 index = line['index'].split('-')[0]
                 raw_samplesheet[i]['index'] = index
-            #raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
+            else:
+                indexes = line['index'].split('-')
+                if len(indexes) == 2:
+                    (index1, index2) = indexes
+                    raw_samplesheet[i]['index'] = '{}-{}'.format(index1, reverse_complement(index2))
+                
         click.echo('[Data]')
 
     click.echo(delimiter.join(header))
