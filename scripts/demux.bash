@@ -9,7 +9,7 @@ shopt -s expand_aliases
 source $HOME/.bashrc
 source $HOME/SCRIPTS/demux.functions
 
-VERSION=4.15.1
+VERSION=4.15.2
 
 ##########
 # PARAMS #
