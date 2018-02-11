@@ -1,11 +1,11 @@
 #!/bin/bash
 # demux Xrun in parts
 
-set -eu -o pipefail
 
 shopt -s expand_aliases
 source ~/.bashrc
 
+set -eu -o pipefail
 
 
 ##########
