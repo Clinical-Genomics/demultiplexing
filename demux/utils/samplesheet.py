@@ -255,6 +255,17 @@ class Samplesheet(object):
 
 class HiSeqXSamplesheet(Samplesheet):
 
+    def unparse(self, delim=','):
+        """Reconstruct the sample sheet based on the (modified) parsed values. """
+        rs = []
+        yield '[Data]'
+        yield delim.join(self._get_data_header_r())
+        for line in self.samplesheet:
+            line_r = []
+            for part in self._get_data_header():
+                line_r.append(line[part])
+            yield delim.join(line_r)
+
     def validate(self):
         Samplesheet.validate(self)
 

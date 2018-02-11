@@ -122,6 +122,7 @@ done
 
 # launch the stats generation and linking after demux finishes ok
 log "submit postface"
+set +u # RUNNING_JOBIDS might be unbound
 RUNNING_JOBIDS=( $(squeue -h --format=%i) ) # get all running/queued jobs
 REMAINING_JOBIDS=( $(comm -12 <( printf '%s\n' "${RUNNING_JOBIDS[@]}" | LC_ALL=C sort ) <( printf '%s\n' "${DEMUX_JOBIDS[@]}" | LC_ALL=C sort )) ) # get all jobs that are still relevant
 DEPENDENCY=""

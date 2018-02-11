@@ -4,6 +4,7 @@ import click
 import yaml
 
 from .samplesheet import sheet
+from ..basemask import basemask
 
 log = logging.getLogger(__name__)
 
@@ -40,3 +41,4 @@ def setup_logging(level='INFO'):
     return root_logger
 
 demux.add_command(sheet)
+demux.add_command(basemask)
