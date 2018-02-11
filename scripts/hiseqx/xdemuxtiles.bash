@@ -3,6 +3,11 @@
 
 set -eu -o pipefail
 
+shopt -s expand_aliases
+source ~/.bashrc
+
+
+
 ##########
 # PARAMS #
 ##########

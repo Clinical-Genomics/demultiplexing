@@ -100,9 +100,10 @@ I2=''
 if [[ ${indexread2count} -gt 0 ]]; then # dual
     if [[ ${LEN_SAMPLE_INDEX2} -gt 0 ]]; then
         I2="I${LEN_SAMPLE_INDEX2}"
+        I2=",${I2}"
+    else # it seems we need to ignore second part of index regardless if run as dualindex
+        I2=
     fi
-    I2n=$(head -c $(( ${indexread2count} - ${LEN_SAMPLE_INDEX2} )) < /dev/zero | tr '\0' 'n') # print 'n' n times
-    I2=",${I2}${I2n}"
 fi
 
 BASEMASK="Y151,${I1}${I2},Y151"
