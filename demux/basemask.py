@@ -53,17 +53,18 @@ def create(rundir, lane, application, fix):
     i1 = 'I' + str(len(index1)) + i1n
 
     # index2 basemask
+    i2=''
     if read2_len > 0:
         if len(index2) > 0:
             i2 = ',I' + str(len(index2))
         else:
-            i2 = ',n8'
+            i2 = ',n*'
 
-            if fix:
-                for line in lines:
-                    line['index'] = line['index'] + '-NNNNNNNN'
-                
-                with open(samplesheet, 'w') as sheet_file:
-                    sheet_file.write('\n'.join(sheet.unparse()))
+            #if fix:
+            #    for line in lines:
+            #        line['index'] = line['index'] + '-NNNNNNNN'
+            #    
+            #    with open(samplesheet, 'w') as sheet_file:
+            #        sheet_file.write('\n'.join(sheet.unparse()))
 
     click.echo(f'Y151,{i1}{i2},Y151')

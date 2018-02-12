@@ -15,7 +15,7 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-VERSION=4.16.1
+VERSION=4.16.2
 DEMUXDIR=${1?'absolute path to the DEMUX/rundir'}
 EMAIL=clinical-demux@scilifelab.se
 

@@ -83,7 +83,7 @@ RUNDIR=${TMPDIR}/${INDIR}
 # DEMUX #
 #########
 
-BASEMASK=$(demux basemask create --lane ${LANE} --application wgs --fix ${RUNDIR})
+BASEMASK=$(demux basemask create --lane ${LANE} --application wgs ${RUNDIR})
 
 TILES_OPTS=''
 for TILE in ${TILES[@]}; do
