@@ -54,11 +54,14 @@ def create(rundir, lane, application, fix):
 
     # index2 basemask
     i2=''
-    if read2_len > 0:
+    if read2_len == 0:
+        click.echo(f'Y151,{i1},Y151')
+    else:
         if len(index2) > 0:
             i2 = ',I' + str(len(index2))
-        else:
-            i2 = ',n*'
+            click.echo(f'Y151,{i1}{i2},Y151')
+        else: # suggestion from Illumina
+            click.echo('Y*,I*,I*,Y*')
 
             #if fix:
             #    for line in lines:
