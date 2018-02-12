@@ -20,8 +20,7 @@ def basemask():
 @click.argument('rundir')
 @click.option('-l', '--lane', help='lane number')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt', 'miseq']), help='sequencing type')
-@click.option('-f', '--fix', is_flag=True, help='fix the samplesheet. DESTRUCTIVE')
-def create(rundir, lane, application, fix):
+def create(rundir, lane, application):
     """Create a basemask based on SampleSheet.csv and runParameters"""
 
     sheet = None
@@ -53,7 +52,6 @@ def create(rundir, lane, application, fix):
     i1 = 'I' + str(len(index1)) + i1n
 
     # index2 basemask
-    i2=''
     if read2_len == 0:
         click.echo(f'Y151,{i1},Y151')
     else:
@@ -61,13 +59,4 @@ def create(rundir, lane, application, fix):
             i2 = ',I' + str(len(index2))
             click.echo(f'Y151,{i1}{i2},Y151')
         else: # suggestion from Illumina
-            click.echo('Y*,I*,I*,Y*')
-
-            #if fix:
-            #    for line in lines:
-            #        line['index'] = line['index'] + '-NNNNNNNN'
-            #    
-            #    with open(samplesheet, 'w') as sheet_file:
-            #        sheet_file.write('\n'.join(sheet.unparse()))
-
-    click.echo(f'Y151,{i1}{i2},Y151')
+            click.echo("'Y*,I*,I*,Y*'")
