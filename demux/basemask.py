@@ -44,7 +44,7 @@ def create(rundir, lane, application):
     
     # get the inex lengths
     first = lines[0]
-    index1, *_ = first['index'].split('-')
+    index1, *_ = first['index'].replace('+', '-').split('-')
     index2 = _[0] if len(_) > 0 else '' # ok, a bit weird. *_ is a catch all and returns a list.
 
     # index1 basemask
