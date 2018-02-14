@@ -56,9 +56,8 @@ for RUN in ${RAWBASE}/*; do
             mkdir -p ${DEMUX_DIR}/${RUN}/
             PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             ${SCRIPT_DIR}/xdemuxtiles.bash ${RAWBASE}/${RUN} &>> ${PROJECTLOG}
-            if [[ -e ${DEMUX_DIR}/${RUN}/delivery.txt ]]; then
-                rm ${DEMUX_DIR}/${RUN}/delivery.txt
-            fi
+            rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
+            rm -f ${DEMUX_DIR}/${RUN}/delivery.txt
         else
             log "${RUN} is finished and demultiplexing has already started"
         fi
