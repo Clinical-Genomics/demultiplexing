@@ -20,10 +20,15 @@ class SampleSheetParsexception(Exception):
 
 class Line(dict):
 
+    def _reverse_complement(dna):
+        complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+        return ''.join([complement[base] for base in dna[::-1]])
+
     @property
-    def dualindex(self, delim='-'):
-        if 'index2' in self:
-            return self['index'] + delim + self['index2']
+    def dualindex(self, delim='-', revcomp=False):
+        if 'index2' in self and len(self['index2']):
+            index2 = _reverse_complement(self['index2']) if revcomp else self['index2']
+            return self['index'] + delim + index2
         return self['index']
 
 class Samplesheet(object):
@@ -277,9 +282,19 @@ class HiSeqXSamplesheet(Samplesheet):
                     msg = 'Project and SampleName cannot be different!'
                     return (msg, line_nr)
 
-        rs = _validate_project_samplename()
-        if type(rs) is tuple:
-            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+        def _validate_index():
+            for i, line in enumerate(self.lines()):
+                if line['index'] == '':
+                    # add i + 2 as it makes it easier to spot the 'wrong' line
+                    line_nr = i + 2
+                    msg = 'Missing index!'
+                    return (msg, line_nr)
+
+        for rs in [ _validate_index(), _validate_project_samplename() ]:
+            if type(rs) is tuple:
+                raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+
+        return True
 
 
 class MiseqSamplesheet(Samplesheet):
