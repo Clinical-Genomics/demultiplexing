@@ -83,6 +83,11 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
 
     # ... fix some X specifics
     if application == 'wgs':
+        if dualindex:
+             lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name', 'control', 'recipe', 'operator', 'project']
+             for line in raw_samplesheet:
+                 line['index2'] = ''
+
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
 
         # first do some 10X magic, if any
@@ -99,7 +104,7 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
                 new_samplesheet.append(line)
         raw_samplesheet = new_samplesheet
 
-        # do some single index stuff
+        # do some single/dual index stuff
         for i, line in enumerate(raw_samplesheet):
             if not dualindex:
                 index = line['index'].split('-')[0]
@@ -108,7 +113,8 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
                 indexes = line['index'].split('-')
                 if len(indexes) == 2:
                     (index1, index2) = indexes
-                    raw_samplesheet[i]['index'] = '{}-{}'.format(index1, reverse_complement(index2))
+                    raw_samplesheet[i]['index'] = index1
+                    raw_samplesheet[i]['index2'] = reverse_complement(index2)
                 
         click.echo('[Data]')
 
