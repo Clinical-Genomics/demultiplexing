@@ -70,21 +70,7 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
     log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    if ! demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv; then
-        # ok, fetch it from the old place then
-        log "wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv"
-        wget http://tools.scilifelab.se/samplesheet/${FC}.csv -O ${RUNDIR}/SampleSheet.csv
-        # backup
-        cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ori
-        # add the [Data] header
-        echo '[Data]' > ${RUNDIR}/SampleSheet.csv
-        # as we don't know if this is a rerun or an unprocessed run, remove the [Data] header, if any
-        grep -v '^\[Data\]$' ${RUNDIR}/SampleSheet.ori >> ${RUNDIR}/SampleSheet.csv
-        # convert the column headers, remove the second index
-        sed  -i -e 's/Description/SampleName/' -e 's/SampleProject/Project/' -e 's/Index/index/' -e 's/-[ACGT]*,/,/' ${RUNDIR}/SampleSheet.csv
-        # remove empty lines
-        sed -i '/^$/d' ${RUNDIR}/SampleSheet.csv
-    fi
+    demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv
 fi
 
 # validate!
