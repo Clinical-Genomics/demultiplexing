@@ -43,9 +43,8 @@ def create(rundir, lane, application):
     lines = [line for line in sheet.lines_per_column('lane', lane)]
     
     # get the inex lengths
-    first = lines[0]
-    index1, *_ = first['index'].replace('+', '-').split('-')
-    index2 = _[0] if len(_) > 0 else '' # ok, a bit weird. *_ is a catch all and returns a list.
+    index1 = lines[0]['index']
+    index2 = lines[0]['index2'] if 'index2' in lines[0] else ''
 
     # index1 basemask
     i1n = 'n' * (read1_len - len(index1))
@@ -55,8 +54,9 @@ def create(rundir, lane, application):
     if read2_len == 0:
         click.echo(f'Y151,{i1},Y151')
     else:
+        i2n = 'n' * (read2_len - len(index2))
         if len(index2) > 0:
-            i2 = ',I' + str(len(index2))
-            click.echo(f'Y151,{i1}{i2},Y151')
-        else: # suggestion from Illumina
-            click.echo("'Y*,I*,I*,Y*'")
+            i2 = 'I' + str(len(index2)) + i2n
+        else:
+            i2 = i2n
+        click.echo(f'Y151,{i1},{i2},Y151')
