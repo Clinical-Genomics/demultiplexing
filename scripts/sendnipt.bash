@@ -3,7 +3,7 @@
 
 set -ue
 
-VERSION=4.16.7
+VERSION=4.16.8
 echo "Version $VERSION"
 
 ##########
