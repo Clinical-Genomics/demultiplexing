@@ -392,10 +392,10 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     assert lanes_r == expected_lanes
 
 
-def test_miseq_samplesheet():
-    samplesheet = MiseqSamplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv')
-
-    assert samplesheet._get_flowcell() == '000000000-AY7H3'
-
-    with open('tests/fixtures/161129_M03284_0041_000000000-AY7H3/demux_samplesheet.csv') as demux_samplesheet:
-        assert samplesheet.to_demux() == ''.join(demux_samplesheet.readlines()).rstrip('\n')
+#def test_miseq_samplesheet():
+#    samplesheet = MiseqSamplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv')
+#
+#    assert samplesheet._get_flowcell() == '000000000-AY7H3'
+#
+#    with open('tests/fixtures/161129_M03284_0041_000000000-AY7H3/demux_samplesheet.csv') as demux_samplesheet:
+#        assert samplesheet.to_demux() == ''.join(demux_samplesheet.readlines()).rstrip('\n')
