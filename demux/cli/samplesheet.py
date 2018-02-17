@@ -71,7 +71,7 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
     if len(raw_samplesheet) == 0:
-        log.error('No LIMS info found!')
+        log.error('Samplesheet not found in LIMS!')
         sys.exit(1)
 
     # this is how the data is keyed when it gets back from LIMS
