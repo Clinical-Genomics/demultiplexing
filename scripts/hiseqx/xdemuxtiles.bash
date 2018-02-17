@@ -83,7 +83,7 @@ log "Using sample sheet:"
 log_file ${RUNDIR}/SampleSheet.csv
 
 log "Starting overall process"
-lanes=(1)
+lanes=(1 2 3 4 5 6 7 8)
 tiles=('11 12' '21 22')
 DEMUX_JOBIDS=()
 i=0
