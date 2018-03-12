@@ -115,7 +115,8 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
                     (index1, index2) = indexes
                     raw_samplesheet[i]['index'] = index1
                     raw_samplesheet[i]['index2'] = reverse_complement(index2)
-                
+            raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
+
         click.echo('[Data]')
 
     click.echo(delimiter.join(header))
