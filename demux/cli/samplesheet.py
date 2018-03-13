@@ -74,19 +74,22 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
         log.error('Samplesheet not found in LIMS!')
         sys.exit(1)
 
-    # this is how the data is keyed when it gets back from LIMS
-    lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
-
     # ... fix some 2500 specifics
     if application == 'wes':
+        # this is how the data is keyed when it gets back from LIMS
+        lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'description', 'control', 'recipe', 'operator', 'project']
         header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
+        for i, line in enumerate(raw_samplesheet):
+            raw_samplesheet[i]['description'] = line['sample_id']
 
     # ... fix some X specifics
     if application == 'wgs':
         if dualindex:
-             lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name', 'control', 'recipe', 'operator', 'project']
-             for line in raw_samplesheet:
-                 line['index2'] = ''
+            lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name', 'control', 'recipe', 'operator', 'project']
+            for line in raw_samplesheet:
+                line['index2'] = ''
+        else:
+            lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
 
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
 
