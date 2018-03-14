@@ -54,10 +54,11 @@ def demux(samplesheet, application, flowcell):
 @click.argument('flowcell')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
 @click.option('-i', '--dualindex', is_flag=True, default=False, help='force X dual index')
+@click.option('-l', '--indexlength', help='only return this index length')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
-def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
+def fetch(context, flowcell, application, dualindex, indexlength=None, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
     def reverse_complement(dna):
@@ -74,19 +75,28 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
         log.error('Samplesheet not found in LIMS!')
         sys.exit(1)
 
-    # this is how the data is keyed when it gets back from LIMS
-    lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
-
     # ... fix some 2500 specifics
     if application == 'wes':
+        # this is how the data is keyed when it gets back from LIMS
+        lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'description', 'control', 'recipe', 'operator', 'project']
         header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
+
+        # ok, let's iterate over a copy of the sheet as we might remove some elements
+        raw_samplesheet_copy = raw_samplesheet.copy()
+        # ... and let's iterate over the reversed list so we can remove some elements without causing the universe to collapse
+        for i, line in reversed(list(enumerate(raw_samplesheet_copy))):
+            raw_samplesheet[i]['description'] = line['sample_id']
+            if indexlength and len(line['index'].replace('-','')) != int(indexlength):
+                del raw_samplesheet[i]
 
     # ... fix some X specifics
     if application == 'wgs':
         if dualindex:
-             lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name', 'control', 'recipe', 'operator', 'project']
-             for line in raw_samplesheet:
-                 line['index2'] = ''
+            lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name', 'control', 'recipe', 'operator', 'project']
+            for line in raw_samplesheet:
+                line['index2'] = ''
+        else:
+            lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'sample_name', 'control', 'recipe', 'operator', 'project']
 
         header = [ Samplesheet.header_map[head] for head in lims_keys ]
 
@@ -122,7 +132,7 @@ def fetch(context, flowcell, application, dualindex, delimiter=',', end='\n'):
     click.echo(delimiter.join(header))
     for line in raw_samplesheet:
         # fix the project content
-        project = get_project(line['project']) 
+        project = get_project(line['project'])
         line['project'] = project
         line['sample_name'] = project
 
