@@ -22,6 +22,13 @@ for RUNDIR in ${INDIR}/*; do
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
+            if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
+                echo [${NOW}] ${RUN} fetching samplesheet.csv
+                FC=${RUN%%*_}
+                FC=${FC:1}
+                demux sheet fetch -a wes ${FC} > ${RUNDIR}/SampleSheet.csv
+                cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
+            fi
             echo [${NOW}] ${RUN} starting demultiplexing
             bash /home/hiseq.clinical/SCRIPTS/demux.bash ${RUNDIR} ${DEMUXDIR}
             rm ${DEMUXDIR}/copycomplete.txt
