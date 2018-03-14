@@ -5,7 +5,7 @@
 
 set -eu -o pipefail
 
-VERSION=4.18.3
+VERSION=4.19.0
 
 ##########
 # PARAMS #
