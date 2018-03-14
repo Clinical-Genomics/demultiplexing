@@ -5,7 +5,14 @@
 
 set -eu -o pipefail
 
+<<<<<<< Updated upstream
 VERSION=4.19.0
+=======
+shopt -s expand_aliases
+. ~/.bashrc
+
+VERSION=4.14.4
+>>>>>>> Stashed changes
 
 ##########
 # PARAMS #
@@ -14,9 +21,7 @@ VERSION=4.19.0
 BASE=${1?'please provide a run dir'}
 
 EMAIL=kenny.billiau@scilifelab.se
-DEMUX_DIR=/home/clinical/DEMUX/
-DEST_SERVER=rastapopoulos
-DEST_DIR=/mnt/hds/proj/bioinfo/DEMUX/
+DEMUX_DIR=/home/hiseq.clinical/NIPT_DEMUX/
 
 SCRIPT_DIR=$(dirname $0)
 RUN=$(basename ${BASE})
@@ -43,11 +48,19 @@ trap failed ERR
 # MAIN #
 ########
 
-cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-log "/home/clinical/SCRIPTS/massagenipt.py ${BASE}/SampleSheet.csv nuru > ${BASE}/SampleSheet.mas"
-/home/clinical/SCRIPTS/massagenipt.py ${BASE}/SampleSheet.csv nuru > ${BASE}/SampleSheet.mas
+mkdir -p ${DEMUX_DIR}/${RUN}
+
+cp ${BASE}/SampleSheet.ori ${BASE}/SampleSheet.csv
+if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
+    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+fi
+sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
+
+log "demux sheet demux -a nipt ${BASE}/SampleSheet.csv > ${BASE}/SampleSheet.mas"
+demux sheet demux -a nipt ${BASE}/SampleSheet.csv > ${BASE}/SampleSheet.mas
 mv ${BASE}/SampleSheet.mas ${BASE}/SampleSheet.csv
 cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/
 
-log "bash ${SCRIPT_DIR}/demux.v5.bash ${BASE}"
-bash ${SCRIPT_DIR}/demux.v5.bash ${BASE}
+log "bash ${SCRIPT_DIR}/demux.bash ${BASE} ${DEMUX_DIR}"
+bash ${SCRIPT_DIR}/demux.bash ${BASE} ${DEMUX_DIR}
+
