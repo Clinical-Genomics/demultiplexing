@@ -12,7 +12,7 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-VERSION=4.19.0
+VERSION=4.20.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
 
