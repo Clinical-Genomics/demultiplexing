@@ -1,6 +1,8 @@
 #!/bin/bash
 
 shopt -s nullglob
+shopt -s expand_aliases
+source ~/.aliases
 
 INDIR=${1?'please provide a run dur'}
 DEMUXDIR=${2?'please provide a demux dir'}
@@ -24,7 +26,7 @@ for RUNDIR in ${INDIR}/*; do
             fi
             if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
-                FC=${RUN%%*_}
+                FC=${RUN##*_}
                 FC=${FC:1}
                 demux sheet fetch -a wes ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
