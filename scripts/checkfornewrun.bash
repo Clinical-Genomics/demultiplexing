@@ -28,7 +28,7 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                demux sheet fetch -a wes ${FC} > ${RUNDIR}/SampleSheet.csv
+                demux sheet fetch --application wes --longestindex ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
