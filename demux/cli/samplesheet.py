@@ -83,7 +83,7 @@ def fetch(context, flowcell, application, dualindex, indexlength=None, delimiter
 
         # ok, let's iterate over a copy of the sheet as we might remove some elements
         raw_samplesheet_copy = raw_samplesheet.copy()
-        # ... and let's iterate over the reversed list so we can remove some elements without causing the universe to collapse
+        # ... and let's iterate over the list in reverse so we can remove some elements without causing the universe to collapse
         for i, line in reversed(list(enumerate(raw_samplesheet_copy))):
             raw_samplesheet[i]['description'] = line['sample_id']
             if indexlength and len(line['index'].replace('-','')) != int(indexlength):
