@@ -53,12 +53,13 @@ def demux(samplesheet, application, flowcell):
 @sheet.command()
 @click.argument('flowcell')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
-@click.option('-i', '--dualindex', is_flag=True, default=False, help='force X dual index')
-@click.option('-l', '--indexlength', help='only return this index length')
+@click.option('-i', '--dualindex', is_flag=True, default=False, help='X: force dual index')
+@click.option('-l', '--indexlength', default=None, help='2500: only return this index length')
+@click.option('-L', '--longestindex', is_flag=True, help='2500: only return longest index')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
-def fetch(context, flowcell, application, dualindex, indexlength=None, delimiter=',', end='\n'):
+def fetch(context, flowcell, application, dualindex, indexlength, longestindex, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
     def reverse_complement(dna):
@@ -74,6 +75,12 @@ def fetch(context, flowcell, application, dualindex, indexlength=None, delimiter
     if len(raw_samplesheet) == 0:
         log.error('Samplesheet not found in LIMS!')
         sys.exit(1)
+    if longestindex:
+        longestindex_len = 0
+        for line in raw_samplesheet:
+            longestindex_len = len(line['index'].replace('-', '')) \
+                if len(line['index'].replace('-', '')) > longestindex_len else longestindex_len
+        indexlength = longestindex_len # longestindex overwrites indexlength
 
     # ... fix some 2500 specifics
     if application == 'wes':
@@ -88,7 +95,7 @@ def fetch(context, flowcell, application, dualindex, indexlength=None, delimiter
             raw_samplesheet[i]['description'] = line['sample_id']
             if indexlength and len(line['index'].replace('-','')) != int(indexlength):
                 del raw_samplesheet[i]
-
+                
     # ... fix some X specifics
     if application == 'wgs':
         if dualindex:
