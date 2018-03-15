@@ -6,7 +6,7 @@
 set -eu -o pipefail
 
 <<<<<<< Updated upstream
-VERSION=4.20.1
+VERSION=4.21.0
 =======
 shopt -s expand_aliases
 . ~/.bashrc
