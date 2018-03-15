@@ -1,8 +1,10 @@
 #!/bin/bash
 # script to rsync a run to the NIPT server
 
-set -eu
 shopt -s nullglob
+shopt -s expand_aliases
+source ~/.aliases
+set -eu
 
 VERSION=4.20.0
 echo "Version $VERSION"
