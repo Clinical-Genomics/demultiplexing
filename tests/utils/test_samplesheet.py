@@ -215,6 +215,13 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
     assert lines_r == expectes_lines_r
 
 
+def test_nipt_faulty_samplesheet():
+    samplesheet = NIPTSamplesheet('tests/fixtures/nipt_faulty_samplesheet.csv')
+
+    with pytest.raises(SampleSheetValidationException):
+        samplesheet.validate()
+
+
 def test_x_samplesheet():
     samplesheet = Samplesheet('tests/fixtures/x_samplesheet.csv')
 
