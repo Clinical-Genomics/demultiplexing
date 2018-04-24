@@ -246,7 +246,7 @@ class Samplesheet(object):
 
         def _validate_sample_name(samplesheet):
             for i, line in enumerate(samplesheet):
-                forbidden_chars = set(' _')
+                forbidden_chars = set(' ')
                 if any((c in forbidden_chars) for c in line['sample_id']):
                     return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
 
