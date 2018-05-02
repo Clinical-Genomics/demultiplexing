@@ -126,6 +126,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longestindex, 
             if not dualindex:
                 index = line['index'].split('-')[0]
                 raw_samplesheet[i]['index'] = index
+                raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], index)
             else:
                 ori_index = line['index']
                 indexes = ori_index.split('-')
@@ -133,7 +134,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longestindex, 
                     (index1, index2) = indexes
                     raw_samplesheet[i]['index'] = index1
                     raw_samplesheet[i]['index2'] = reverse_complement(index2)
-            raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], ori_index)
+                    raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], ori_index)
 
         click.echo('[Data]')
 
