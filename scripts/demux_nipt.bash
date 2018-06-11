@@ -4,15 +4,10 @@
 #   under $UNALIGNEDBASE
 
 set -eu -o pipefail
-
-<<<<<<< Updated upstream
-VERSION=4.21.0
-=======
 shopt -s expand_aliases
 . ~/.bashrc
 
-VERSION=4.14.4
->>>>>>> Stashed changes
+VERSION=4.21.0
 
 ##########
 # PARAMS #
