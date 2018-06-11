@@ -244,6 +244,12 @@ class Samplesheet(object):
 
             return True
 
+        def _validate_sample_name(samplesheet):
+            for i, line in enumerate(samplesheet):
+                forbidden_chars = set(' ')
+                if any((c in forbidden_chars) for c in line['sample_id']):
+                    return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
+
         rs = _validate_uniq_index(self.samplesheet)
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
@@ -254,6 +260,9 @@ class Samplesheet(object):
             if type(rs) is tuple:
                 raise SampleSheetValidationException(section_marker, rs[1], rs[0])
 
+        rs = _validate_sample_name(self.samplesheet)
+        if type(rs) is tuple:
+            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         return True
 

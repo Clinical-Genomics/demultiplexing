@@ -37,7 +37,7 @@ setup(
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
     # see http://packaging.python.org/en/latest/tutorial.html#version
-    version='4.21.0',
+    version='4.22.2',
     description='Scripts and API handling demultiplexing',
     long_description=long_description,
     # What does your project relate to? Separate with spaces.
@@ -79,6 +79,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.6',
 
         'Environment :: Console',
     ],
