@@ -9,14 +9,18 @@
 #SBATCH -o /mnt/hds/proj/bioinfo/LOG/undetermined-%j.out
 
 VERSION=4.22.2
-RUNDIR=$1
-LANE=$2
+RUNDIR=${1?'please provide a demuxdir'}
+LANE=${2?'please provide a lane number'}
 
 LOGDIR=${RUNDIR}/LOG/
+INDIR="${TMPDIR}/${RUNDIR}/l${LANE}t*/"
 [[ ! -e ${LOGDIR} ]] && mkdir ${LOGDIR}
 
-echo "zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
-zgrep ^@ST ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
+# copy with parent to avoid overwriting files
+cp --parent ${RUNDIR}/l${LANE}t*/Undetermined*R1*.fastq.gz ${TMPDIR}/
+
+echo "zgrep ^@ST ${INDIR}/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> $LOGDIR/${LANE}.index.stats.txt"
+zgrep ^@ST ${INDIR}/Undetermined*R1*.fastq.gz | cut -d: -f 11 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
 
 # following line calcs undetermined for HiSeq2500
 #zgrep ^@HISEQ ${RUNDIR}/Unaligned5/Undetermined_indices/Sample_lane${LANE}/*R1*.fastq.gz | cut -d: -f 10 | sort | uniq -c | sort -nr >> ${LOGDIR}/${LANE}.index.stats.txt
