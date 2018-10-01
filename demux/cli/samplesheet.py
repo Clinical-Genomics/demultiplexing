@@ -92,6 +92,8 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
 
         raw_samplesheet = [ line for line in raw_samplesheet if indexlength and len(line['index'].replace('-','')) == int(indexlength) ]
+        for line in raw_samplesheet:
+            line['description'] = line['sample_id']
 
     # ... fix some X specifics
     if application == 'wgs':
