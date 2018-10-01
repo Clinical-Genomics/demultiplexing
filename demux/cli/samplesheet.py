@@ -55,11 +55,12 @@ def demux(samplesheet, application, flowcell):
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
 @click.option('-i', '--dualindex', is_flag=True, default=False, help='X: force dual index')
 @click.option('-l', '--indexlength', default=None, help='2500: only return this index length')
-@click.option('-L', '--longestindex', is_flag=True, help='2500: only return longest index')
+@click.option('-L', '--longest', is_flag=True, help='2500: only return longest index')
+@click.option('-S', '--shortest', is_flag=True, help='2500: only return shortest index')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
-def fetch(context, flowcell, application, dualindex, indexlength, longestindex, delimiter=',', end='\n'):
+def fetch(context, flowcell, application, dualindex, indexlength, longest, shortest, delimiter=',', end='\n'):
     """Fetch a samplesheet from LIMS"""
 
     def reverse_complement(dna):
@@ -73,14 +74,16 @@ def fetch(context, flowcell, application, dualindex, indexlength, longestindex, 
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
     if len(raw_samplesheet) == 0:
-        log.error('Samplesheet not found in LIMS!')
-        sys.exit(1)
-    if longestindex:
-        longestindex_len = 0
-        for line in raw_samplesheet:
-            longestindex_len = len(line['index'].replace('-', '')) \
-                if len(line['index'].replace('-', '')) > longestindex_len else longestindex_len
-        indexlength = longestindex_len # longestindex overwrites indexlength
+        click.echo('Samplesheet not found in LIMS!', color=RED)
+        context.abort()
+
+    if longest:
+        longest_row = max(raw_samplesheet, key=lambda x:len(x['index'].replace('-', '')))
+        indexlength = len(longest_row['index'].replace('-', ''))
+
+    if shortest:
+        shortest_row = min(raw_samplesheet, key=lambda x:len(x['index'].replace('-', '')))
+        indexlength = len(shortest_row['index'].replace('-', ''))
 
     # ... fix some 2500 specifics
     if application == 'wes':
@@ -88,14 +91,10 @@ def fetch(context, flowcell, application, dualindex, indexlength, longestindex, 
         lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'description', 'control', 'recipe', 'operator', 'project']
         header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
 
-        # ok, let's iterate over a copy of the sheet as we might remove some elements
-        raw_samplesheet_copy = raw_samplesheet.copy()
-        # ... and let's iterate over the list in reverse so we can remove some elements without causing the universe to collapse
-        for i, line in reversed(list(enumerate(raw_samplesheet_copy))):
-            raw_samplesheet[i]['description'] = line['sample_id']
-            if indexlength and len(line['index'].replace('-','')) != int(indexlength):
-                del raw_samplesheet[i]
-                
+        raw_samplesheet = [ line for line in raw_samplesheet if indexlength and len(line['index'].replace('-','')) == int(indexlength) ]
+        for line in raw_samplesheet:
+            line['description'] = line['sample_id']
+
     # ... fix some X specifics
     if application == 'wgs':
         if dualindex:
@@ -136,6 +135,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longestindex, 
                     raw_samplesheet[i]['index2'] = reverse_complement(index2)
                     raw_samplesheet[i]['sample_id'] = '{}_{}'.format(line['sample_id'], ori_index)
 
+        # add [section] header
         click.echo('[Data]')
 
     click.echo(delimiter.join(header))
