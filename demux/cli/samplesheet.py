@@ -74,7 +74,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
     if len(raw_samplesheet) == 0:
-        click.echo('Samplesheet not found in LIMS!', color=RED)
+        click.echo(click.style('Samplesheet not found in LIMS!', fg='red'))
         context.abort()
 
     if longest:
