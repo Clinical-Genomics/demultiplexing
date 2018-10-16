@@ -1,7 +1,4 @@
-#!/bin/bash
-#   usage: demux.bash <absolute-path-to-run-dir>
-#   The output i.e. Unaligned dir will be created 
-#   under $DEMUX_DIR
+#!/usr/bin/env bash
 
 set -eu -o pipefail
 
@@ -20,6 +17,10 @@ DEMUX_DIR=${2?'please provide a demux dir'}
 
 RUN=$(basename ${BASE})
 RUN_DIR=$(dirname ${BASE})
+OUT_DIR=${DEMUX_DIR}/${RUN}
+UNALIGNED_DIR=Unaligned
+
+BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
 
 #############
 # FUNCTIONS #
@@ -30,54 +31,28 @@ log() {
     echo "[$NOW] $@"
 }
 
-###########
-# PREMAIN #
-###########
-
-# transform SampleSheet from Mac to Unix
-if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
-    cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-    if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
-        sed -i 's//\n/g' ${BASE}/SampleSheet.csv
-    fi
-    sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
-fi
-
 ########
 # MAIN #
 ########
 
 # init
-mkdir -p ${DEMUX_DIR}/${RUN}
+mkdir -p ${OUT_DIR}
 
 # log the version
-/usr/local/bcl2fastq2/bin/bcl2fastq --version
+${BCL2FASTQ_BIN} --version
 
 # here we go!
 log "Here we go!"
 
-echo $(get_basemask ${BASE})
-BASEMASK=$(get_basemask ${BASE})
-UNALDIR=Unaligned-${BASEMASK//,}
+BASEMASK=$Y151,I8,I10,Y151
+echo ${BASEMASK}
 
 # DEMUX !
-log "/usr/local/bcl2fastq2/bin/bcl2fastq --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir /demux/180619_A00187_0036_BHFM5JDMXX_dual8 --use-bases-mask Y151,I8NNNNNNNNN,I8,Y147 --sample-sheet HFM5JDMXX-samplesheet.csv"
+log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${INDIR}/SampleSheet.csv"
+${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${INDIR}/SampleSheet.csv
 
-# Add stats
-log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/"
-cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECTLOG}
+log "rm -f ${OUT_DIR}/copycomplete.txt"
+rm -f ${OUT_DIR}/copycomplete.txt
 
-# create stats files
-FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${DEMUX_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
-for PROJ in ${PROJs[@]}; do
-    prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt"
-    cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
-done
-
-log "rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt"
-rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
-
-log "date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
-date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
+log "date > ${OUT_DIR}/demuxcomplete.txt"
+date > ${OUT_DIR}/demuxcomplete.txt
