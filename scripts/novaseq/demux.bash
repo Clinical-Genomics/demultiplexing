@@ -17,11 +17,9 @@ VERSION=4.23.0
 
 BASE=${1?'please provide a run dir'}
 DEMUX_DIR=${2?'please provide a demux dir'}
-EMAIL=clinical-demux@scilifelab.se
 
 RUN=$(basename ${BASE})
 RUN_DIR=$(dirname ${BASE})
-PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
 
 #############
 # FUNCTIONS #
@@ -29,15 +27,8 @@ PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
 
 log() {
     local NOW=$(date +"%Y%m%d%H%M%S")
-    # the weird sed command converts control chars to the string representation
     echo "[$NOW] $@"
-    echo "[$NOW] $@" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
 }
-
-failed() {
-    cat ${PROJECTLOG} | mail -s "ERROR demux $(hostname):${RUN}" ${EMAIL}
-}
-trap failed ERR
 
 ###########
 # PREMAIN #
@@ -58,27 +49,21 @@ fi
 
 # init
 mkdir -p ${DEMUX_DIR}/${RUN}
-log "${PROJECTLOG} created by $0 $VERSION"
-date > ${BASE}/demuxstarted.txt
-cp ${BASE}/SampleSheet.csv ${DEMUX_DIR}/${RUN}/
+
+# log the version
+/usr/local/bcl2fastq2/bin/bcl2fastq --version
 
 # here we go!
-log "Setup correct, starts demuxing . . ."
+log "Here we go!"
 
 echo $(get_basemask ${BASE})
 BASEMASK=$(get_basemask ${BASE})
 UNALDIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR}"
-# the sed command is there to remove the color codes out of the demux output and create a pretty log file
-/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
-
-cd ${DEMUX_DIR}/${RUN}/${UNALDIR}
-nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1
+log "/usr/local/bcl2fastq2/bin/bcl2fastq --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir /demux/180619_A00187_0036_BHFM5JDMXX_dual8 --use-bases-mask Y151,I8NNNNNNNNN,I8,Y147 --sample-sheet HFM5JDMXX-samplesheet.csv"
 
 # Add stats
-
 log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/"
 cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECTLOG}
 
