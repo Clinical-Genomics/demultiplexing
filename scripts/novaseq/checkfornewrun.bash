@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u
+
 shopt -s nullglob
 shopt -s expand_aliases
 source ~/.aliases
@@ -53,12 +55,12 @@ for RUNDIR in ${INDIR}/*; do
             mkdir -p ${DEMUX_DIR}/${RUN}/
             PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUNDIR} ${DEMUX_DIR} &>> ${PROJECTLOG}"
-            #bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUNDIR} ${DEMUX_DIR} &>> ${PROJECTLOG}
+            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUNDIR} ${DEMUX_DIR} &>> ${PROJECTLOG}
 
-            log "rm -f ${DEMUX_DIR}/copycomplete.txt"
-            rm -f ${DEMUX_DIR}/copycomplete.txt
-            log "date > ${OUT_DIR}/demuxcomplete.txt"
-            date > ${OUT_DIR}/demuxcomplete.txt
+            log "rm -f ${DEMUX_DIR}/${RUN}copycomplete.txt"
+            rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
+            log "date +'%Y%m%d%H%M%S' > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
+            date +'%Y%m%d%H%M%S' > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
         else
             log "${RUN} is finished and demultiplexing has already started"
         fi
