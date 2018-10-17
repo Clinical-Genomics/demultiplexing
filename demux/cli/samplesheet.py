@@ -162,7 +162,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
             flowcell_id = raw_samplesheet[0]['fcid']
 
             for lane in lanes:
-                sample_indexes = [f"{sample['index']}" for sample in raw_samplesheet if sample['lane'] == lane]
+                sample_indexes = [sample['index'] for sample in raw_samplesheet if sample['lane'] == lane]
                 for name, dummy_index in dummy_samples:
                     if not(any(sample_index.startswith(dummy_index) for sample_index in sample_indexes)):
                         add_dummy_sample = {'control': 'N',
