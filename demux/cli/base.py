@@ -8,13 +8,13 @@ from ..basemask import basemask
 
 log = logging.getLogger(__name__)
 
-__version__ = '3.42.7'
+__version__ = '4.23.0'
 
 
 @click.group()
 @click.option('-l', '--log-level', default='INFO', envvar='LOGLEVEL')
 @click.option('-c', '--config', type=click.File('r'))
-@click.version_option(version=__version__, prog_name="deliver")
+@click.version_option(version=__version__, prog_name="demux")
 @click.pass_context
 def demux(context, log_level, config):
     """Making demuxing easier!"""
