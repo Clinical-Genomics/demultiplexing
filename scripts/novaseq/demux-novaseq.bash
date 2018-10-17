@@ -55,6 +55,7 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
 
     PROJECT=$(basename ${PROJECT_DIR})
     if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
+    if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
 
     for SAMPLE_DIR in ${PROJECT_DIR}/*; do
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
