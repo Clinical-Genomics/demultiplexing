@@ -45,15 +45,17 @@ for RUN_DIR in ${IN_DIR}/*; do
 
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
+            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
+            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
+
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application all ${FC} > ${RUN_DIR}/SampleSheet.csv"
                 demux sheet fetch --application all ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
-            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
-            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p ${DEMUXES_DIR}/${RUN}/
+
             PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
