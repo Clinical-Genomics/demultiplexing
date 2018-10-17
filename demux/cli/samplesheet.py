@@ -207,4 +207,3 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         # print it!
         click.echo(delimiter.join([str(line[head]) for head in lims_keys]))
-    # import ipdb; ipdb.set_trace()
