@@ -51,8 +51,4 @@ echo ${BASEMASK}
 log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${INDIR}/SampleSheet.csv"
 ${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${INDIR}/SampleSheet.csv
 
-log "rm -f ${OUT_DIR}/copycomplete.txt"
-rm -f ${OUT_DIR}/copycomplete.txt
-
-log "date > ${OUT_DIR}/demuxcomplete.txt"
-date > ${OUT_DIR}/demuxcomplete.txt
+# Need to add stats code here :)
