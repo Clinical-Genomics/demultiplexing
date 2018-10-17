@@ -51,6 +51,11 @@ ${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3
 FC=${RUN##*_}
 FC=${FC:1}
 for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
+    if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
+
+    PROJECT=$(basename ${PROJECT_DIR})
+    if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
+
     for SAMPLE_DIR in ${PROJECT_DIR}/*; do
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
             FASTQ=$(basename ${FASTQ_FILE})
@@ -63,7 +68,6 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
         mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
     done
 
-    PROJECT=$(basename ${PROJECT_DIR})
     log "mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
     mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
