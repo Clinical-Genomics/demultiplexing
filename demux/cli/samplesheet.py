@@ -4,6 +4,8 @@ import sys
 import click
 import logging
 import copy
+import csv
+import os
 
 from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
@@ -52,11 +54,12 @@ def demux(samplesheet, application, flowcell):
 
 @sheet.command()
 @click.argument('flowcell')
-@click.option('-a', '--application', type=click.Choice(['wgs', 'wes']), help='application type')
-@click.option('-i', '--dualindex', is_flag=True, default=False, help='X: force dual index')
-@click.option('-l', '--indexlength', default=None, help='2500: only return this index length')
-@click.option('-L', '--longest', is_flag=True, help='2500: only return longest index')
-@click.option('-S', '--shortest', is_flag=True, help='2500: only return shortest index')
+@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nova']), help='application type')
+@click.option('-i', '--dualindex', is_flag=True, default=False, help='X: force dual index, not used \
+              for NovaSeq!')
+@click.option('-l', '--indexlength', default=None, help='2500 and NovaSeq: only return this index length')
+@click.option('-L', '--longest', is_flag=True, help='2500 and NovaSeq: only return longest index')
+@click.option('-S', '--shortest', is_flag=True, help='2500 and NovaSeq: only return shortest index')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
 @click.pass_context
@@ -138,6 +141,63 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         # add [section] header
         click.echo('[Data]')
 
+    if application == 'nova':
+        if dualindex:
+            click.echo(click.style(f"No need to specify dual or single index for NovaSeq sample "
+                                   f"sheets, please use --shortest, --longest, or --indexlength "
+                                   f"only!", fg='red'))
+            context.abort()
+
+        lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
+                     'control', 'recipe', 'operator', 'project']
+        header = [Samplesheet.header_map[head] for head in lims_keys]
+
+        path = os.path.abspath(__file__)
+        dir_path = os.path.dirname(path)
+        with open(f"{dir_path}/../../files/20181012_Indices.csv") as csv_file:
+            dummy_samples_csv = csv.reader(csv_file, delimiter=',')
+            dummy_samples = [row for row in dummy_samples_csv]
+            added_dummy_samples = []
+            lanes = set([flowcell['lane'] for flowcell in raw_samplesheet])
+            flowcell_id = raw_samplesheet[0]['fcid']
+
+            for lane in lanes:
+                sample_indexes = [f"{sample['index']}" for sample in raw_samplesheet if sample['lane'] == lane]
+                for name, dummy_index in dummy_samples:
+                    if not(any(sample_index.startswith(dummy_index) for sample_index in sample_indexes)):
+                        add_dummy_sample = {'control': 'N',
+                                            'description': '',
+                                            'fcid': flowcell_id,
+                                            'index': dummy_index,
+                                            'index2': '',
+                                            'lane': lane,
+                                            'operator': 'script',
+                                            'project': 'indexcheck',
+                                            'recipe': 'R1',
+                                            'sample_id': name,
+                                            'sample_name': 'indexcheck',
+                                            'sample_ref': 'hg19'}
+
+                        added_dummy_samples.append(add_dummy_sample)
+
+            raw_samplesheet.extend(added_dummy_samples)
+
+        if indexlength:
+            raw_samplesheet = [line for line in raw_samplesheet if indexlength and
+                               len(line['index'].replace('-', '')) == int(indexlength)]
+
+        for line in raw_samplesheet:
+            if '-' in line['index']:
+                index1 = line['index'].split('-')[0]
+                index2 = line['index'].split('-')[1]
+                line['index'] = index1
+                line['index2'] = index2
+            else:
+                line['index2'] = ''
+
+        # add [section] header
+        click.echo('[Data]')
+
     click.echo(delimiter.join(header))
     for line in raw_samplesheet:
         # fix the project content
@@ -147,3 +207,4 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         # print it!
         click.echo(delimiter.join([str(line[head]) for head in lims_keys]))
+    # import ipdb; ipdb.set_trace()
