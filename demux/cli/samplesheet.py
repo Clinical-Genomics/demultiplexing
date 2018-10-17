@@ -188,7 +188,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         for line in raw_samplesheet:
             if '-' in line['index']:
                 index1 = line['index'].split('-')[0]
-                index2 = line['index'].split('-')[1]
+                index1, index2 = line['index'].split('-')
                 line['index'] = index1
                 line['index2'] = index2
             else:
