@@ -41,10 +41,10 @@ mkdir -p ${OUT_DIR}
 # log the version
 ${BCL2FASTQ_BIN} --version
 
-# here we go!
+# Here we go!
 log "Here we go!"
 
-BASEMASK=$Y151,I8,I10,Y151
+BASEMASK=Y151,I8,I10,Y151
 echo ${BASEMASK}
 
 # DEMUX !
