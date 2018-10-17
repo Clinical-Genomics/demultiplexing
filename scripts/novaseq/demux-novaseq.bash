@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 
-set -eu -o pipefail
+set -eu
 
 shopt -s expand_aliases
 source $HOME/.bashrc
-source $HOME/SCRIPTS/demux.functions
-
-VERSION=4.23.0
 
 ##########
 # PARAMS #
 ##########
 
 IN_DIR=${1?'please provide a run dir'}
-DEMUX_DIR=${2?'please provide a demux dir'}
+DEMUXES_DIR=${2?'please provide the demuxes dir'}
 
 RUN=$(basename ${IN_DIR})
-RUN_DIR=$(dirname ${IN_DIR})
-OUT_DIR=${DEMUX_DIR}/${RUN}
+OUT_DIR=${DEMUXES_DIR}/${RUN}
 
 BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
 
@@ -38,6 +34,7 @@ log() {
 mkdir -p ${OUT_DIR}
 
 # log the version
+demux --version
 ${BCL2FASTQ_BIN} --version
 
 # Here we go!
