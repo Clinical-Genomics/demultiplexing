@@ -13,7 +13,7 @@ source ~/.aliases
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
-#EMAIL=clinical-demux@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 EMAIL=kenny.billiau@scilifelab.se
 
 #############
@@ -49,8 +49,8 @@ for RUN_DIR in ${IN_DIR}/*; do
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
-                log "demux sheet fetch --application all ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application all ${FC} > ${RUN_DIR}/SampleSheet.csv
+                log "demux sheet fetch --application nova ${FC} > ${RUN_DIR}/SampleSheet.csv"
+                demux sheet fetch --application nova ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
