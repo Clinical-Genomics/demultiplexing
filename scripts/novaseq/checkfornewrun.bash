@@ -14,7 +14,6 @@ IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
 EMAIL=clinical-demux@scilifelab.se
-#EMAIL=kenny.billiau@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -33,6 +32,11 @@ trap failed ERR
 ########
 # MAIN #
 ########
+
+if pgrep bcl2fastq; then
+    log "an instance of bcl2fastq is already running -- skipping"
+    exit 0
+fi
 
 for RUN_DIR in ${IN_DIR}/*; do
     if [[ ! -d ${RUN_DIR} ]]; then
