@@ -174,7 +174,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                                             'operator': 'script',
                                             'project': 'indexcheck',
                                             'recipe': 'R1',
-                                            'sample_id': name,
+                                            'sample_id': name.replace(' ', '-').replace('(', '-').replace(')', '-'),
                                             'sample_name': 'indexcheck',
                                             'sample_ref': 'hg19'}
 
