@@ -46,6 +46,7 @@ for RUN_DIR in ${IN_DIR}/*; do
     RUN=$(basename ${RUN_DIR})
     FC=${RUN##*_}
     FC=${FC:1}
+    PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
@@ -53,21 +54,22 @@ for RUN_DIR in ${IN_DIR}/*; do
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
-                log "demux sheet fetch --application nova ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova ${FC} > ${RUN_DIR}/SampleSheet.csv
+                log "demux sheet fetch --application nova --shortest ${FC} > ${RUN_DIR}/SampleSheet.csv"
+                demux sheet fetch --application nova --shortest ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p ${DEMUXES_DIR}/${RUN}/
 
-            PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
 
-            log "rm -f ${DEMUXES_DIR}/${RUN}copycomplete.txt"
-            rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
-            log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
-            date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
+            if [[ $? == 0 ]]; then
+                log "rm -f ${DEMUXES_DIR}/${RUN}copycomplete.txt"
+                rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
+                log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
+                date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
+            fi
         else
             log "${RUN} is finished and demultiplexing has already started"
         fi
