@@ -74,3 +74,12 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
 done
 
 # Need to add stats code here :)
+log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
+cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
+
+PROJECTS=$(ls ${OUT_DIR}/${UNALIGNED_DIR}/ | grep Project_)
+for PROJECT_DIR in ${PROJECTS[@]}; do
+    PROJECT=$(echo ${PROJECT_DIR} | sed 's/Project_//')
+    log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
+    cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
+done
