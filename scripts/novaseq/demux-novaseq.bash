@@ -41,15 +41,15 @@ ${BCL2FASTQ_BIN} --version
 # Here we go!
 log "Here we go!"
 
-BASEMASK=Y151,I8,N10,Y151
+BASEMASK=Y151,I8,I8,Y151
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
-
-# add samplesheet to unaligned folder
-cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
 # DEMUX !
 log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 0"
 ${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 0
+
+# add samplesheet to unaligned folder
+cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
 # Restructure the output dir!
 FC=${RUN##*_}
@@ -60,6 +60,7 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     PROJECT=$(basename ${PROJECT_DIR})
     if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
     if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
+    if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
 
     for SAMPLE_DIR in ${PROJECT_DIR}/*; do
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
@@ -83,7 +84,7 @@ cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
 
 PROJECTS=$(ls ${OUT_DIR}/${UNALIGNED_DIR}/ | grep Project_)
 for PROJECT_DIR in ${PROJECTS[@]}; do
-    PROJECT=$(echo ${PROJECT_DIR} | sed 's/Project_//')
+    PROJECT=${PROJECT_DIR##*_}
     log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
     cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
 done

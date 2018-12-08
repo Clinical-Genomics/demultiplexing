@@ -65,7 +65,7 @@ for RUN_DIR in ${IN_DIR}/*; do
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
 
             if [[ $? == 0 ]]; then
-                log "rm -f ${DEMUXES_DIR}/${RUN}copycomplete.txt"
+                log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
                 rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
                 date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
