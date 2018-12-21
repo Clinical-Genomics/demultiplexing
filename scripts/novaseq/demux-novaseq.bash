@@ -61,7 +61,10 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
     if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
     if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
-    if [[ ${PROJECT} == 'indexcheck' ]]; then mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}; fi
+    if [[ ${PROJECT} == 'indexcheck' ]]; then
+        mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+        continue
+    fi
 
     for SAMPLE_DIR in ${PROJECT_DIR}/*; do
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
