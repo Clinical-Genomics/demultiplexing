@@ -12,6 +12,8 @@ VERSION=3.4.3
 INDIR=${1-/home/clinical/DEMUX/}
 TARGET_SERVER=${2-rastapopoulos.scilifelab.se}
 TARGET_DIR=${3-/mnt/hds/proj/bioinfo/DEMUX/}
+TARGET_SERVER_HASTA=hasta.scilifelab.se
+TARGET_DIR_HASTA=/home/proj/demultiplexed-runs/
 EMAILS=${4-}
 
 #############
@@ -48,9 +50,11 @@ for RUNDIR in ${INDIR}/*; do
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
         log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
-        log "rsync -a --checksum ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
+        rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR} &
+        rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:{$TARGET_DIR_HASTA}
+        #log "rsync -a --checksum ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
+        #rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
+        #rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
         log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
         ssh ${TARGET_SERVER} "rm -f ${TARGET_DIR}/${RUN}/delivery.txt"
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
