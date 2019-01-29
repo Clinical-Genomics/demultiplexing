@@ -52,9 +52,6 @@ for RUNDIR in ${INDIR}/*; do
         log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
         rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR} &
         rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:{$TARGET_DIR_HASTA}
-        #log "rsync -a --checksum ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        #rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
-        #rsync -a --checksum --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
         log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
         ssh ${TARGET_SERVER} "rm -f ${TARGET_DIR}/${RUN}/delivery.txt"
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
