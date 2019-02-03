@@ -13,8 +13,8 @@ INDIR=${1-/home/clinical/DEMUX/}
 TARGET_SERVER=${2-rastapopoulos.scilifelab.se}
 TARGET_DIR=${3-/mnt/hds/proj/bioinfo/DEMUX/}
 TARGET_SERVER_HASTA=hasta.scilifelab.se
-TARGET_DIR_HASTA=/home/proj/demultiplexed-runs/
-EMAILS=${4-}
+TARGET_DIR_HASTA=/home/proj/production/demultiplexed-runs/
+EMAILS=${4-clinical-demux@scilifelab.se}
 
 #############
 # FUNCTIONS #
@@ -32,6 +32,9 @@ log() {
 failed() {
     NAS=$(hostname)
     echo "Error while sending ${RUN} to ${TARGET_SERVER}" | mail -s "Error while sending ${RUN} to ${TARGET_SERVER}" ${EMAILS}
+    if [[ ! -z ${RUNDIR} ]]; then
+        rm ${RUNDIR}/copycomplete.txt
+    fi
 }
 trap failed ERR
 
@@ -50,15 +53,21 @@ for RUNDIR in ${INDIR}/*; do
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
         log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR} &
-        rsync -a --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:{$TARGET_DIR_HASTA}
-        log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
-        ssh ${TARGET_SERVER} "rm -f ${TARGET_DIR}/${RUN}/delivery.txt"
+        rsync -a --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
+        log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
+        ssh ${TARGET_SERVER} "rm -f ${TARGET_DIR}/${RUN}/delivery.txt"
         if [[ -n ${EMAILS} ]]; then
-            log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} finished' ${EMAILS}"
-            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} finished" ${EMAILS}
+            log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} delivered to ${TARGET_SERVER}' ${EMAILS}"
+            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} deliverd to ${TARGET_SERVER}" ${EMAILS}
+        fi
+        rsync -a --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
+        log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}/${RUN}/"
+        scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}/${RUN}/
+        if [[ -n ${EMAILS} ]]; then
+            log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} delivered to ${TARGET_SERVER_HASTA}' ${EMAILS}"
+            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} delivered to ${TARGET_SERVER_HASTA}" ${EMAILS}
         fi
         continue
     fi
