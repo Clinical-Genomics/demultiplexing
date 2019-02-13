@@ -53,7 +53,7 @@ for RUNDIR in ${INDIR}/*; do
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
         log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -a --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
+        rsync -rvt --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
         log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
@@ -62,7 +62,7 @@ for RUNDIR in ${INDIR}/*; do
             log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} delivered to ${TARGET_SERVER}' ${EMAILS}"
             column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} deliverd to ${TARGET_SERVER}" ${EMAILS}
         fi
-        rsync -a --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
+        rsync -rvt --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}/${RUN}/
         if [[ -n ${EMAILS} ]]; then
