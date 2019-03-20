@@ -62,9 +62,16 @@ def demux(samplesheet, application, flowcell):
 @click.option('-S', '--shortest', is_flag=True, help='2500 and NovaSeq: only return shortest index')
 @click.option('-d', '--delimiter', default=',', show_default=True, help='column delimiter')
 @click.option('-e', '--end', default='\n', show_default=True, help='line delimiter')
+@click.option('-p', '--pad', is_flag=True, default=False, help='add 2 bases to indices with length 8')
 @click.pass_context
-def fetch(context, flowcell, application, dualindex, indexlength, longest, shortest, delimiter=',', end='\n'):
-    """Fetch a samplesheet from LIMS"""
+def fetch(context, flowcell, application, dualindex, indexlength, longest, shortest, pad,
+          delimiter=',', end='\n'):
+    """
+    Fetch a samplesheet from LIMS.
+    If a flowcell has dual indices of length 10+10 bp (dual 10) as well as 8+8 bp (dual 8), use
+    the option -p, or --pad to add two bases to length 8 indices (AT for index1, AC for index2).
+    This will ensure that all indices in the sample sheet are of the same length.
+    """
 
     def reverse_complement(dna):
         complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
@@ -76,6 +83,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
+
     if len(raw_samplesheet) == 0:
         click.echo(click.style('Samplesheet not found in LIMS!', fg='red'))
         context.abort()
@@ -148,6 +156,17 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                                    f"only!", fg='red'))
             context.abort()
 
+        if pad and not indexlength:
+            click.echo(click.style(f"Please specify an index length when using the pad option!"
+                                   f"Use --longest or --indexlength. Nota that padding only works"
+                                   f"in combination with dual 10 indxes!", fg='red'))
+            context.abort()
+
+        if pad and indexlength != 20:
+            click.echo(click.style(f"Padding is only allowed in combination with dual 10 indexes!",
+                                   fg='red'))
+            context.abort()
+
         lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
                      'control', 'recipe', 'operator', 'project']
         header = [Samplesheet.header_map[head] for head in lims_keys]
@@ -183,15 +202,25 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
             raw_samplesheet.extend(added_dummy_samples)
 
         if indexlength:
-            raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
+            # if indexlength == 20 (2 * 10 for dual index), also add indexes of length 16 (2 * 8 for dual
+            # indexes) if the pad option is provided
+            if pad and indexlength == 20:
+                raw_samplesheet = [line for line in raw_samplesheet if
+                                   len(line['index'].replace('-', '')) in (16, 20)]
+            else:
+                raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
 
         for line in raw_samplesheet:
             if '-' in line['index']:
-                index1 = line['index'].split('-')[0]
                 index1, index2 = line['index'].split('-')
+                if pad and len(index1) == 8:
+                    index1 += 'AT'
+                    index2 += 'AC'
                 line['index'] = index1
                 line['index2'] = index2
             else:
+                if pad and len(line['index']) == 8:
+                    line['index'] += 'AT'
                 line['index2'] = ''
 
         # add [section] header
