@@ -14,8 +14,7 @@ TARGET_SERVER=${2-hasta.scilifelab.se}
 TARGET_DIR=${3-/home/proj/production/demultiplexed-runs/}
 TARGET_SERVER_HASTA=rastapopoulos.scilifelab.se
 TARGET_DIR_HASTA=/mnt/hds/proj/bioinfo/DEMUX/
-#EMAILS=${4-clinical-demux@scilifelab.se}
-EMAILS=${4-kenny.billiau@scilifelab.se}
+EMAILS=${4-clinical-demux@scilifelab.se}
 
 #############
 # FUNCTIONS #
