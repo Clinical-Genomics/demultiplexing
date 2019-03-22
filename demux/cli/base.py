@@ -8,7 +8,7 @@ from ..basemask import basemask
 
 log = logging.getLogger(__name__)
 
-__version__ = '4.28.0'
+__version__ = '4.28.1'
 
 
 @click.group()
