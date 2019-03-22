@@ -10,11 +10,12 @@ VERSION=3.4.3
 ########
 
 INDIR=${1-/home/clinical/DEMUX/}
-TARGET_SERVER=${2-rastapopoulos.scilifelab.se}
-TARGET_DIR=${3-/mnt/hds/proj/bioinfo/DEMUX/}
-TARGET_SERVER_HASTA=hasta.scilifelab.se
-TARGET_DIR_HASTA=/home/proj/production/demultiplexed-runs/
-EMAILS=${4-clinical-demux@scilifelab.se}
+TARGET_SERVER=${2-hasta.scilifelab.se}
+TARGET_DIR=${3-/home/proj/production/demultiplexed-runs/}
+TARGET_SERVER_HASTA=rastapopoulos.scilifelab.se
+TARGET_DIR_HASTA=/mnt/hds/proj/bioinfo/DEMUX/
+#EMAILS=${4-clinical-demux@scilifelab.se}
+EMAILS=${4-kenny.billiau@scilifelab.se}
 
 #############
 # FUNCTIONS #
