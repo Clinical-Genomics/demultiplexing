@@ -54,8 +54,8 @@ for RUN_DIR in ${IN_DIR}/*; do
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
-                log "demux sheet fetch --application nova --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
+                log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
