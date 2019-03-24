@@ -60,7 +60,7 @@ for RUNDIR in ${INDIR}/*; do
         ssh ${TARGET_SERVER} "rm -f ${TARGET_DIR}/${RUN}/delivery.txt"
         if [[ -n ${EMAILS} ]]; then
             log "column -t ${RUNDIR}/stats-* | mail -s 'DEMUX ${RUN} delivered to ${TARGET_SERVER}' ${EMAILS}"
-            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} deliverd to ${TARGET_SERVER}" ${EMAILS}
+            column -t ${RUNDIR}/stats-* | mail -s "DEMUX ${RUN} delivered to ${TARGET_SERVER}" ${EMAILS}
         fi
         rsync -rvt --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER_HASTA}:${TARGET_DIR_HASTA}/${RUN}/"
