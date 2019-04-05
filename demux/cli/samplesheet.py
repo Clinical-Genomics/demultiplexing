@@ -102,7 +102,8 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'description', 'control', 'recipe', 'operator', 'project']
         header = [ HiSeq2500Samplesheet.header_map[head] for head in lims_keys ]
 
-        raw_samplesheet = [ line for line in raw_samplesheet if indexlength and len(line['index'].replace('-','')) == int(indexlength) ]
+        if indexlength:
+            raw_samplesheet = [ line for line in raw_samplesheet if len(line['index'].replace('-','')) == int(indexlength) ]
         for line in raw_samplesheet:
             line['description'] = line['sample_id']
 
