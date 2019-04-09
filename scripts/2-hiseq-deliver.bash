@@ -9,7 +9,7 @@ VERSION=3.4.3
 # VARS #
 ########
 
-INDIR=${1-/home/clinical/DEMUX/}
+INDIR=${1-/home/hiseq.clinical/DEMUX/}
 TARGET_SERVER=${2-hasta.scilifelab.se}
 TARGET_DIR=${3-/home/proj/production/demultiplexed-runs/}
 TARGET_SERVER_HASTA=rastapopoulos.scilifelab.se
