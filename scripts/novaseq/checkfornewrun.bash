@@ -7,8 +7,11 @@ shopt -s expand_aliases
 source "${HOME}/.bashrc"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     useprod
-else
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
     usestage
+else
+    >&2 echo "Production nor stage is loaded. Exiting"
+    exit 1
 fi
 
 ########
@@ -67,14 +70,15 @@ for RUN_DIR in "${IN_DIR}"/*; do
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p "${DEMUXES_DIR}/${RUN}/"
 
-
             ACCOUNT=development
             if [[ ${ENVIRONMENT} == 'production' ]]; then
                 ACCOUNT=production
             fi
+            SBATCH_STDOUT=/home/proj/${ENVIRONMENT}/logs/demux-novaseq-%j.txt
+            SBATCH_STDERR=/home/proj/${ENVIRONMENT}/logs/demux-novaseq-%j.txt
 
-            log "sbatch --account ${ACCOUNT} ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
-            if sbatch --account ${ACCOUNT} "${SCRIPT_DIR}/demux-novaseq.bash" "${RUN_DIR}" "${DEMUXES_DIR}" &>> "${PROJECTLOG}"; then
+            log "sbatch --account ${ACCOUNT} --error ${SBATCH_STDERR} --out ${SBATCH_STDOUT} ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
+            if sbatch --account ${ACCOUNT} --error "${SBATCH_STDERR}" --out "${SBATCH_STDOUT}" "${SCRIPT_DIR}/demux-novaseq.bash" "${RUN_DIR}" "${DEMUXES_DIR}" &>> "${PROJECTLOG}"; then
                 log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
                 rm -f "${DEMUXES_DIR}/${RUN}/copycomplete.txt"
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"

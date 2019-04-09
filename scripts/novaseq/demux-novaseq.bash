@@ -3,8 +3,6 @@
 #SBATCH --time=12:00:00
 #SBATCH --qos=high
 #SBATCH --job-name=demux-novaseq
-#SBATCH --error=/home/proj/stage/logs/demux-novaseq-%j.txt
-#SBATCH --output=/home/proj/stage/logs/demux-novaseq-%j.txt
 
 set -eu
 
