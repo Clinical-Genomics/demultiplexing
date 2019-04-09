@@ -5,7 +5,11 @@ set -u
 shopt -s nullglob
 shopt -s expand_aliases
 source "${HOME}/.bashrc"
-useprod
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    useprod
+else
+    usestage
+fi
 
 ########
 # VARS #
@@ -14,7 +18,7 @@ useprod
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname "$(readlink -nm "$0")")
-EMAIL=clinical-demux@scilifelab.se
+EMAIL=${3-clinical-demux@scilifelab.se}
 
 #############
 # FUNCTIONS #
@@ -27,7 +31,7 @@ log () {
 }
 
 failed() {
-    mail -s "ERROR starting novaseq ${FC} on $(hostname)" $EMAIL < "${PROJECTLOG}"
+    mail -s "ERROR starting novaseq ${FC} on $(hostname)" "$EMAIL" < "${PROJECTLOG}"
 }
 trap failed ERR
 
@@ -63,9 +67,14 @@ for RUN_DIR in "${IN_DIR}"/*; do
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p "${DEMUXES_DIR}/${RUN}/"
 
-            log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
 
-            if sbatch "${SCRIPT_DIR}/demux-novaseq.bash" "${RUN_DIR}" "${DEMUXES_DIR}" &>> "${PROJECTLOG}"; then
+            ACCOUNT=development
+            if [[ ${ENVIRONMENT} == 'production' ]]; then
+                ACCOUNT=production
+            fi
+
+            log "sbatch --account ${ACCOUNT} ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
+            if sbatch --account ${ACCOUNT} "${SCRIPT_DIR}/demux-novaseq.bash" "${RUN_DIR}" "${DEMUXES_DIR}" &>> "${PROJECTLOG}"; then
                 log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
                 rm -f "${DEMUXES_DIR}/${RUN}/copycomplete.txt"
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"

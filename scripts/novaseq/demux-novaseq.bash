@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#SBATCH --account=development # change to production for the production script
 #SBATCH --ntasks=36
 #SBATCH --time=12:00:00
 #SBATCH --qos=high
@@ -12,7 +11,11 @@ set -eu
 shopt -s expand_aliases
 source "$HOME/.bashrc"
 ulimit -n 4096
-usestage # set to useprod in production
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    useprod
+else
+    usestage
+fi
 
 ##########
 # PARAMS #
