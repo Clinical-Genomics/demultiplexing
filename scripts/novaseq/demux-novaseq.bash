@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
+#SBATCH --account=development # change to production for the production script
+#SBATCH --ntasks=36
+#SBATCH --time=12:00:00
+#SBATCH --qos=high
+#SBATCH --job-name=demux-novaseq
+#SBATCH --error=/home/proj/stage/logs/demux-novaseq-%j.txt
+#SBATCH --output=/home/proj/stage/logs/demux-novaseq-%j.txt
 
 set -eu
 
 shopt -s expand_aliases
 source "$HOME/.bashrc"
 ulimit -n 4096
+usestage # set to useprod in production
 
 ##########
 # PARAMS #
@@ -46,8 +54,8 @@ BASEMASK=Y151,I10,I10,Y151
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 12 --writing-threads 3 --runfolder-dir "${IN_DIR}" --output-dir "${OUT_DIR}/${UNALIGNED_DIR}" --use-bases-mask ${BASEMASK} --sample-sheet "${IN_DIR}/SampleSheet.csv" --barcode-mismatches 1
+log "${BCL2FASTQ_BIN} --loading-threads 6 --processing-threads 36 --writing-threads 6 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+${BCL2FASTQ_BIN} --loading-threads 6 --processing-threads 36 --writing-threads 6 --runfolder-dir "${IN_DIR}" --output-dir "${OUT_DIR}/${UNALIGNED_DIR}" --use-bases-mask ${BASEMASK} --sample-sheet "${IN_DIR}/SampleSheet.csv" --barcode-mismatches 1
 
 # add samplesheet to unaligned folder
 cp "${IN_DIR}/SampleSheet.csv" "${OUT_DIR}/${UNALIGNED_DIR}/"
