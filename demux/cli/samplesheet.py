@@ -198,9 +198,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
             raw_samplesheet.extend(added_dummy_samples)
 
         if indexlength:
-            if pad and indexlength in (16, 20):
+            if pad and int(indexlength) in (16, 20):
                 raw_samplesheet = [line for line in raw_samplesheet if
-                                   len(line['index'].replace('-', '')) in (16, indexlength)]
+                                   len(line['index'].replace('-', '')) in (16, int(indexlength))]
             else:
                 raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
 
