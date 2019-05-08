@@ -68,9 +68,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
           delimiter=',', end='\n'):
     """
     Fetch a samplesheet from LIMS.
-    If a flowcell has dual indices of length 10+10 bp (dual 10) as well as 8+8 bp (dual 8), use
+    If a flowcell has dual indices of length 10+10 bp (dual 10) and/or 8+8 bp (dual 8), use
     the option -p, or --pad to add two bases to length 8 indices (AT for index1, AC for index2).
-    This will ensure that all indices in the sample sheet are of the same length.
+    This will ensure that all indices in the sample sheet are of the same length, namely 10.
     """
 
     def reverse_complement(dna):
