@@ -159,8 +159,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         if pad and not indexlength:
             click.echo(click.style(f"Please specify an index length when using the pad option!"
-                                   f"Use --longest or --indexlength. Nota that padding only works"
-                                   f"in combination with dual 10 indxes!", fg='red'))
+                                   f"Use --longest or --indexlength", fg='red'))
             context.abort()
 
         lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
