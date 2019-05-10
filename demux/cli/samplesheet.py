@@ -68,9 +68,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
           delimiter=',', end='\n'):
     """
     Fetch a samplesheet from LIMS.
-    If a flowcell has dual indices of length 10+10 bp (dual 10) as well as 8+8 bp (dual 8), use
+    If a flowcell has dual indices of length 10+10 bp (dual 10) and/or 8+8 bp (dual 8), use
     the option -p, or --pad to add two bases to length 8 indices (AT for index1, AC for index2).
-    This will ensure that all indices in the sample sheet are of the same length.
+    This will ensure that all indices in the sample sheet are of the same length, namely 10.
     """
 
     def reverse_complement(dna):
@@ -159,13 +159,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         if pad and not indexlength:
             click.echo(click.style(f"Please specify an index length when using the pad option!"
-                                   f"Use --longest or --indexlength. Nota that padding only works"
-                                   f"in combination with dual 10 indxes!", fg='red'))
-            context.abort()
-
-        if pad and indexlength != 20:
-            click.echo(click.style(f"Padding is only allowed in combination with dual 10 indexes!",
-                                   fg='red'))
+                                   f"Use --longest or --indexlength", fg='red'))
             context.abort()
 
         lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
@@ -203,11 +197,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
             raw_samplesheet.extend(added_dummy_samples)
 
         if indexlength:
-            # if indexlength == 20 (2 * 10 for dual index), also add indexes of length 16 (2 * 8 for dual
-            # indexes) if the pad option is provided
-            if pad and indexlength == 20:
+            if pad and int(indexlength) in (16, 20):
                 raw_samplesheet = [line for line in raw_samplesheet if
-                                   len(line['index'].replace('-', '')) in (16, 20)]
+                                   len(line['index'].replace('-', '')) in (16, int(indexlength))]
             else:
                 raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
 
