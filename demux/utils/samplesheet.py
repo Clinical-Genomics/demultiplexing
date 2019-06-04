@@ -262,21 +262,22 @@ class Samplesheet:
             for i, line in enumerate(samplesheet):
                 forbidden_chars = set(' ')
                 if any((c in forbidden_chars) for c in line['sample_id']):
-                    return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
+                    return ('Sample contains forbidden chars ({}): {}'.\
+                            format(forbidden_chars, line['sample_id']), i + 2)
 
-        rs = _validate_uniq_index(self.samplesheet)
-        if isinstance(rs, tuple):
-            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+        result = _validate_uniq_index()
+        if isinstance(result, tuple):
+            raise SampleSheetValidationException(self.DATA, result[1], result[0])
 
         for section_marker, section in self.section.items():
             validation_section = section[:] # only validate the content, not the [Data] header
             result = _validate_length(validation_section)
             if isinstance(result, tuple):
-                raise SampleSheetValidationException(section_marker, rs[1], rs[0])
+                raise SampleSheetValidationException(section_marker, result[1], result[0])
 
         result = _validate_sample_name(self.samplesheet)
         if isinstance(result, tuple):
-            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+            raise SampleSheetValidationException(self.DATA, result[1], result[0])
 
         return True
 
@@ -286,7 +287,6 @@ class HiSeqXSamplesheet(Samplesheet):
 
     def unparse(self, delim=','):
         """Reconstruct the sample sheet based on the (modified) parsed values. """
-        rs = []
         yield '[Data]'
         yield delim.join(self._get_data_header_r())
         for line in self.samplesheet:
@@ -314,21 +314,22 @@ class HiSeqXSamplesheet(Samplesheet):
                     msg = 'Missing index!'
                     return (msg, line_nr)
 
-        for rs in [ _validate_index(), _validate_project_samplename() ]:
-            if type(rs) is tuple:
-                raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+        for result in [_validate_index(), _validate_project_samplename()]:
+            if isinstance(result, tuple):
+                raise SampleSheetValidationException(self.DATA, result[1], result[0])
 
         return True
 
 
 class MiseqSamplesheet(Samplesheet):
+    """ MiSeq samplesheet """
 
-    header_map = { 
-            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
-            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
-            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
-            'index2': 'index2', 'i5_index_id': 'I5_Index_ID', 'genome_folder': 'GenomeFolder',
-            'description': 'Description'
+    header_map = {
+        'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+        'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+        'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+        'index2': 'index2', 'i5_index_id': 'I5_Index_ID', 'genome_folder': 'GenomeFolder',
+        'description': 'Description'
     }
 
     si5 = {
@@ -350,14 +351,6 @@ class MiseqSamplesheet(Samplesheet):
         'AAGGCTAT': 'S520',
         'GAGCCTTA': 'S521',
         'TTATGCGA': 'S522'
-        #'TAGATCGC': 'N501',
-        #'CTCTCTAT': 'N502',
-        #'TATCCTCT': 'N503',
-        #'AGAGTAGA': 'N504',
-        #'GTAAGGAG': 'N505',
-        #'ACTGCATA': 'N506',
-        #'AAGGAGTA': 'N507',
-        #'CTAAGCCT': 'N508',
     }
     ni7 = {
         'TAAGGCGA': 'N701',
@@ -414,9 +407,9 @@ class MiseqSamplesheet(Samplesheet):
 
     def __init__(self, samplesheet_path, flowcell=None, sequencing_date=None):
         Samplesheet.__init__(self, samplesheet_path)
-        if flowcell == None:
+        if flowcell is None:
             flowcell = Path(samplesheet_path).dirname().basename().split('_')[-1]
-        if sequencing_date == None:
+        if sequencing_date is None:
             sequencing_date = Path(samplesheet_path).dirname().basename().split('_')[0]
         self.flowcell = flowcell
         self.sequencing_date = sequencing_date
@@ -429,8 +422,8 @@ class MiseqSamplesheet(Samplesheet):
 
         checked_indexes = {} # the indexes in the SampleSheet
 
-        def clean(input):
-            return re.sub(r'[ _/]+', '', input)
+        def clean(string):
+            return re.sub(r'[ _/]+', '', string)
 
         def check_index(index):
             checked_indexes[index] = 1
@@ -451,13 +444,13 @@ class MiseqSamplesheet(Samplesheet):
                     if ns_index not in checked_indexes:
                         yield ns_index, str(ni7_name + '-' + si5_name)
 
-        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description',
+                           'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
         flowcell_id = self._get_flowcell()
         cur_date = self.sequencing_date
 
-        header = self.section[self.DATA][0] # '0' is the csv header
         data_lines = [] # the new data section. Each line holds a dict with the right header keys
         data_lines.append(expected_header)
         for line in self.samplesheet:
@@ -499,11 +492,11 @@ class MiseqSamplesheet(Samplesheet):
                 ordered_line.append(data_line[head])
             data_lines.append(ordered_line)
 
-        rs = []
+        result = []
         for line in data_lines:
-            rs.append(delim.join(line))
+            result.append(delim.join(line))
 
-        return end.join(rs)
+        return end.join(result)
 
     def validate(self):
         Samplesheet.validate(self)
@@ -532,27 +525,29 @@ class MiseqSamplesheet(Samplesheet):
                 if not readymade_index:
                     return ('Index {} not in readymade indexes!'.format(line['index']), i)
 
-        rs = _validate_missing_index()
-        if type(rs) is tuple:
-            raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
+        result = _validate_missing_index()
+        if isinstance(result, tuple):
+            raise SampleSheetValidationException(self.DATA, result[1], result[0])
 
 
 class HiSeq2500Samplesheet(Samplesheet):
+    """ HiSeq2500 samplesheet """
 
     header_map = {
-            'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
-            'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'description': 'Description', 'project': 'SampleProject'
+        'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
+        'index': 'Index', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
+        'operator': 'Operator', 'description': 'Description', 'project': 'SampleProject'
     }
 
 
 class NIPTSamplesheet(Samplesheet):
+    """ NIPT samplesheet """
 
-    header_map = { 
-            'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
-            'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
-            'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
-            'description': 'Description', 'sample_type': 'SampleType', 'library_nm': 'Library_nM'
+    header_map = {
+        'lane': 'Lane', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+        'sample_plate': 'Sample_Plate', 'sample_well': 'Sample_Well',
+        'i7_index_id': 'I7_Index_ID', 'index': 'index', 'sample_project': 'Sample_Project',
+        'description': 'Description', 'sample_type': 'SampleType', 'library_nm': 'Library_nM'
     }
 
     def _get_flowcell(self):
@@ -589,13 +584,13 @@ class NIPTSamplesheet(Samplesheet):
                 line[1] = '_'.join(investigator_name)
                 section_copy[self.HEADER][i] = line
 
-        rs = []
+        result = []
         for section_marker, section in section_copy.items():
             if section_marker in self.section_markers:
-                rs.append(delim.join(self.section_markers[section_marker]))
+                result.append(delim.join(self.section_markers[section_marker]))
             for line in section:
-                rs.append(delim.join(line))
-        return end.join(rs)
+                result.append(delim.join(line))
+        return end.join(result)
 
     def to_demux(self, delim=',', end='\n'):
         """ Replaced the [Data] section with a demuxable [Data] section.
@@ -603,21 +598,23 @@ class NIPTSamplesheet(Samplesheet):
         This is non destructive and will only return a demuxable samplesheet.
 
         Convert the Data section from
-            Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Project,Description,SampleType
+            Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Project,
+            Description,SampleType
         to
             FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
         """
 
-        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description', 'Control', 'Recipe', 'Operator', 'SampleProject']
+        expected_header = ['FCID', 'Lane', 'SampleID', 'SampleRef', 'Index', 'Description',
+                           'Control', 'Recipe', 'Operator', 'SampleProject']
 
         # get the experiment name
         flowcell_id = self._get_flowcell()
-        project_id  = self._get_project_id()
+        project_id = self._get_project_id()
 
         header = self.section[self.DATA][0] # '0' is the csv header
         data_lines = [] # the new data section. Each line holds a dict with the right header keys
         data_lines.append(expected_header)
-        for i, line in enumerate(self.section[self.DATA][1:]):
+        for line in self.section[self.DATA][1:]:
             data_line = dict(zip(header, line))
 
             data_line['FCID'] = flowcell_id
@@ -635,8 +632,7 @@ class NIPTSamplesheet(Samplesheet):
                 ordered_line.append(data_line[head])
             data_lines.append(ordered_line)
 
-        rs = []
+        result = []
         for line in data_lines:
-            rs.append(delim.join(line))
-        return end.join(rs)
-
+            result.append(delim.join(line))
+        return end.join(result)
