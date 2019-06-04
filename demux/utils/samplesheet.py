@@ -1,11 +1,14 @@
+""" Holds the classes representing samplesheets per sequencer """
+
 import re
-from time import strftime
 from copy import deepcopy
 from collections import OrderedDict
 from path import Path
 
 class SampleSheetValidationException(Exception):
+    """ Raise when a samplesheet.validate() call fails """
     def __init__(self, section, msg, line_nr):
+        super().__init__()
         self.section = section
         self.msg = msg
         self.line_nr = line_nr
@@ -15,23 +18,32 @@ class SampleSheetValidationException(Exception):
 
 
 class SampleSheetParsexception(Exception):
-    pass
+    """ Raise when a samplesheet.parse() call fails """
 
 
 class Line(dict):
-
-    def _reverse_complement(dna):
-        complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-        return ''.join([complement[base] for base in dna[::-1]])
+    """ Abstraction of a line in samplesheet """
 
     @property
     def dualindex(self, delim='-', revcomp=False):
-        if 'index2' in self and len(self['index2']):
+        """
+        Magic field creating the complemented dual index str when
+        an 'index' and 'index2' column is present.
+
+        When 'index' and 'index2' is present, with values 'ACAC' and 'AGAG' respectively,
+        it will return value of 'index' + '-' + reverse compleneted value of 'index2'.
+        The reverse complemented value of index2 is 'CTCT'. The return value will be: 'ACAC-CTCT'.
+        """
+        def _reverse_complement(dna):
+            complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+            return ''.join([complement[base] for base in dna[::-1]])
+
+        if 'index2' in self and self['index2']:
             index2 = _reverse_complement(self['index2']) if revcomp else self['index2']
             return self['index'] + delim + index2
         return self['index']
 
-class Samplesheet(object):
+class Samplesheet:
     """SampleSheet.
 
     Stores the samplesheet in sections: self.section
@@ -53,13 +65,14 @@ class Samplesheet(object):
         {'FCID': 'HHGGFFSS', 'SampleID': 'ADM1123A1', 'Index': 'ACTGACTG'}
     ]
 
-    The original split line with the section marker, will be stored in self.section_markers['[Data]'] = ['[Data]','','']
+    The original split line with the section marker, will be stored in
+    self.section_markers['[Data]'] = ['[Data]','','']
 
     """
 
     # known sections
     HEADER = '[Header]'
-    DATA   = '[Data]'
+    DATA = '[Data]'
 
     # for the [Data] section: provide a universal header line.
     # The mapping is like this: universal: expected, e.g. for NIPT we have expected Sample_ID,
@@ -68,9 +81,9 @@ class Samplesheet(object):
     # lowercase with words separated by underscores as necessary to improve readability.
     # One can make one header map for each samplesheet type.
     header_map = {
-            'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
-            'index': 'index', 'index2': 'index2', 'sample_name': 'SampleName', 'control': 'Control', 'recipe': 'Recipe',
-            'operator': 'Operator', 'project': 'Project'
+        'fcid': 'FCID', 'lane': 'Lane', 'sample_id': 'SampleID', 'sample_ref': 'SampleRef',
+        'index': 'index', 'index2': 'index2', 'sample_name': 'SampleName', 'control': 'Control',
+        'recipe': 'Recipe', 'operator': 'Operator', 'project': 'Project'
     }
 
     def _get_flowcell(self):
@@ -87,8 +100,8 @@ class Samplesheet(object):
 
     def _get_data_header(self):
         header_r = self._get_data_header_r()
-        header_map_r = dict((v,k) for k,v in self.header_map.items())
-        header = [ header_map_r[k] for k in header_r ]
+        header_map_r = dict((v, k) for k, v in self.header_map.items())
+        header = [header_map_r[k] for k in header_r]
 
         return header
 
@@ -128,10 +141,10 @@ class Samplesheet(object):
             raise SampleSheetParsexception('No data found!')
 
         header = self._get_data_header()
-        self.samplesheet = [ Line(dict(zip(header, line))) for line in self.section[self.DATA][1:] ]
+        self.samplesheet = [Line(dict(zip(header, line))) for line in self.section[self.DATA][1:]]
 
         header_r = self._get_data_header_r()
-        self.samplesheet_r = [ dict(zip(header_r, line)) for line in self.section[self.DATA][1:] ]
+        self.samplesheet_r = [dict(zip(header_r, line)) for line in self.section[self.DATA][1:]]
 
     def lines(self):
         """ Yields all lines of the [Data] section. """
@@ -145,10 +158,10 @@ class Samplesheet(object):
 
     def raw(self, delim=',', end='\n'):
         """Reconstructs the sample sheet. """
-        rs = []
+        result = []
         for line in self.original_sheet:
-            rs.append(delim.join(line))
-        return end.join(rs)
+            result.append(delim.join(line))
+        return end.join(result)
 
     def samples(self, column='sample_id'):
         """ Return all samples in the samplesheet """
@@ -171,7 +184,7 @@ class Samplesheet(object):
     def cell(self, line, column):
         """ return the contents of a column in a line """
 
-        return line[ self._get_header_key(column) ]
+        return line[self._get_header_key(column)]
 
     def lines_per_column(self, column, content):
         """ Return all lines with the same column content
@@ -227,7 +240,7 @@ class Samplesheet(object):
                         return (msg, i + 2)
             return True
 
-        def _validate_uniq_index(samplesheet):
+        def _validate_uniq_index():
             lanes = list(set(self.column('lane')))
             for lane in lanes:
                 if self.is_pooled_lane(lane, column='lane'):
@@ -240,7 +253,8 @@ class Samplesheet(object):
 
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
-                            return ('Same index for {} on lane {}'.format(' , '.join(samples), lane), index)
+                            return ('Same index for {} on lane {}'.\
+                                    format(' , '.join(samples), lane), index)
 
             return True
 
@@ -251,23 +265,24 @@ class Samplesheet(object):
                     return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
 
         rs = _validate_uniq_index(self.samplesheet)
-        if type(rs) is tuple:
+        if isinstance(rs, tuple):
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         for section_marker, section in self.section.items():
             validation_section = section[:] # only validate the content, not the [Data] header
-            rs = _validate_length(validation_section)
-            if type(rs) is tuple:
+            result = _validate_length(validation_section)
+            if isinstance(result, tuple):
                 raise SampleSheetValidationException(section_marker, rs[1], rs[0])
 
-        rs = _validate_sample_name(self.samplesheet)
-        if type(rs) is tuple:
+        result = _validate_sample_name(self.samplesheet)
+        if isinstance(result, tuple):
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         return True
 
 
 class HiSeqXSamplesheet(Samplesheet):
+    """ Specifics of a HiSeqX samplesheet """
 
     def unparse(self, delim=','):
         """Reconstruct the sample sheet based on the (modified) parsed values. """
