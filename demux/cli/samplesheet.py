@@ -1,14 +1,16 @@
-# -*- coding: utf-8 -*-
+""" CLI points for samplesheeet action """
 
 import sys
-import click
 import logging
 import copy
 import csv
 import os
 
+import click
+
 from cglims.api import ClinicalLims, ClinicalSample
-from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
+from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet,\
+                    MiseqSamplesheet
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +56,7 @@ def demux(samplesheet, application, flowcell):
 
 @sheet.command()
 @click.argument('flowcell')
-@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nova']), help='application type')
+@click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nova', 'iseq']), help='application type')
 @click.option('-i', '--dualindex', is_flag=True, default=False, help='X: force dual index, not used \
               for NovaSeq!')
 @click.option('-l', '--indexlength', default=None, help='2500 and NovaSeq: only return this index length')
@@ -196,6 +198,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
             raw_samplesheet.extend(added_dummy_samples)
 
+
         if indexlength:
             if pad and int(indexlength) in (16, 20):
                 raw_samplesheet = [line for line in raw_samplesheet if
@@ -209,6 +212,45 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                 if pad and len(index1) == 8:
                     index1 += 'AT'
                     index2 += 'AC'
+                line['index'] = index1
+                line['index2'] = index2
+            else:
+                if pad and len(line['index']) == 8:
+                    line['index'] += 'AT'
+                line['index2'] = ''
+
+        # add [section] header
+        click.echo('[Data]')
+
+    if application == 'iseq':
+        if dualindex:
+            click.echo(click.style(f"No need to specify dual or single index for iSeq sample "
+                                   f"sheets, please use --shortest, --longest, or --indexlength "
+                                   f"only!", fg='red'))
+            context.abort()
+
+        if pad and not indexlength:
+            click.echo(click.style(f"Please specify an index length when using the pad option!"
+                                   f"Use --longest or --indexlength", fg='red'))
+            context.abort()
+
+        lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
+                     'control', 'recipe', 'operator', 'project']
+        header = [Samplesheet.header_map[head] for head in lims_keys]
+
+        if indexlength:
+            if pad and int(indexlength) in (16, 20):
+                raw_samplesheet = [line for line in raw_samplesheet if
+                                   len(line['index'].replace('-', '')) in (16, int(indexlength))]
+            else:
+                raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
+
+        for line in raw_samplesheet:
+            if '-' in line['index']:
+                index1, index2 = line['index'].split('-')
+                if pad and len(index1) == 8:
+                    index1 += 'AT'
+                    index2 = 'AC' + index2
                 line['index'] = index1
                 line['index2'] = index2
             else:
