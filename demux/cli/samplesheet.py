@@ -253,7 +253,8 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                 raw_samplesheet = [line for line in raw_samplesheet if
                                    len(line['index'].replace('-', '')) in (16, int(indexlength))]
             else:
-                raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace('-', '')) == int(indexlength)]
+                raw_samplesheet = [line for line in raw_samplesheet if len(line['index'].replace(
+                    '-', '')) == int(indexlength)]
 
         for line in raw_samplesheet:
             if '-' in line['index']:
