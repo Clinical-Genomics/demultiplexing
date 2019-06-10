@@ -624,4 +624,3 @@ class NIPTSamplesheet(Samplesheet):
         for line in data_lines:
             rs.append(delim.join(line))
         return end.join(rs)
-
