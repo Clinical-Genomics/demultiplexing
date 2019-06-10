@@ -640,5 +640,5 @@ class IseqSamplesheet(Samplesheet):
         'manifest': 'Manifest',
         'genome_folder': 'GenomeFolder',
         'sample_project': 'Sample_Project',
-        'sample_well': 'Sample_Well',
+        'sample_well': 'Sample_Well'
     }
