@@ -235,7 +235,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
             context.abort()
 
         lims_keys = ['sample_id',
-                     'sample_name',
+                     'sample_id',
                      'sample_plate',
                      'description',
                      'i7_index_id',
@@ -244,9 +244,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                      'index2',
                      'manifest',
                      'genome_folder',
-                     'sample_project',
+                     'sample_name',
                      'sample_well']
-        header = [IseqSamplesheet.header_map[head] for head in lims_keys]
+        header = IseqSamplesheet.header_map.values()
 
         if indexlength:
             if pad and int(indexlength) in (16, 20):
@@ -279,4 +279,4 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         line['sample_name'] = project
 
         # print it!
-        click.echo(delimiter.join([str(line.get(head, '')) for head in lims_keys]))
+        click.echo(delimiter.join([str(line.get(lims_key, '')) for lims_key in lims_keys]))
