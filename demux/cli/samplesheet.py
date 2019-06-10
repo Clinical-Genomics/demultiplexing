@@ -272,6 +272,9 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                 line['index2'] = ''
 
         # add [section] header
+        click.echo('[Header]')
+        click.echo('[Reads]')
+        click.echo('30')
         click.echo('[Data]')
 
     click.echo(delimiter.join(header))
