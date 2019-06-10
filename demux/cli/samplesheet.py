@@ -294,4 +294,4 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         line['sample_name'] = project
 
         # print it!
-        click.echo(delimiter.join([str(line.get(lims_key, '')) for lims_key in lims_keys]))
+        click.echo(delimiter.join([str(line[lims_key]) for lims_key in lims_keys]))
