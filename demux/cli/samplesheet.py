@@ -236,17 +236,17 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         lims_keys = ['sample_id',
                      'sample_name',
-                     'Sample_Plate',
-                     'Description',
-                     'I7_Index_ID',
+                     'sample_plate',
+                     'description',
+                     'i7_index_id',
                      'index',
-                     'I5_Index_ID',
+                     'i5_index_id',
                      'index2',
-                     'Manifest',
-                     'GenomeFolder',
-                     'Sample_Project',
-                     'Sample_Well']
-        header = [Samplesheet.header_map[head] for head in lims_keys]
+                     'manifest',
+                     'genome_folder',
+                     'sample_project',
+                     'sample_well']
+        header = [IseqSamplesheet.header_map[head] for head in lims_keys]
 
         if indexlength:
             if pad and int(indexlength) in (16, 20):
