@@ -83,7 +83,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         """ Only keeps the first part of the project name"""
         return project.split(' ')[0]
 
-    lims_api = ClinicalLims(**context.obj['lim s'])
+    lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     if len(raw_samplesheet) == 0:
