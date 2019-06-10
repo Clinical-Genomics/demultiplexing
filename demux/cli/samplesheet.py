@@ -83,7 +83,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         """ Only keeps the first part of the project name"""
         return project.split(' ')[0]
 
-    lims_api = ClinicalLims(**context.obj['lims'])
+    lims_api = ClinicalLims(**context.obj['lim s'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     if len(raw_samplesheet) == 0:
@@ -234,8 +234,18 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                                    f"Use --longest or --indexlength", fg='red'))
             context.abort()
 
-        lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
-                     'control', 'recipe', 'operator', 'project']
+        lims_keys = ['sample_id',
+                     'sample_name',
+                     'Sample_Plate',
+                     'Description',
+                     'I7_Index_ID',
+                     'index',
+                     'I5_Index_ID',
+                     'index2',
+                     'Manifest',
+                     'GenomeFolder',
+                     'Sample_Project',
+                     'Sample_Well']
         header = [Samplesheet.header_map[head] for head in lims_keys]
 
         if indexlength:
