@@ -236,30 +236,18 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         lims_keys = ['sample_id',
                      'sample_id',
-                     'sample_plate',
                      'sample_id',
-                     'i7_index_id',
                      'index',
-                     'i5_index_id',
                      'index2',
-                     'manifest',
-                     'genome_folder',
-                     'sample_name',
-                     'sample_well']
+                     'sample_name']
 
         header = [
             'Sample_ID',
             'Sample_Name',
-            'Sample_Plate',
             'Description',
-            'I7_Index_ID',
             'index',
-            'I5_Index_ID',
             'index2',
-            'Manifest',
-            'GenomeFolder',
-            'Sample_Project',
-            'Sample_Well'
+            'Sample_Project'
         ]
 
         if indexlength:
