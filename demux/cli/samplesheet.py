@@ -10,7 +10,7 @@ import click
 
 from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet,\
-                    MiseqSamplesheet
+                    MiseqSamplesheet, IseqSamplesheet
 
 log = logging.getLogger(__name__)
 

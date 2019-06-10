@@ -625,3 +625,20 @@ class NIPTSamplesheet(Samplesheet):
             rs.append(delim.join(line))
         return end.join(rs)
 
+
+class IseqSamplesheet(Samplesheet):
+
+    header_map = {
+        'sample_id': 'Sample_ID',
+        'sample_name': 'Sample_Name',
+        'sample_plate': 'Sample_Plate',
+        'description': 'Description',
+        'i7_index_id': 'I7_Index_ID',
+        'index': 'index',
+        'i5_index_id': 'I5_Index_ID',
+        'index2': 'index2',
+        'manifest': 'Manifest',
+        'genome_folder': 'GenomeFolder',
+        'sample_project': 'Sample_Project',
+        'sample_well': 'Sample_Well',
+    }
