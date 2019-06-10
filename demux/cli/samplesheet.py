@@ -237,7 +237,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         lims_keys = ['sample_id',
                      'sample_id',
                      'sample_plate',
-                     'description',
+                     'sample_id',
                      'i7_index_id',
                      'index',
                      'i5_index_id',
