@@ -10,7 +10,7 @@ import click
 
 from cglims.api import ClinicalLims, ClinicalSample
 from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet,\
-                    MiseqSamplesheet, IseqSamplesheet
+                    MiseqSamplesheet
 
 log = logging.getLogger(__name__)
 
@@ -246,7 +246,21 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                      'genome_folder',
                      'sample_name',
                      'sample_well']
-        header = IseqSamplesheet.header_map.values()
+
+        header = [
+            'Sample_ID',
+            'Sample_Name',
+            'Sample_Plate',
+            'Description',
+            'I7_Index_ID',
+            'index',
+            'I5_Index_ID',
+            'index2',
+            'Manifest',
+            'GenomeFolder',
+            'Sample_Project',
+            'Sample_Well'
+        ]
 
         if indexlength:
             if pad and int(indexlength) in (16, 20):
