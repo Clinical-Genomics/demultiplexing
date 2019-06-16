@@ -4,15 +4,7 @@ set -u
 
 shopt -s nullglob
 shopt -s expand_aliases
-source "${HOME}/.bashrc"
-if [[ ${ENVIRONMENT} == 'production' ]]; then
-    useprod
-elif [[ ${ENVIRONMENT} == 'stage' ]]; then
-    usestage
-else
-    >&2 echo "Production nor stage is loaded. Exiting"
-    exit 1
-fi
+source ~/.aliases
 
 ########
 # VARS #
@@ -20,21 +12,20 @@ fi
 
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
-SCRIPT_DIR=$(dirname "$(readlink -nm "$0")")
-EMAIL=${3-clinical-demux@scilifelab.se}
+SCRIPT_DIR=$(dirname $(readlink -nm $0))
+EMAIL=clinical-demux@scilifelab.se
 
 #############
 # FUNCTIONS #
 #############
 
 log () {
-    local NOW
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo "[${NOW}] $*"
+    echo [${NOW}] $@
 }
 
 failed() {
-    mail -s "ERROR starting novaseq ${FC} on $(hostname)" "$EMAIL" < "${PROJECTLOG}"
+    cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname)" $EMAIL
 }
 trap failed ERR
 
@@ -47,12 +38,12 @@ if pgrep bcl2fastq; then
     exit 0
 fi
 
-for RUN_DIR in "${IN_DIR}"/*; do
+for RUN_DIR in ${IN_DIR}/*; do
     if [[ ! -d ${RUN_DIR} ]]; then
         continue
     fi
 
-    RUN=$(basename "${RUN_DIR}")
+    RUN=$(basename ${RUN_DIR})
     FC=${RUN##*_}
     FC=${FC:1}
     PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
@@ -60,29 +51,24 @@ for RUN_DIR in "${IN_DIR}"/*; do
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
             log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
-            date +'%Y%m%d%H%M%S' > "${RUN_DIR}"/demuxstarted.txt
+            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova --pad --longest "${FC}" > "${RUN_DIR}"/SampleSheet.csv
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
-            mkdir -p "${DEMUXES_DIR}/${RUN}/"
+            mkdir -p ${DEMUXES_DIR}/${RUN}/
 
-            ACCOUNT=development
-            if [[ ${ENVIRONMENT} == 'production' ]]; then
-                ACCOUNT=production
-            fi
-            SBATCH_STDOUT=/home/proj/${ENVIRONMENT}/logs/demux-novaseq-%j.txt
-            SBATCH_STDERR=/home/proj/${ENVIRONMENT}/logs/demux-novaseq-%j.txt
+            log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
+            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
 
-            log "sbatch --account ${ACCOUNT} --error ${SBATCH_STDERR} --out ${SBATCH_STDOUT} ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
-            if sbatch --account ${ACCOUNT} --error "${SBATCH_STDERR}" --out "${SBATCH_STDOUT}" "${SCRIPT_DIR}/demux-novaseq.bash" "${RUN_DIR}" "${DEMUXES_DIR}" &>> "${PROJECTLOG}"; then
+            if [[ $? == 0 ]]; then
                 log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
-                rm -f "${DEMUXES_DIR}/${RUN}/copycomplete.txt"
+                rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
-                date +'%Y%m%d%H%M%S' > "${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
+                date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
             fi
         else
             log "${RUN} is finished and demultiplexing has already started"
