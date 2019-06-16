@@ -1,8 +1,5 @@
 #!/bin/bash
 
-shopt -s expand_aliases
-source ~/.bashrc
-
 set -e
 set -u
 
@@ -10,7 +7,7 @@ set -u
 # VARS #
 ########
 
-SCRIPT_DIR=$(dirname $(readlink -nm $0))
+SCRIPT_DIR="$(dirname "$(readlink -nm "$0")")"
 RAWBASE=/mnt/hds2/proj/bioinfo/Runs/
 DEMUX_DIR=/mnt/hds/proj/bioinfo/DEMUX/
 EMAIL=clinical-demux@scilifelab.se
@@ -23,7 +20,7 @@ function join { local IFS="$1"; shift; echo "$*"; }
 
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [${NOW}] $@
+    echo "[${NOW}] $@"
 }
 
 failed() {
@@ -35,17 +32,17 @@ trap failed ERR
 # MAIN #
 ########
 
-for RUN in ${RAWBASE}/*; do
-    RUN=$(basename ${RUN}/)
-    FC=$( echo ${RUN} | awk 'BEGIN {FS="_"} {print substr($4,2,length($4))}')
+for RUN in "${RAWBASE}"/*; do
+    RUN="$(basename "${RUN}/")"
+    FC=$( echo "${RUN}" | awk 'BEGIN {FS="_"} {print substr($4,2,length($4))}')
 
-    if [ -f ${RAWBASE}/${RUN}/RTAComplete.txt ]; then
+    if [[ -f "${RAWBASE}/${RUN}/RTAComplete.txt" ]]; then
         if [ ! -f ${RAWBASE}/${RUN}/demuxstarted.txt ]; then
 
             # process FCs serially
             FCS=( $(squeue --format=%j | grep Xdem | grep -v ${FC} | cut -d- -f 3 | sort | uniq) )
-            if [[ ${#FCS[@]} > 0 ]]; then
-                RUNNING_FCS=$(join , ${FCS[@]})
+            if [[ ${#FCS[@]} -gt 0 ]]; then
+                RUNNING_FCS=$(join , "${FCS[@]}")
                 log "${RUN} ${RUNNING_FCS} are demuxing - Postpone demux!"
                 continue
             fi

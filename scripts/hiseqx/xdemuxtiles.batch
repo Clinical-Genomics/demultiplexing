@@ -9,9 +9,6 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=clinical-demux@scilifelab.se
 
-shopt -s expand_aliases
-source /home/hiseq.clinical/.bashrc
-
 set -eu -o pipefail
 
 ##########

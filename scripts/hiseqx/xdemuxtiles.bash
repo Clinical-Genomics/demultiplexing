@@ -1,12 +1,7 @@
 #!/bin/bash
 # demux Xrun in parts
 
-
-shopt -s expand_aliases
-source ~/.bashrc
-
 set -eu -o pipefail
-
 
 ##########
 # PARAMS #
@@ -15,7 +10,6 @@ set -eu -o pipefail
 VERSION=4.29.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
-
 
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
