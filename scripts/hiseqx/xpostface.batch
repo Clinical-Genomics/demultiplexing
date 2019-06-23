@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH -t 04:00:00
 #SBATCH -c 1
-#SBATCH -A prod001
 #SBATCH -J xpostface
 #SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.out
 #SBATCH --error=/mnt/hds/proj/bioinfo/LOG/xdem-postface-%j.err
 #SBATCH --mail-type=FAIL
-#SBATCH --mail-user=clinical-demux@scilifelab.se
+#SBATCH --mail-user=kenny.billiau@scilifelab.se
+##SBATCH --mail-user=clinical-demux@scilifelab.se
 
 set -eu -o pipefail
 
@@ -17,7 +17,8 @@ set -eu -o pipefail
 
 VERSION=4.29.0
 DEMUXDIR=${1?'absolute path to the DEMUX/rundir'}
-EMAIL=clinical-demux@scilifelab.se
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=kenny.billiau@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -33,63 +34,22 @@ failed() {
 }
 trap 'failed $LINENO' ERR
 
-get_online_quote() {
-    num_online_quotes=9999
-    rand_online=$[ ( $RANDOM % $num_online_quotes ) + 1 ]
-    # In HTML source, <dt> is unique to quote and </dd> is unique to author
-    # The field separators (FS) are either < or > which is [<>] in posix
-    # TODO: Wanted to print as "quote -- author n (mini-bio)", but MacOSX 'fmt' is blah 
-    quote=$(wget -q -O - "http://www.quotationspage.com/quote/$rand_online.html" |
-     grep -e "<dt>" -e "</dd>" | awk -F'[<>]' '{ 
-        if($2 ~ /dt/)
-        { print $3 } 
-        else if($4 ~ /b/)
-        { print "-- " $7} 
-     }')
-}
-
-getquote() {
-    i=1
-    # 5 Attempts at obtaining a quote.  Silently fail.
-    while [ $i -lt 5 ]
-    do
-        get_online_quote 
-        echo "$quote" | grep ERROR > /dev/null
-        if [ $? -eq 0 ]
-        then
-            get_online_quote
-            i=`expr $i + 1`
-        else
-            echo $quote
-            return
-        fi
-    done
-}
-
 ########
 # INIT #
 ########
 
 log "VERSION ${VERSION}"
 log "INDIR: ${DEMUXDIR}"
-#SCRIPTDIR=$(dirname $(readlink -nm $0)) # takes the invocation dir on SLURM
-SCRIPTDIR=/mnt/hds/proj/bioinfo/SCRIPTS/
-
-# remove copy control files
-rm -Rf ${DEMUXDIR}/copybackcomplete/
+SCRIPTDIR=$(dirname $(readlink -nm $0)) # takes the invocation dir on SLURM
+#SCRIPTDIR=/home/proj/${ENVIRONMENT}/
 
 # create the Unaligned directory structure
 log "bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log"
 bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
 
-# calculate Undetermined stats
-log "bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/"
-bash ${SCRIPTDIR}/xundetermined.bash ${DEMUXDIR}/
-
 # make sure we signal the rest of the pipeline all processing is done now
 log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
 date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
 
-QUOTE=$(getquote)
-log "ssh rasta \"echo '${QUOTE}' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL\""
-ssh rasta "echo '${QUOTE}' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL"
+log "ssh hasta \"echo 'done' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL\""
+ssh hasta "echo 'done' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL"

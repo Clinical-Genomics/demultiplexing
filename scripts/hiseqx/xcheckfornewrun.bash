@@ -52,7 +52,7 @@ for RUN in "${RUNS_DIR}"/*; do
 
             mkdir -p ${DEMUXES_DIR}/${RUN}/
             PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
-            #${SCRIPT_DIR}/xdemuxtiles.bash ${RUNS_DIR}/${RUN} &>> ${PROJECTLOG}
+            ${SCRIPT_DIR}/xdemuxtiles.bash ${RUNS_DIR}/${RUN} &>> ${PROJECTLOG}
             rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
             rm -f ${DEMUXES_DIR}/${RUN}/delivery.txt
         else

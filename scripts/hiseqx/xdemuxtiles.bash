@@ -9,12 +9,17 @@ set -eu -o pipefail
 
 VERSION=4.29.0
 RUNDIR=${1?'full path to run dir'}
-OUTDIR=${2-/mnt/hds/proj/bioinfo/DEMUX/$(basename ${RUNDIR})/}
+OUTDIR=${2-/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename ${RUNDIR})/}
 
-EMAIL=clinical-demux@scilifelab.se
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=kenny.billiau@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
-CP_COMPLETE_DIR=${OUTDIR}/copycomplete/ # dir to store cp-is-complete check file/lane-tile
 SCRIPTDIR=$(dirname $(readlink -nm $0))
+
+SLURM_ACCOUNT=development
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    SLURM_ACCOUNT=production
+fi
 
 #############
 # FUNCTIONS #
@@ -47,7 +52,6 @@ trap failed ERR
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
-mkdir -p $CP_COMPLETE_DIR
 
 log "demuxtiles.bash VERSION ${VERSION}"
 
@@ -87,16 +91,11 @@ for lane in "${lanes[@]}"; do
 
     tile_qs=( ${tile} )
     JOB_TITLE="Xdem-l${lane}t${tile_qs[0]}-${FC}"
-    log "sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile}"
-    RS=$(sbatch -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
+    log "sbatch -A ${SLURM_ACCOUNT} -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile}"
+    RS=$(sbatch -A ${SLURM_ACCOUNT} -J $JOB_TITLE -o $LOGDIR/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xdemuxtiles.batch ${RUNDIR} ${OUTDIR}/ ${lane} ${tile})
     DEMUX_JOBIDS[$((i++))]=${RS##* }
 
     log $RS
-
-    # Wait until the copy is complete ...
-    while [[ ! -e ${CP_COMPLETE_DIR}/l${lane}t${tile_qs[0]} ]]; do
-        sleep 10
-    done
   done
 done
 
@@ -113,12 +112,11 @@ log "Running ${RUNNING_JOBIDS[@]}"
 log "Demux ${DEMUX_JOBIDS[@]}"
 log "Remaining ${REMAINING_JOBIDS[@]}"
 JOB_TITLE="xdem-xpostface-${FC}"
-log "sbatch -J 'Xdem-postface' --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
-     sbatch -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/
+log "sbatch -A ${SLURM_ACCOUNT} -J 'Xdem-postface' --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
+     sbatch -A ${SLURM_ACCOUNT} -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/
 
 ###########
 # CLEANUP #
 ###########
 
-rm -Rf ${CP_COMPLETE_DIR}
 log "Everything started"
