@@ -99,22 +99,6 @@ for lane in "${lanes[@]}"; do
   done
 done
 
-# launch the stats generation and linking after demux finishes ok
-log "submit postface"
-set +u # RUNNING_JOBIDS might be unbound
-RUNNING_JOBIDS=( $(squeue -h --format=%i) ) # get all running/queued jobs
-REMAINING_JOBIDS=( $(comm -12 <( printf '%s\n' "${RUNNING_JOBIDS[@]}" | LC_ALL=C sort ) <( printf '%s\n' "${DEMUX_JOBIDS[@]}" | LC_ALL=C sort )) ) # get all jobs that are still relevant
-DEPENDENCY=""
-if [[ ${#REMAINING_JOBIDS[@]} > 0 ]]; then
-    DEPENDENCY="afterok:$(join : ${REMAINING_JOBIDS[@]})"
-fi
-log "Running ${RUNNING_JOBIDS[@]}"
-log "Demux ${DEMUX_JOBIDS[@]}"
-log "Remaining ${REMAINING_JOBIDS[@]}"
-JOB_TITLE="xdem-xpostface-${FC}"
-log "sbatch -A ${SLURM_ACCOUNT} -J 'Xdem-postface' --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/"
-     sbatch -A ${SLURM_ACCOUNT} -J "Xdem-postface" --dependency=${DEPENDENCY} -o ${LOGDIR}/${JOB_TITLE}-%j.log -e ${LOGDIR}/${JOB_TITLE}-%j.err ${SCRIPTDIR}/xpostface.batch ${OUTDIR}/
-
 ###########
 # CLEANUP #
 ###########

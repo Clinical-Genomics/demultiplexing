@@ -54,7 +54,8 @@ log "TILES: ${TILES[@]}"
 TMPOUT=$(mktemp -d)
 TMPOUT_DIR=${OUTDIR}/${TMPOUT}
 mkdir -p ${TMPOUT_DIR}
-echo ${TMPOUT_DIR}
+UNALIGNED_DIR=Unaligned
+mkdir -p ${OUTDIR}/${UNALIGNED_DIR}
 
 #########
 # DEMUX #
@@ -78,6 +79,7 @@ log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R ${RUNDIR} -o ${TM
 ###############
 
 # first copy the lane-tile specific information
+LANE_TILE=l${LANE}t${TILES[0]}
 TILE_DIR=l${LANE}t${TILES[0]}/
 OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
 log "starting copy output"
@@ -90,41 +92,42 @@ cp -rlf ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
 log "ln -f ${RUNDIR}/SampleSheet.csv ${OUTDIR}/"
 ln -f ${RUNDIR}/SampleSheet.csv ${OUTDIR}/
 
-# second copy the actual fastq files
-for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
-    if [[ ${PROJECT_ID} == 'Reports' || ${PROJECT_ID} == 'Stats' ]]; then
-        continue
-    fi
-    if [[ ${PROJECT_ID} =~ ^Undetermined.* ]]; then
-        continue
-    fi
+FC=${RUNDIR##*_}
+FC=${FC:1}
 
-    # skip the zero sized fastq files
-    for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
-        for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
-            if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
-                continue
-            fi
+# second link the fastq files
+for PROJECT_DIR in ${TMPOUT_DIR}/*; do
+    if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
 
-            SAMPLE_OUTDIR=${OUTDIR}/${TILE_DIR}/Project_${PROJECT_ID}/Sample_${SAMPLE_ID}
-            log "mkdir -p ${SAMPLE_OUTDIR}"
-            mkdir -p ${SAMPLE_OUTDIR}
+    PROJECT=$(basename ${PROJECT_DIR})
+    if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
+    if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
+    if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
 
-            log "ln ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}"
-            ln ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
+    for SAMPLE_DIR in ${PROJECT_DIR}/*; do
+        SAMPLE=$(basename ${SAMPLE_DIR})
+        if [[ ${SAMPLE} =~ Sample_ ]]; then continue; fi
+
+        for FASTQ_FILE in ${SAMPLE_DIR}/*; do
+            FASTQ=$(basename ${FASTQ_FILE})
+            log "mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
+            mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}
         done
-    done
-done
 
-# Copy the undetermined indexes
-UNDETERMINED_OUTDIR=${OUTDIR}/${TILE_DIR}
-mkdir -p ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
-for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
-    # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
-    if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${UNDETERMINED_OUTDIR}/${UNDETERMINED} ]]; then
-        log "ln ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}"
-        ln ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}
-    fi
+        # Undetermined
+        for UNDETERMINED_FASTQ_FILE in ${TMPOUT_DIR}/Undetermined*.fastq.gz; do
+            UNDETERMINED_FASTQ=$(basename ${UNDETERMINED_FASTQ_FILE})
+            log "ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
+            ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}
+        done
+
+        SAMPLE=$(basename ${SAMPLE_DIR})
+        log "cp -rl ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}"
+        cp -rl ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
+    done
+
+    log "cp -rl ${PROJECT_DIR} ${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
+    cp -rl ${PROJECT_DIR} ${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
 log "Done copying output"

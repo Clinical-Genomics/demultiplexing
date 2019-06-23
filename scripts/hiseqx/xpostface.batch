@@ -40,12 +40,26 @@ trap 'failed $LINENO' ERR
 
 log "VERSION ${VERSION}"
 log "INDIR: ${DEMUXDIR}"
-SCRIPTDIR=$(dirname $(readlink -nm $0)) # takes the invocation dir on SLURM
-#SCRIPTDIR=/home/proj/${ENVIRONMENT}/
 
-# create the Unaligned directory structure
-log "bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log"
-bash ${SCRIPTDIR}/xcreateunaligned.bash ${DEMUXDIR} > ${DEMUXDIR}/LOG/xcreateunaligned.`date +'%Y%m%d%H%M%S'`.log
+for PROJECT_DIR in ${DEMUXDIR}/Unaligned/*; do
+    if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
+
+    PROJECT=$(basename ${PROJECT_DIR})
+    if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
+    if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
+
+    for SAMPLE_DIR in ${PROJECT_DIR}/*; do
+        SAMPLE=$(basename ${SAMPLE_DIR})
+        if [[ ${SAMPLE} =~ Sample_ ]]; then continue; fi
+
+        log "rm ${SAMPLE_DIR}"
+        rm ${SAMPLE_DIR}
+    done
+
+    log "rm ${PROJECT_DIR}"
+    rm ${PROJECT_DIR}
+done
+${DEMUXDIR}/Unaligned/
 
 # make sure we signal the rest of the pipeline all processing is done now
 log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
