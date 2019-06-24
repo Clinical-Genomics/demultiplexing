@@ -110,6 +110,7 @@ for PROJECT_DIR in ${TMPOUT_DIR}/*; do
 
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
             FASTQ=$(basename ${FASTQ_FILE})
+            # here you can safely rename the fastq files
             log "mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
             mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}
         done
@@ -117,17 +118,21 @@ for PROJECT_DIR in ${TMPOUT_DIR}/*; do
         # Undetermined
         for UNDETERMINED_FASTQ_FILE in ${TMPOUT_DIR}/Undetermined*.fastq.gz; do
             UNDETERMINED_FASTQ=$(basename ${UNDETERMINED_FASTQ_FILE})
+            # the undetermined fastq files are used on multiple places, so link them
             log "ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
             ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}
         done
 
-        SAMPLE=$(basename ${SAMPLE_DIR})
-        log "cp -rl ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}"
-        cp -rl ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
+        # safely rename the sample dir as they are located in a tmp folder
+        log "mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}"
+        mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
     done
 
-    log "cp -rl ${PROJECT_DIR} ${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
-    cp -rl ${PROJECT_DIR} ${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+    # hardlink the project dir as it might already be existing in the target location
+    PROJECT_OUTDIR=${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+    mkdir -p ${PROJECT_OUTDIR}
+    log "cp -rl ${PROJECT_DIR}/* ${PROJECT_OUTDIR}"
+    cp -rl ${PROJECT_DIR}/* ${PROJECT_OUTDIR}
 done
 
 log "Done copying output"
