@@ -27,11 +27,11 @@ EMAIL=kenny.billiau@scilifelab.se
 
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [${NOW}] $@
+    echo "[${NOW}] $*"
 }
 
 failed() {
-    cat ${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err | mail -s "ERROR demultiplexing of $(basename $RUNDIR)" ${EMAIL}
+    mail -s "ERROR demultiplexing of $(basename "$RUNDIR")" ${EMAIL} < "${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err"
 }
 trap failed ERR
 
@@ -44,7 +44,7 @@ log "starting, will use ${TMPDIR}"
 log "RUNDIR: ${RUNDIR}"
 log "OUTDIR: ${OUTDIR}"
 log "LANE: ${LANE}"
-log "TILES: ${TILES[@]}"
+log "TILES: ${TILES[*]}"
 
 # log the version
 /usr/local/bin/bcl2fastq --version 2>&1
@@ -53,26 +53,26 @@ log "TILES: ${TILES[@]}"
 
 TMPOUT=$(mktemp -d)
 TMPOUT_DIR=${OUTDIR}/${TMPOUT}
-mkdir -p ${TMPOUT_DIR}
+mkdir -p "${TMPOUT_DIR}"
 UNALIGNED_DIR=Unaligned
-mkdir -p ${OUTDIR}/${UNALIGNED_DIR}
+mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 
 #########
 # DEMUX #
 #########
 
-BASEMASK=$(demux basemask create --lane ${LANE} --application wgs ${RUNDIR})
+BASEMASK=$(demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
 
 TILES_OPTS=''
-if [[ -n ${TILES} ]]; then
-    for TILE in ${TILES[@]}; do
+if (( ${#TILES[@]} )); then
+    for TILE in "${TILES[@]}"; do
         TILES_OPTS="${TILES_OPTS},s_${LANE}_${TILE}"
     done
     TILES_OPTS="--tiles ${TILES_OPTS:1}"
 fi
-log "start demultiplexing one lane ${LANE}, part ${TILES[@]}"
-log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}"
-     /usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}
+log "start demultiplexing one lane ${LANE}, part ${TILES[*]}"
+log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 '${TILES_OPTS}' -R '${RUNDIR}' -o '${TMPOUT_DIR}' --barcode-mismatches 1 --use-bases-mask '${BASEMASK}'"
+     /usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 "${TILES_OPTS}" -R "${RUNDIR}" -o "${TMPOUT_DIR}" --barcode-mismatches 1 --use-bases-mask "${BASEMASK}"
 
 ###############
 # LINK OUTPUT #
@@ -84,55 +84,55 @@ TILE_DIR=l${LANE}t${TILES[0]}/
 OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
 log "starting copy output"
 log "mkdir -p ${OUTDIR}"
-mkdir -p ${OUTDIR}
+mkdir -p "${OUTDIR}"
 log "mkdir -p ${OUTDIR_LT}"
-mkdir -p ${OUTDIR_LT}
-log "cp -rlf ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}"
-cp -rlf ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
-log "ln -f ${RUNDIR}/SampleSheet.csv ${OUTDIR}/"
-ln -f ${RUNDIR}/SampleSheet.csv ${OUTDIR}/
+mkdir -p "${OUTDIR_LT}"
+log "cp -rlf '${TMPOUT_DIR}/Reports' '${TMPOUT_DIR}/Stats' '${OUTDIR_LT}'"
+     cp -rlf "${TMPOUT_DIR}/Reports" "${TMPOUT_DIR}/Stats" "${OUTDIR_LT}"
+log "ln -f '${RUNDIR}/SampleSheet.csv' '${OUTDIR}/'"
+     ln -f "${RUNDIR}/SampleSheet.csv" "${OUTDIR}/"
 
 FC=${RUNDIR##*_}
 FC=${FC:1}
 
 # second link the fastq files
-for PROJECT_DIR in ${TMPOUT_DIR}/*; do
+for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
     if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
 
-    PROJECT=$(basename ${PROJECT_DIR})
+    PROJECT=$(basename "${PROJECT_DIR}")
     if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
     if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
     if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
 
-    for SAMPLE_DIR in ${PROJECT_DIR}/*; do
-        SAMPLE=$(basename ${SAMPLE_DIR})
+    for SAMPLE_DIR in "${PROJECT_DIR}"/*; do
+        SAMPLE=$(basename "${SAMPLE_DIR}")
         if [[ ${SAMPLE} =~ Sample_ ]]; then continue; fi
 
-        for FASTQ_FILE in ${SAMPLE_DIR}/*; do
-            FASTQ=$(basename ${FASTQ_FILE})
+        for FASTQ_FILE in "${SAMPLE_DIR}"/*; do
+            FASTQ=$(basename "${FASTQ_FILE}")
             # here you can safely rename the fastq files
-            log "mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
-            mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}
+            log "mv '${FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}'"
+                 mv "${FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
         done
 
         # Undetermined
-        for UNDETERMINED_FASTQ_FILE in ${TMPOUT_DIR}/Undetermined*.fastq.gz; do
-            UNDETERMINED_FASTQ=$(basename ${UNDETERMINED_FASTQ_FILE})
+        for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
+            UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
             # the undetermined fastq files are used on multiple places, so link them
-            log "ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
-            ln ${UNDETERMINED_FASTQ_FILE} ${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}
+            log "ln '${UNDETERMINED_FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
+                 ln "${UNDETERMINED_FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
         done
 
         # safely rename the sample dir as they are located in a tmp folder
-        log "mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}"
-        mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
+        log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE}'"
+             mv "${SAMPLE_DIR}" "${PROJECT_DIR}/Sample_${SAMPLE}"
     done
 
     # hardlink the project dir as it might already be existing in the target location
     PROJECT_OUTDIR=${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
-    mkdir -p ${PROJECT_OUTDIR}
-    log "cp -rl ${PROJECT_DIR}/* ${PROJECT_OUTDIR}"
-    cp -rl ${PROJECT_DIR}/* ${PROJECT_OUTDIR}
+    mkdir -p "${PROJECT_OUTDIR}"
+    log "cp -rl '${PROJECT_DIR}'/* '${PROJECT_OUTDIR}'"
+         cp -rl "${PROJECT_DIR}"/* "${PROJECT_OUTDIR}"
 done
 
 log "Done copying output"
@@ -141,5 +141,5 @@ log "Done copying output"
 # CLEAN UP #
 ############
 
-rm -r ${TMPOUT_DIR}
+rm -r "${TMPOUT_DIR}"
 log "Done removing temp files"

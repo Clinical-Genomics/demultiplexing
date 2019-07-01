@@ -26,11 +26,11 @@ EMAIL=kenny.billiau@scilifelab.se
 
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [${NOW}] $@
+    echo "[${NOW}] $*"
 }
 
 failed() {
-    echo "Error on line number $1." | mail -s "ERROR $0 in $(basename $DEMUXDIR)" ${EMAIL}
+    echo "Error on line number $1." | mail -s "ERROR $0 in $(basename "$DEMUXDIR")" ${EMAIL}
 }
 trap 'failed $LINENO' ERR
 
@@ -42,8 +42,8 @@ log "VERSION ${VERSION}"
 log "INDIR: ${DEMUXDIR}"
 
 # make sure we signal the rest of the pipeline all processing is done now
-log "date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt"
-date +'%Y%m%d%H%M%S' > ${DEMUXDIR}/copycomplete.txt
+log "date +'%Y%m%d%H%M%S' > '${DEMUXDIR}/copycomplete.txt'"
+     date +'%Y%m%d%H%M%S' > "${DEMUXDIR}/copycomplete.txt"
 
-log "ssh hasta \"echo 'done' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL\""
-ssh hasta "echo 'done' | mail -s '$(basename ${DEMUXDIR}) finished demultiplexing' $EMAIL"
+log "ssh hasta \"echo 'done' | mail -s '$(basename "${DEMUXDIR}") finished demultiplexing' $EMAIL\""
+     ssh hasta  "echo 'done' | mail -s '$(basename "${DEMUXDIR}") finished demultiplexing' $EMAIL"
