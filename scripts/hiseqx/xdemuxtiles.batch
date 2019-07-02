@@ -71,8 +71,8 @@ if (( ${#TILES[@]} )); then
     TILES_OPTS="--tiles ${TILES_OPTS:1}"
 fi
 log "start demultiplexing one lane ${LANE}, part ${TILES[*]}"
-log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 '${TILES_OPTS}' -R '${RUNDIR}' -o '${TMPOUT_DIR}' --barcode-mismatches 1 --use-bases-mask '${BASEMASK}'"
-     /usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 "${TILES_OPTS}" -R "${RUNDIR}" -o "${TMPOUT_DIR}" --barcode-mismatches 1 --use-bases-mask "${BASEMASK}"
+log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R '${RUNDIR}' -o '${TMPOUT_DIR}' --barcode-mismatches 1 --use-bases-mask '${BASEMASK}'"
+     /usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R "${RUNDIR}" -o "${TMPOUT_DIR}" --barcode-mismatches 1 --use-bases-mask "${BASEMASK}"
 
 ###############
 # LINK OUTPUT #
