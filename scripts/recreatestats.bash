@@ -3,7 +3,7 @@
 # * create the stats-*.txt files
 # * sync the stats-*.txt files to rasta
 
-VERSION=4.30.1
+VERSION=5.0.0
 
 NOW=$(date +"%Y%m%d%H%M%S")
 UNALIGNEDBASE=/home/clinical/DEMUX/
