@@ -1,7 +1,6 @@
 #!/bin/bash
 #SBATCH -t 1-24:00:00
-#SBATCH -c 16
-#SBATCH -A prod001
+#SBATCH -c 18
 #SBATCH -J Xdem
 #SBATCH --qos=high
 #SBATCH --output=/mnt/hds/proj/bioinfo/LOG/xdem-%j.out
@@ -9,16 +8,13 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=clinical-demux@scilifelab.se
 
-shopt -s expand_aliases
-source /home/hiseq.clinical/.bashrc
-
 set -eu -o pipefail
 
 ##########
 # PARAMS #
 ##########
 
-INDIR=${1?'Run dir'}
+RUNDIR=${1?'Run dir'}
 OUTDIR=${2?'Demux dir'}
 LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
@@ -30,11 +26,11 @@ EMAIL=clinical-demux@scilifelab.se
 
 log() {
     NOW=$(date +"%Y%m%d%H%M%S")
-    echo [${NOW}] $@
+    echo "[${NOW}] $*"
 }
 
 failed() {
-    cat ${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err | mail -s "ERROR demultiplexing of $(basename $INDIR)" ${EMAIL}
+    mail -s "ERROR demultiplexing of $(basename "$RUNDIR")" ${EMAIL} < "${OUTDIR}/LOG/*-${SLURM_JOB_ID}.err"
 }
 trap failed ERR
 
@@ -44,117 +40,98 @@ trap failed ERR
 
 log "On node: $(hostname)"
 log "starting, will use ${TMPDIR}"
-log "INDIR: ${INDIR}"
+log "RUNDIR: ${RUNDIR}"
 log "OUTDIR: ${OUTDIR}"
 log "LANE: ${LANE}"
-log "TILES: ${TILES[@]}"
+log "TILES: ${TILES[*]}"
 
 # log the version
 /usr/local/bin/bcl2fastq --version 2>&1
 
 # set us up
-TMPOUT_DIR=${TMPDIR}/Xout
-CP_COMPLETE_DIR=${OUTDIR}/copycomplete/
-CP_BACK_COMPLETE_DIR=${OUTDIR}/copybackcomplete/
-mkdir -p ${TMPOUT_DIR}
-mkdir -p ${CP_COMPLETE_DIR}
-mkdir -p ${CP_BACK_COMPLETE_DIR}
 
-#########
-# CP IN #
-#########
-
-log "start copying"
-for TILE in ${TILES[@]}; do
-    cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/*/s_${LANE}_${TILE}* ${TMPDIR}/
-    cp --parent ${INDIR}/Data/Intensities/BaseCalls/L00${LANE}/s_${LANE}_${TILE}* ${TMPDIR}/
-done
-cp --parent ${INDIR}/Data/Intensities/s.locs ${TMPDIR}/
-cp --parent ${INDIR}/RunInfo.xml ${TMPDIR}/
-cp --parent ${INDIR}/SampleSheet.csv ${TMPDIR}/
-cp --parent ${INDIR}/runParameters.xml ${TMPDIR}/
-
-# we finished copying, let the pipeline know
-touch ${CP_COMPLETE_DIR}/l${LANE}t${TILES[0]}
-
-RUNDIR=${TMPDIR}/${INDIR}
+TMPOUT=$(mktemp -d)
+TMPOUT_DIR=${OUTDIR}/${TMPOUT}
+mkdir -p "${TMPOUT_DIR}"
+UNALIGNED_DIR=Unaligned
+mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 
 #########
 # DEMUX #
 #########
 
-BASEMASK=$(demux basemask create --lane ${LANE} --application wgs ${RUNDIR})
+BASEMASK=$(demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
 
 TILES_OPTS=''
-for TILE in ${TILES[@]}; do
-    TILES_OPTS="${TILES_OPTS} --tiles s_${LANE}_${TILE}"
-done
-log "start demultiplexing one lane ${LANE}, part ${TILES[@]}"
-log "/usr/local/bin/bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}"
-     /usr/local/bin/bcl2fastq -d 2 -r 4 -w 4 -p 14 ${TILES_OPTS} -R ${RUNDIR} -o ${TMPOUT_DIR} --barcode-mismatches 1 --use-bases-mask ${BASEMASK}
+if (( ${#TILES[@]} )); then
+    for TILE in "${TILES[@]}"; do
+        TILES_OPTS="${TILES_OPTS},s_${LANE}_${TILE}"
+    done
+    TILES_OPTS="--tiles ${TILES_OPTS:1}"
+fi
+log "start demultiplexing one lane ${LANE}, part ${TILES[*]}"
+log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R '${RUNDIR}' -o '${TMPOUT_DIR}' --barcode-mismatches 1 --use-bases-mask '${BASEMASK}'"
+     /usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R "${RUNDIR}" -o "${TMPOUT_DIR}" --barcode-mismatches 1 --use-bases-mask "${BASEMASK}"
 
-##########
-# CP OUT #
-##########
+###############
+# LINK OUTPUT #
+###############
 
 # first copy the lane-tile specific information
+LANE_TILE=l${LANE}t${TILES[0]}
 TILE_DIR=l${LANE}t${TILES[0]}/
 OUTDIR_LT=${OUTDIR}/${TILE_DIR}/
 log "starting copy output"
 log "mkdir -p ${OUTDIR}"
-mkdir -p ${OUTDIR}
+mkdir -p "${OUTDIR}"
 log "mkdir -p ${OUTDIR_LT}"
-mkdir -p ${OUTDIR_LT}
-log "cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}"
-cp -R ${TMPOUT_DIR}/Reports ${TMPOUT_DIR}/Stats ${OUTDIR_LT}
-log "cp ${INDIR}/SampleSheet.csv ${OUTDIR}/"
-cp ${INDIR}/SampleSheet.csv ${OUTDIR}/
+mkdir -p "${OUTDIR_LT}"
+log "cp -rlf '${TMPOUT_DIR}/Reports' '${TMPOUT_DIR}/Stats' '${OUTDIR_LT}'"
+     cp -rlf "${TMPOUT_DIR}/Reports" "${TMPOUT_DIR}/Stats" "${OUTDIR_LT}"
+log "ln -f '${RUNDIR}/SampleSheet.csv' '${OUTDIR}/'"
+     ln -f "${RUNDIR}/SampleSheet.csv" "${OUTDIR}/"
 
-# second copy the actual fastq files
-for PROJECT_ID in `ls ${TMPOUT_DIR}`; do
-    if [[ ${PROJECT_ID} == 'Reports' || ${PROJECT_ID} == 'Stats' ]]; then
-        continue
-    fi
-    if [[ ${PROJECT_ID} =~ ^Undetermined.* ]]; then
-        continue
-    fi
+FC=${RUNDIR##*_}
+FC=${FC:1}
 
-    # wait until other jobs finished copying ... yes yes, race condition
-    while [[ $( ls -A ${CP_BACK_COMPLETE_DIR}) ]]; do
-        sleep 10
-    done
-    touch ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
+# second link the fastq files
+for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
+    if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
 
-    # skip the zero sized fastq files
-    for SAMPLE_ID in `ls ${TMPOUT_DIR}/${PROJECT_ID}`; do
-        for FASTQ_FILE in `ls ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/`; do
-            if [[ ! -s ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ]]; then
-                continue
-            fi
+    PROJECT=$(basename "${PROJECT_DIR}")
+    if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
+    if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
+    if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
 
-            SAMPLE_OUTDIR=${OUTDIR}/${TILE_DIR}/Project_${PROJECT_ID}/Sample_${SAMPLE_ID}
-            log "mkdir -p ${SAMPLE_OUTDIR}"
-            mkdir -p ${SAMPLE_OUTDIR}
+    for SAMPLE_DIR in "${PROJECT_DIR}"/*; do
+        SAMPLE=$(basename "${SAMPLE_DIR}")
+        if [[ ${SAMPLE} =~ Sample_ ]]; then continue; fi
 
-            log "cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}"
-            cp ${TMPOUT_DIR}/${PROJECT_ID}/${SAMPLE_ID}/${FASTQ_FILE} ${SAMPLE_OUTDIR}/${FASTQ_FILE}
+        for FASTQ_FILE in "${SAMPLE_DIR}"/*; do
+            FASTQ=$(basename "${FASTQ_FILE}")
+            # here you can safely rename the fastq files
+            log "mv '${FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}'"
+                 mv "${FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
         done
+
+        # Undetermined
+        for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
+            UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
+            # the undetermined fastq files are used on multiple places, so link them
+            log "ln '${UNDETERMINED_FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
+                 ln "${UNDETERMINED_FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
+        done
+
+        # safely rename the sample dir as they are located in a tmp folder
+        log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE}'"
+             mv "${SAMPLE_DIR}" "${PROJECT_DIR}/Sample_${SAMPLE}"
     done
 
-    # we're done copying, release the lock
-    rm ${CP_BACK_COMPLETE_DIR}/l${LANE}t${TILES[0]}
-
-done
-
-# Copy the undetermined indexes
-UNDETERMINED_OUTDIR=${OUTDIR}/${TILE_DIR}
-mkdir -p ${UNDETERMINED_OUTDIR} # in the odd case the tile dir wasn't created
-for UNDETERMINED in $( ( cd ${TMPOUT_DIR}/ && ls Undetermined*) ); do
-    # if Undetermined is not zero size and is not copied to $TMPOUT_DIR yet ...
-    if [[ -s ${TMPOUT_DIR}/${UNDETERMINED} && ! -e ${UNDETERMINED_OUTDIR}/${UNDETERMINED} ]]; then
-        log "cp ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}"
-        cp ${TMPOUT_DIR}/${UNDETERMINED} ${UNDETERMINED_OUTDIR}/${UNDETERMINED}
-    fi
+    # hardlink the project dir as it might already be existing in the target location
+    PROJECT_OUTDIR=${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+    mkdir -p "${PROJECT_OUTDIR}"
+    log "cp -rl '${PROJECT_DIR}'/* '${PROJECT_OUTDIR}'"
+         cp -rl "${PROJECT_DIR}"/* "${PROJECT_OUTDIR}"
 done
 
 log "Done copying output"
@@ -163,6 +140,5 @@ log "Done copying output"
 # CLEAN UP #
 ############
 
-rm -r ${TMPDIR}/Xout/
-rm -r ${TMPDIR}/*
+rm -r "${TMPOUT_DIR}"
 log "Done removing temp files"
