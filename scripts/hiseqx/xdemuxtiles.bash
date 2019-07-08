@@ -11,8 +11,7 @@ VERSION=4.29.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
-#EMAIL=clinical-demux@scilifelab.se
-EMAIL=kenny.billiau@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 

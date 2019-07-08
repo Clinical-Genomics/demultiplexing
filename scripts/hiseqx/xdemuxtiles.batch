@@ -18,8 +18,7 @@ RUNDIR=${1?'Run dir'}
 OUTDIR=${2?'Demux dir'}
 LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
-#EMAIL=clinical-demux@scilifelab.se
-EMAIL=kenny.billiau@scilifelab.se
+EMAIL=clinical-demux@scilifelab.se
 
 #############
 # FUNCTIONS #
