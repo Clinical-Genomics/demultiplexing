@@ -130,8 +130,8 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
     # hardlink the project dir as it might already be existing in the target location
     PROJECT_OUTDIR=${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
     mkdir -p "${PROJECT_OUTDIR}"
-    log "cp -rl '${PROJECT_DIR}'/* '${PROJECT_OUTDIR}'"
-         cp -rl "${PROJECT_DIR}"/* "${PROJECT_OUTDIR}"
+    log "cp -rlf '${PROJECT_DIR}'/* '${PROJECT_OUTDIR}'"
+         cp -rlf "${PROJECT_DIR}"/* "${PROJECT_OUTDIR}"
 done
 
 log "Done copying output"
