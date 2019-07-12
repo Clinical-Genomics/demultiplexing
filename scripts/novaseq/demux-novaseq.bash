@@ -54,6 +54,7 @@ cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 # Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
+shopt -s nullglob
 for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
 

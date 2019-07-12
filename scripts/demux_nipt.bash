@@ -4,7 +4,7 @@
 #   under $UNALIGNEDBASE
 
 set -eu -o pipefail
-VERSION=4.29.2
+VERSION=5.0.0
 shopt -s expand_aliases
 . ~/.bashrc
 
