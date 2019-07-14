@@ -54,5 +54,9 @@ username: apiuser
 password: somepassword
 ```
 
+## Contributing
+
+Demux is using github flow branching model as described in our [development manual][development manual].
+
 [travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
 [travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
