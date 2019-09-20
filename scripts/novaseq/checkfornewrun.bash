@@ -74,6 +74,10 @@ for RUN_DIR in ${IN_DIR}/*; do
             log "${RUN} is finished and demultiplexing has already started"
         fi
     else
+        if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
+            log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
+            demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
+        fi
         log "${RUN} is not finished yet"
     fi
 done
