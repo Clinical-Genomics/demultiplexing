@@ -41,7 +41,7 @@ ${BCL2FASTQ_BIN} --version
 # Here we go!
 log "Here we go!"
 
-BASEMASK=Y30I10I10
+BASEMASK=Y30,I10,I10
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
