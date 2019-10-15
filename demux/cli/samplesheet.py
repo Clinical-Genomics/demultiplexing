@@ -265,7 +265,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                     index1 += 'AT'
                     index2 = 'AC' + index2
                 line['index'] = index1
-                line['index2'] = index2
+                line['index2'] = reverse_complement(index2)
             else:
                 if pad and len(line['index']) == 8:
                     line['index'] += 'AT'
