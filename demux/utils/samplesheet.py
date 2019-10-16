@@ -4,6 +4,7 @@ from copy import deepcopy
 from collections import OrderedDict
 from path import Path
 
+
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
         self.section = section
@@ -30,6 +31,7 @@ class Line(dict):
             index2 = _reverse_complement(self['index2']) if revcomp else self['index2']
             return self['index'] + delim + index2
         return self['index']
+
 
 class Samplesheet(object):
     """SampleSheet.
@@ -304,6 +306,14 @@ class HiSeqXSamplesheet(Samplesheet):
                 raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         return True
+
+
+class iseqSampleSheet(Samplesheet):
+
+    header_map = {
+            'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name', 'description': 'Description',
+            'index': 'index', 'index2': 'index2', 'sample_project': 'Sample_Project'
+    }
 
 
 class MiseqSamplesheet(Samplesheet):
