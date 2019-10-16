@@ -311,8 +311,9 @@ class HiSeqXSamplesheet(Samplesheet):
 class iseqSampleSheet(Samplesheet):
 
     header_map = {
-            'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name', 'description': 'Description',
-            'index': 'index', 'index2': 'index2', 'project': 'Sample_Project'
+            'fcid': 'FCID', 'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name',
+            'description': 'Description', 'index': 'index', 'index2': 'index2', 'project':
+            'Sample_Project'
     }
 
 
