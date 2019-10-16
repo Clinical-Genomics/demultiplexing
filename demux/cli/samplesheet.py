@@ -234,7 +234,8 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                                    f"Use --longest or --indexlength", fg='red'))
             context.abort()
 
-        lims_keys = ['sample_id',
+        lims_keys = ['fcid',
+                     'sample_id',
                      'sample_id',
                      'sample_id',
                      'index',
@@ -242,6 +243,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                      'sample_name']
 
         header = [
+            'FCID',
             'Sample_ID',
             'Sample_Name',
             'Description',
@@ -265,7 +267,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                     index1 += 'AT'
                     index2 = 'AC' + index2
                 line['index'] = index1
-                line['index2'] = index2
+                line['index2'] = reverse_complement(index2)
             else:
                 if pad and len(line['index']) == 8:
                     line['index'] += 'AT'
