@@ -234,14 +234,19 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
                                    f"Use --longest or --indexlength", fg='red'))
             context.abort()
 
-        lims_keys = ['sample_id',
+        # lims_keys = ['fcid', 'lane', 'sample_id', 'sample_ref', 'index', 'index2', 'sample_name',
+        #              'control', 'recipe', 'operator', 'project']
+        lims_keys = ['fcid',
+                     'sample_id',
                      'sample_id',
                      'sample_id',
                      'index',
                      'index2',
                      'sample_name']
 
+        # header = [Samplesheet.header_map[head] for head in lims_keys]
         header = [
+            'FCID',
             'Sample_ID',
             'Sample_Name',
             'Description',
