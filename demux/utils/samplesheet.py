@@ -89,8 +89,8 @@ class Samplesheet(object):
 
     def _get_data_header(self):
         header_r = self._get_data_header_r()
-        header_map_r = dict((v,k) for k,v in self.header_map.items())
-        header = [ header_map_r[k] for k in header_r ]
+        header_map_r = dict((v, k) for k, v in self.header_map.items())
+        header = [header_map_r[k] for k in header_r]
 
         return header
 
@@ -312,7 +312,7 @@ class iseqSampleSheet(Samplesheet):
 
     header_map = {
             'sample_id': 'Sample_ID', 'sample_name': 'Sample_Name', 'description': 'Description',
-            'index': 'index', 'index2': 'index2', 'sample_project': 'Sample_Project'
+            'index': 'index', 'index2': 'index2', 'project': 'Sample_Project'
     }
 
 
