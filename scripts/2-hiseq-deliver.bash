@@ -50,8 +50,8 @@ for RUNDIR in ${INDIR}/*; do
 
     if [[ ! -e ${RUNDIR}/copycomplete.txt ]]; then
         date +'%Y%m%d%H%M%S' > ${RUNDIR}/copycomplete.txt
-        log "rsync -a ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
-        rsync -rvt --progress --exclude=copycomplete.txt ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
+        log "rsync -rt --progress --exclude=copycomplete.txt --exclude='Undetermined*' ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}"
+        rsync -rt --progress --exclude=copycomplete.txt --exclude='Undetermined*' ${RUNDIR} ${TARGET_SERVER}:${TARGET_DIR}
         log "scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/"
         scp ${RUNDIR}/copycomplete.txt ${TARGET_SERVER}:${TARGET_DIR}/${RUN}/
         log "ssh ${TARGET_SERVER} 'rm ${TARGET_DIR}/${RUN}/delivery.txt'"
