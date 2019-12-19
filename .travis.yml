@@ -24,6 +24,11 @@ jobs:
       if: type = pull_request
       script:
         - pip check
+    - name: "development dependencies"
+      if: type = pull_request
+      script:
+        - pip install -U -r requirements-dev.txt .
+        - pip check
     - name: "coverage"
       if: NOT type = pull_request
       script:
