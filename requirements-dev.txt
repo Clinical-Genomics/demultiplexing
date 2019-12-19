@@ -1,0 +1,15 @@
+pytest
+coverage<5
+pytest-cov
+coveralls
+pytest-mock
+git-lint
+pylint
+pycodestyle
+yamllint
+docutils
+html-linter
+tidy
+python-coveralls
+black
+pre-commit
