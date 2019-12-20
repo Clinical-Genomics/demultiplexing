@@ -13,3 +13,4 @@ tidy
 python-coveralls
 black
 pre-commit
+six==1.12                   # due to astroid 2.3.3
