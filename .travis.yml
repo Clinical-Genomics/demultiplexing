@@ -1,10 +1,10 @@
 language: python
 python:
-    - "3.6"
-    - "3.7"
+  - "3.6"
+  - "3.7"
 
 services:
-    - mysql
+  - mysql
 
 # command to install dependencies
 # pip locked to version in P_deliver
