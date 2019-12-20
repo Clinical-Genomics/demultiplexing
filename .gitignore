@@ -1,1 +1,8 @@
 *.pyc
+demux.egg-info/dependency_links.txt
+demux.egg-info/entry_points.txt
+demux.egg-info/not-zip-safe
+demux.egg-info/PKG-INFO
+demux.egg-info/requires.txt
+demux.egg-info/SOURCES.txt
+demux.egg-info/top_level.txt
