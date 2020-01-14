@@ -33,7 +33,7 @@ jobs:
       install:
         - pip install pip==9.0.1  # pip on prod
         - pip install -U cython
-        - pip install -U -r requirements.txt
+        - pip install -U -r requirements.txt .
       script: pip check
 
     - name: "Production dependencies on Hasta"
@@ -42,7 +42,7 @@ jobs:
       install:
         - pip install pip==19.0.1   # pip version in P_demux
         - pip install -U cython
-        - pip install -U -r requirements.txt
+        - pip install -U -r requirements.txt .
       script: pip check
 
     - name: "Development dependencies"
