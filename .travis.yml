@@ -4,9 +4,9 @@ cache: pip
 
 jobs:
   include:
-    - name: "Tests on python 3.6 (Thalamus)"
+    - name: "Tests on python 3.6 (Clinical-Preproc)"
       if: type = pull_request
-      python: "3.6"
+      python: "3.6.2"   # on prod
       services: mysql
       install: pip install -U -r requirements.txt -r requirements-dev.txt .
       script:
@@ -15,7 +15,7 @@ jobs:
 
     - name: "Tests on python 3.7 (Hasta)"
       if: type = pull_request
-      python: "3.7"
+      python: "3.7.2" # on P_demux
       services: mysql
       install: pip install -U -r requirements.txt -r requirements-dev.txt .
       script:
@@ -27,20 +27,20 @@ jobs:
       install: python setup.py install
       script: true
 
-    - name: "Production dependencies on python 3.6 (Thalamus)"
+    - name: "Production dependencies on Clinical-Preproc"
       if: type = pull_request
-      python: "3.6"
+      python: "3.6.2"             # on prod
       install:
-        # - pip install pip==18.1  # pip version in
+        - pip install pip==9.0.1  # pip on prod
         - pip install -U cython
         - pip install -U -r requirements.txt
       script: pip check
 
-    - name: "Production dependencies on python 3.7 (Hasta)"
+    - name: "Production dependencies on Hasta"
       if: type = pull_request
-      python: "3.7"
+      python: "3.7.2"               # on P_demux
       install:
-        # - pip install pip==9.0.1  # pip version in
+        - pip install pip==19.0.1   # pip version in P_demux
         - pip install -U cython
         - pip install -U -r requirements.txt
       script: pip check
