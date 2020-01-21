@@ -5,7 +5,7 @@ cache: pip
 jobs:
   include:
     - name: "Tests on python 3.6 (Clinical-Preproc)"
-      if: type = pull_request
+      if: type = pull_request     # extra tests on PR
       python: "3.6.2"   # on prod
       services: mysql
       install: pip install . -r requirements-dev.txt
@@ -14,7 +14,6 @@ jobs:
         - bash tests/test.bash
 
     - name: "Tests on python 3.7 (Hasta)"
-      if: type = pull_request
       python: "3.7.2" # on P_demux
       services: mysql
       install: pip install . -r requirements-dev.txt
