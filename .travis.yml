@@ -53,7 +53,7 @@ jobs:
       script: pip check
 
     - name: "Coverage"
-      if: NOT type = pull_request
+      if: NOT type = push
       services: mysql
       install:
         - pip install cython
