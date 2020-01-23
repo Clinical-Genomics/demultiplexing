@@ -14,7 +14,7 @@ jobs:
         - bash tests/test.bash
 
     - name: "Tests on python 3.7 (Hasta)"
-      python: "3.7.2" # on P_demux
+      python: "3.7.2"             # on P_demux
       services: mysql
       install: pip install . -r requirements-dev.txt
       script:
