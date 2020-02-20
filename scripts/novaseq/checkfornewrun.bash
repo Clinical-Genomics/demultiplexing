@@ -70,6 +70,9 @@ for RUN_DIR in ${IN_DIR}/*; do
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
                 date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
             fi
+
+            # This is an easy way to avoid running multiple demuxes at the same time
+            break
         else
             log "${RUN} is finished and demultiplexing has already started"
         fi
