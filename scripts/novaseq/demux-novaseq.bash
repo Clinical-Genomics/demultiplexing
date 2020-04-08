@@ -41,12 +41,11 @@ ${BCL2FASTQ_BIN} --version
 # Here we go!
 log "Here we go!"
 
-BASEMASK=Y151,I10,I10,Y151
-UNALIGNED_DIR=Unaligned-${BASEMASK//,}
+UNALIGNED_DIR=Unaligned
 
 # DEMUX !
-log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1
+log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1
 
 # add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
