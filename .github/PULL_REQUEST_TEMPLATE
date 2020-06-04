@@ -1,13 +1,17 @@
-This PR adds a fix for the leaking coffee machine.
+This PR adds/fixes ...
+
+**How to prepare for test**:
+- [ ] ssh to hasta
+- [ ] install on stage:
+`bash servers/resources/hasta.scilifelab.se/update-demux-stage.sh [THIS-BRANCH-NAME]`
 
 **How to test**:
-1. install on stage of the coffee machine: `bash servers/resources/coffee.selecta.se/update-cg-stage.sh fix-water-leak`
-1. activate stage: `us`
-1. run following command: `cg get coffee`
+- [ ] login to ...
+- [ ] do ...
 
-**Expected outcome**:
-`cg` should be providing you with a progress report of your coffee making. The coffee machine should not be leaking.
-Take a screenshot and attach or copy/paste the output.
+**Expected test outcome**:
+- [ ] check that ...
+- [ ] Take a screenshot and attach or copy/paste the output.
 
 **Review:**
 - [ ] code approved by
@@ -15,4 +19,7 @@ Take a screenshot and attach or copy/paste the output.
 - [ ] "Merge and deploy" approved by
 Thanks for filling in who performed the code review and the test!
 
-This is patch|minor|major **version bump** because ...
+This [version](https://semver.org/) is a:
+- [ ] **MAJOR** - when you make incompatible API changes
+- [ ] **MINOR** - when you add functionality in a backwards compatible manner
+- [ ] **PATCH** - when you make backwards compatible bug fixes or documentation/instructions
