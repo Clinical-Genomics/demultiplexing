@@ -51,10 +51,10 @@ for RUN_DIR in ${IN_DIR}/*; do
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
-	    # remove empty sample sheets before continuing
-	    if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
+            # remove empty sample sheets before continuing
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 rm ${RUN_DIR}/SampleSheet.csv
-	    fi
+            fi
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
