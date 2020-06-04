@@ -53,6 +53,11 @@ for RUN_DIR in ${IN_DIR}/*; do
             log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
+	    # remove empty sample sheets before continuing
+	    if [[ ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
+		rm ${RUN_DIR}/SampleSheet.csv
+	    fi
+
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
                 demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
