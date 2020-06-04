@@ -87,7 +87,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     if len(raw_samplesheet) == 0:
-        log.error('Samplesheet not found in LIMS!')
+        sys.stderr.write('Samplesheet not found in LIMS!')
         context.abort()
 
     if longest:
