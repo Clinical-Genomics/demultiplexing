@@ -50,8 +50,6 @@ for RUN_DIR in ${IN_DIR}/*; do
 
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
-            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
-            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
 	    # remove empty sample sheets before continuing
 	    if [[ ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
@@ -65,6 +63,9 @@ for RUN_DIR in ${IN_DIR}/*; do
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p ${DEMUXES_DIR}/${RUN}/
+
+            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
+            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
