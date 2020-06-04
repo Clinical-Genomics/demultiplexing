@@ -53,7 +53,7 @@ for RUN_DIR in ${IN_DIR}/*; do
 
 	    # remove empty sample sheets before continuing
 	    if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
-		rm ${RUN_DIR}/SampleSheet.csv
+                rm ${RUN_DIR}/SampleSheet.csv
 	    fi
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
