@@ -58,7 +58,7 @@ for RUN_DIR in ${IN_DIR}/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 2>>${PROJECTLOG}"
-		demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 2>>${PROJECTLOG} 
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 2>>${PROJECTLOG} 
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
