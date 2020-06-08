@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import click
 import logging
 
-from path import Path
+from pathlib import Path
 import xml.etree.cElementTree as et
 
-from .utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
+from .utils import HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet
 
 log = logging.getLogger(__name__)
+
 
 @click.group()
 def basemask():
     """Samplesheet commands"""
     pass
+
 
 @basemask.command()
 @click.argument('rundir')
@@ -34,14 +35,13 @@ def create(rundir, lane, application):
     elif application == 'wgs':
         sheet = HiSeqXSamplesheet(samplesheet)
 
-
     # runParameters.xml
     run_params_tree = et.parse(Path(rundir).joinpath('runParameters.xml'))
     read1_len = int(run_params_tree.findtext('Setup/IndexRead1'))
     read2_len = int(run_params_tree.findtext('Setup/IndexRead2'))
 
     lines = [line for line in sheet.lines_per_column('lane', lane)]
-    
+
     # get the inex lengths
     index1 = lines[0]['index']
     index2 = lines[0]['index2'] if 'index2' in lines[0] else ''
