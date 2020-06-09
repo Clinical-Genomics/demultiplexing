@@ -61,7 +61,7 @@ for RUN_DIR in ${IN_DIR}/*; do
                 demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 
             fi
 
-	    # exit if samplesheet is still empty after running demux sheet fetch
+            # exit if samplesheet is still empty after running demux sheet fetch
             if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 echo "Sample sheet empty! Exiting!" 1>&2
                 continue
