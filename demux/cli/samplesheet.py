@@ -83,11 +83,12 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         """ Only keeps the first part of the project name"""
         return project.split(' ')[0]
 
+    # import ipdb; ipdb.set_trace()
     lims_api = ClinicalLims(**context.obj['lims'])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     if len(raw_samplesheet) == 0:
-        sys.stderr.write('Samplesheet not found in LIMS!')
+        sys.stderr.write(f'Samplesheet for {flowcell} not found in LIMS! ')
         context.abort()
 
     if longest:
