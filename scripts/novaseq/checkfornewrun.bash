@@ -51,14 +51,20 @@ for RUN_DIR in ${IN_DIR}/*; do
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
-            # remove empty sample sheets before continuing
+            # start with a clean slate: remove empty sample sheets before continuing
             if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 rm ${RUN_DIR}/SampleSheet.csv
             fi
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
-                log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 2>>${PROJECTLOG}"
-                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 2>>${PROJECTLOG} 
+                log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 
+            fi
+
+	    # exit if samplesheet is still empty after running demux sheet fetch
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
+                echo "Sample sheet empty! Exiting!" 1>&2
+                continue
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
