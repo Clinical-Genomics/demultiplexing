@@ -62,7 +62,7 @@ for RUN_DIR in ${IN_DIR}/*; do
             fi
 
             # exit if samplesheet is still empty after running demux sheet fetch
-            if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
                 echo "Sample sheet empty! Exiting!" 1>&2
                 continue
             fi
