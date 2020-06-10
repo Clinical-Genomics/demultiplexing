@@ -52,7 +52,7 @@ for RUN_DIR in ${IN_DIR}/*; do
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
             # start with a clean slate: remove empty sample sheets before continuing
-            if [[ ! -s ${RUN_DIR}/SampleSheet.csv && -e ${RUN_DIR}/SampleSheet.csv ]]; then
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv  ]]; then
                 rm ${RUN_DIR}/SampleSheet.csv
             fi
 
