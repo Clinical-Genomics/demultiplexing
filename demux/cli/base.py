@@ -20,7 +20,7 @@ def demux(context, log_level, config):
     """Making demuxing easier!"""
     setup_logging(level=log_level)
     #log.info('{}: version {}'.format(__package__, __version__))
-    context.obj = yaml.load(config) if config else {}
+    context.obj = yaml.full_load(config) if config else {}
     context.obj['log_level'] = log_level
 
 
