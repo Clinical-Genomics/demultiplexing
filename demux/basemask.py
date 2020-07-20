@@ -4,7 +4,7 @@ import sys
 import click
 import logging
 
-from path import Path
+from pathlib import Path
 import xml.etree.cElementTree as et
 
 from .utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Samplesheet, MiseqSamplesheet

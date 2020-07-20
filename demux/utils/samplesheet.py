@@ -2,7 +2,7 @@ import re
 from time import strftime
 from copy import deepcopy
 from collections import OrderedDict
-from path import Path
+from pathlib import Path
 
 
 class SampleSheetValidationException(Exception):
