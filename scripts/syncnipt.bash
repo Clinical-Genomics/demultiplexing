@@ -6,7 +6,7 @@ shopt -s expand_aliases
 source ~/.aliases
 set -eu
 
-VERSION=5.2.5
+VERSION=5.2.6
 echo "Version $VERSION"
 
 ##########
