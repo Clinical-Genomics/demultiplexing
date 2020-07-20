@@ -1,5 +1,0 @@
-psutil
-path.py
-click<7
-PyYAML
-cglims
