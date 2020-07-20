@@ -2,7 +2,7 @@
 import click
 import logging
 
-from path import Path
+from pathlib import Path
 import xml.etree.cElementTree as et
 
 from .utils import (
