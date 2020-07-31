@@ -170,7 +170,8 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
 
         path = os.path.abspath(__file__)
         dir_path = os.path.dirname(path)
-        with open(f"{dir_path}/../../files/20181012_Indices.csv") as csv_file:
+        # with open(f"{dir_path}/../../files/20181012_Indices.csv") as csv_file:
+        with open(f"/home/hiseq.clinical/SCRIPTS/git/demultiplexing/files/20181012_Indices.csv") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=',')
             dummy_samples = [row for row in dummy_samples_csv]
             added_dummy_samples = []
