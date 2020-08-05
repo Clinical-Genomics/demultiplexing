@@ -7,7 +7,7 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-VERSION=5.2.7
+VERSION=5.2.8
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
