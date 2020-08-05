@@ -35,8 +35,8 @@ def create(rundir, lane, application):
     """Create a basemask based on SampleSheet.csv and runParameters"""
 
     # runParameters.xml
-    def parse_run_parameters(run_parameters):
-        return et.parse(Path(rundir).joinpath(run_parameters))
+    def parse_run_parameters(run_parameters_file):
+        return et.parse(Path(rundir).joinpath(run_parameters_file))
 
     def create_basemask(run_params_tree, sheet):
         read1_len = int(run_params_tree.findtext("Setup/IndexRead1"))
@@ -85,10 +85,10 @@ def create(rundir, lane, application):
         sheet = HiSeqXSamplesheet(samplesheet)
 
     if application == "nova":
-        run_parameters = "RunParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters)
+        run_parameters_file = "RunParameters.xml"
+        run_params_tree = parse_run_parameters(run_parameters_file)
         create_novaseq_basemask(run_params_tree)
     else:
-        run_parameters = "runParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters)
+        run_parameters_file = "runParameters.xml"
+        run_params_tree = parse_run_parameters(run_parameters_file)
         create_basemask(run_params_tree, sheet)
