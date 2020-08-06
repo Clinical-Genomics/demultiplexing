@@ -28,7 +28,7 @@ def basemask():
 @click.option(
     "-a",
     "--application",
-    type=click.Choice(["wgs", "wes", "nipt", "miseq", "nova"]),
+    type=click.Choice(["miseq", "nipt", "nova", "wes", "wgs"]),
     help="sequencing type",
 )
 def create(rundir, lane, application):
