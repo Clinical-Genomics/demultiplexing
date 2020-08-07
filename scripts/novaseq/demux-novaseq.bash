@@ -39,7 +39,7 @@ demux --version
 ${BCL2FASTQ_BIN} --version
 
 # Here we go!
-log "Here we go!"
+log "Starting NovaSeq demultiplexing"
 
 BASEMASK=$(demux basemask create --application nova ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
