@@ -1,25 +1,26 @@
-# -*- coding: utf-8 -*-
-import click
+""" create basemask for demultiplexing based on run parameters """
+
 import logging
+import xml.etree.cElementTree as xml_etree
+
+import click
 
 from path import Path
-import xml.etree.cElementTree as et
 
 from .utils import (
-    Samplesheet,
-    HiSeqXSamplesheet,
-    NIPTSamplesheet,
     HiSeq2500Samplesheet,
+    HiSeqXSamplesheet,
     MiseqSamplesheet,
+    NIPTSamplesheet,
 )
 
-log = logging.getLogger(__name__)
+EMPTY_STRING = ""
+LOG = logging.getLogger(__name__)
 
 
 @click.group()
 def basemask():
     """Samplesheet commands"""
-    pass
 
 
 @basemask.command()
@@ -36,9 +37,14 @@ def create(rundir, lane, application):
 
     # runParameters.xml
     def parse_run_parameters(run_parameters_file):
-        return et.parse(Path(rundir).joinpath(run_parameters_file))
+        """ parse the run parameters file """
 
-    def create_basemask(run_params_tree, sheet):
+        return xml_etree.parse(Path(rundir).joinpath(run_parameters_file))
+
+    def create_basemask(sheet):
+        """ create the bcl2fastq basemask """
+        run_parameters_file = "runParameters.xml"
+        run_params_tree = parse_run_parameters(run_parameters_file)
         read1_len = int(run_params_tree.findtext("Setup/IndexRead1"))
         read2_len = int(run_params_tree.findtext("Setup/IndexRead2"))
 
@@ -46,49 +52,57 @@ def create(rundir, lane, application):
 
         # get the index lengths
         index1 = lines[0]["index"]
-        index2 = lines[0]["index2"] if "index2" in lines[0] else ""
+        index2 = lines[0]["index2"] if "index2" in lines[0] else EMPTY_STRING
 
         # index1 basemask
-        i1n = "n" * (read1_len - len(index1))
-        i1 = "I" + str(len(index1)) + i1n
+        index1_n = "n" * (read1_len - len(index1))
+        basemask_index1 = "I" + str(len(index1)) + index1_n
 
         # index2 basemask
         if read2_len == 0:
-            click.echo(f"Y151,{i1},Y151")
+            click.echo(f"Y151,{basemask_index1},Y151")
         else:
-            i2n = "n" * (read2_len - len(index2))
+            index2_n = "n" * (read2_len - len(index2))
             if len(index2) > 0:
-                i2 = "I" + str(len(index2)) + i2n
+                basemask_index2 = "I" + str(len(index2)) + index2_n
             else:
-                i2 = i2n
-            click.echo(f"Y151,{i1},{i2},Y151")
+                basemask_index2 = index2_n
+            click.echo(f"Y151,{basemask_index1},{basemask_index2},Y151")
 
-    def create_novaseq_basemask(run_params_tree):
+    def create_novaseq_basemask():
+        """ create the bcl2fastq basemask for novaseq flowcells"""
+
+        run_parameters_file = "RunParameters.xml"
+        run_params_tree = parse_run_parameters(run_parameters_file)
+
         indexread1 = int(run_params_tree.findtext("IndexRead1NumberOfCycles"))
         indexread2 = int(run_params_tree.findtext("IndexRead2NumberOfCycles"))
         read1 = int(run_params_tree.findtext("Read1NumberOfCycles"))
         read2 = int(run_params_tree.findtext("Read2NumberOfCycles"))
 
-        basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
+        novaseq_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
 
-        click.echo(f"{basemask}")
+        click.echo(f"{novaseq_basemask}")
 
-    sheet = None
-    samplesheet = Path(rundir).joinpath("SampleSheet.csv")
-    if application == "nipt":
-        sheet = NIPTSamplesheet(samplesheet)
-    elif application == "wes":
-        sheet = HiSeq2500Samplesheet(samplesheet)
-    elif application == "miseq":
-        sheet = MiseqSamplesheet(samplesheet)
-    elif application == "wgs":
-        sheet = HiSeqXSamplesheet(samplesheet)
+    def get_application_sheet(application):
+        """ parse the samplesheet in the runs directory, based on the type of application """
+        sheet = None
+        samplesheet = Path(rundir).joinpath("SampleSheet.csv")
+        sheet_map = {
+            "nipt": NIPTSamplesheet,
+            "wes": HiSeq2500Samplesheet,
+            "miseq": MiseqSamplesheet,
+            "wgs": HiSeqXSamplesheet,
+        }
+        sheet = sheet_map[application](samplesheet)
 
-    if application == "nova":
-        run_parameters_file = "RunParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters_file)
-        create_novaseq_basemask(run_params_tree)
-    else:
-        run_parameters_file = "runParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters_file)
-        create_basemask(run_params_tree, sheet)
+        return sheet
+
+    def create_application_basemask(application):
+        """ determine the basemask """
+        if application == "nova":
+            create_novaseq_basemask()
+        else:
+            create_basemask(get_application_sheet(application))
+
+    create_application_basemask(application)
