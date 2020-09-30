@@ -50,16 +50,28 @@ for RUN_DIR in ${IN_DIR}/*; do
 
     if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
-            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
-            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
+
+            # start with a clean slate: remove empty sample sheets before continuing
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv  ]]; then
+                rm ${RUN_DIR}/SampleSheet.csv
+            fi
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 
+            fi
+
+            # exit if samplesheet is still empty after running demux sheet fetch
+            if [[ ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
+                echo "Sample sheet empty! Exiting!" 1>&2
+                continue
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
             mkdir -p ${DEMUXES_DIR}/${RUN}/
+
+            log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
+            date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}

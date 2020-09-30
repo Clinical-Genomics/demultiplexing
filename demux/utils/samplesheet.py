@@ -1,8 +1,7 @@
 import re
-from time import strftime
 from copy import deepcopy
 from collections import OrderedDict
-from path import Path
+from pathlib import Path
 
 
 class SampleSheetValidationException(Exception):
@@ -21,6 +20,7 @@ class SampleSheetParsexception(Exception):
 
 class Line(dict):
 
+    @staticmethod
     def _reverse_complement(dna):
         complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
         return ''.join([complement[base] for base in dna[::-1]])
@@ -28,7 +28,7 @@ class Line(dict):
     @property
     def dualindex(self, delim='-', revcomp=False):
         if 'index2' in self and len(self['index2']):
-            index2 = _reverse_complement(self['index2']) if revcomp else self['index2']
+            index2 = self._reverse_complement(self['index2']) if revcomp else self['index2']
             return self['index'] + delim + index2
         return self['index']
 
