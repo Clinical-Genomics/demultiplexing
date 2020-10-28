@@ -252,7 +252,7 @@ class Samplesheet(object):
                 if any((c in forbidden_chars) for c in line['sample_id']):
                     return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
 
-        rs = _validate_uniq_index(self.samplesheet)
+        rs = _validate_uniq_index()
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
