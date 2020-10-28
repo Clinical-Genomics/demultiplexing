@@ -329,16 +329,6 @@ class HiSeqXSamplesheet(Samplesheet):
                 line_nr = None
                 return (msg, line_nr)
 
-        def _validate_dual_index_length():
-            """Validate that the index has equal length at start and finish"""
-            for i, line in enumerate(self.lines()):
-                try:
-                    if len(line['index']) != len(line['index2']):
-                        line_nr = i + 2
-                        msg = 'Indexes in line are of different length!'
-                        return (msg, line_nr)
-                except KeyError:
-                    pass
 
         for rs in [_validate_index(), _validate_project_samplename(), _validate_index_types(), _validate_dual_index_length()]:
             if type(rs) is tuple:
