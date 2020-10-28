@@ -15,6 +15,7 @@ DEMUXES_DIR=${2?'please provide the demuxes dir'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
+EMAIL=clinical-demux@scilifelab.se
 
 BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
 
@@ -40,6 +41,8 @@ ${BCL2FASTQ_BIN} --version
 
 # Here we go!
 log "Starting NovaSeq demultiplexing"
+# Send a mail that demultiplexing has started
+cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
 
 BASEMASK=$(demux basemask create --application nova ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}

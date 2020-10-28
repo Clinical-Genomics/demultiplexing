@@ -25,9 +25,9 @@ log () {
 }
 
 failed() {
-    cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname)" $EMAIL
+        cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname), line $1" $EMAIL
 }
-trap failed ERR
+trap 'failed ${LINENO}' ERR
 
 ########
 # MAIN #
