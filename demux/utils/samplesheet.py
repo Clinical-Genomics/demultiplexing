@@ -61,7 +61,7 @@ class Samplesheet(object):
 
     # known sections
     HEADER = '[Header]'
-    DATA = '[Data]'
+    DATA   = '[Data]'
 
     # for the [Data] section: provide a universal header line.
     # The mapping is like this: universal: expected, e.g. for NIPT we have expected Sample_ID,
@@ -83,7 +83,7 @@ class Samplesheet(object):
 
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
-        self.original_sheet = [] # all lines of the samplesheet
+        self.original_sheet = [] # all lines of hte samplesheet
         self.section_markers = dict() # [Name]: line; does this section have a named section
         self.parse(samplesheet_path)
 
@@ -229,7 +229,7 @@ class Samplesheet(object):
                         return (msg, i + 2)
             return True
 
-        def _validate_uniq_index():
+        def _validate_uniq_index(samplesheet):
             lanes = list(set(self.column('lane')))
             for lane in lanes:
                 if self.is_pooled_lane(lane, column='lane'):
@@ -252,7 +252,7 @@ class Samplesheet(object):
                 if any((c in forbidden_chars) for c in line['sample_id']):
                     return ('Sample contains forbidden chars ({}): {}'.format(forbidden_chars, line['sample_id']), i + 2)
 
-        rs = _validate_uniq_index()
+        rs = _validate_uniq_index(self.samplesheet)
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
@@ -301,46 +301,7 @@ class HiSeqXSamplesheet(Samplesheet):
                     msg = 'Missing index!'
                     return (msg, line_nr)
 
-        def _validate_index_types():
-            """Check if there are multiple types of indexes, meaning single, dual, or both"""
-            # indexes = {}
-            indexes = []
-            for line in self.lines():
-                # If there is an index
-                if len(line['index']) > 0:
-                    # Create a new tuple
-                    index_1 = len(line['index'])
-                    try:
-                        # Check if it is dual
-                        index_2 = len(line['index2'])
-                        new_index_tuple = (index_1, index_2)
-                    except KeyError:
-                        new_index_tuple = (index_1, )
-
-                # Check if index type has already been identified
-                for index in indexes:
-                    if index == new_index_tuple:
-                        break
-                else:
-                    indexes.append(new_index_tuple)
-
-            if len(indexes) > 1:
-                msg = 'Mulitple indexes!\nCheck SampleSheet!'
-                line_nr = None
-                return (msg, line_nr)
-
-        def _validate_dual_index_length():
-            """Validate that the index has equal length at start and finish"""
-            for i, line in enumerate(self.lines()):
-                try:
-                    if len(line['index']) != len(line['index2']):
-                        line_nr = i + 2
-                        msg = 'Indexes in line are of different length!'
-                        return (msg, line_nr)
-                except KeyError:
-                    pass
-
-        for rs in [_validate_index(), _validate_project_samplename(), _validate_index_types(), _validate_dual_index_length()]:
+        for rs in [ _validate_index(), _validate_project_samplename() ]:
             if type(rs) is tuple:
                 raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
