@@ -72,7 +72,9 @@ for RUN_DIR in ${IN_DIR}/*; do
 
             log "date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt"
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
-
+            
+            # Send a mail that demultiplexing has started
+            cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
 
