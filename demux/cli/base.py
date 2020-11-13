@@ -4,7 +4,8 @@ import click
 import yaml
 
 from .samplesheet import sheet
-from ..basemask import basemask
+# from ..basemask import basemask
+from .basemask import basemask
 
 log = logging.getLogger(__name__)
 

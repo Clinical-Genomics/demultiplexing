@@ -14,16 +14,22 @@ from ..utils import Samplesheet, HiSeqXSamplesheet, NIPTSamplesheet, HiSeq2500Sa
 
 log = logging.getLogger(__name__)
 
+# DUMMY_INDICES = "/home/hiseq.clinical/SCRIPTS/git/demultiplexing/files/20181012_Indices.csv"
+DUMMY_INDICES = "/home/barry.stokman/development/demultiplexing/files/20181012_Indices.csv"
+
+
 @click.group()
 def sheet():
     """Samplesheet commands"""
     pass
+
 
 @sheet.command()
 @click.argument('samplesheet')
 @click.option('-a', '--application', type=click.Choice(['wgs', 'wes', 'nipt', 'miseq']), help='sequencing type')
 def validate(samplesheet, application):
     """validate a samplesheet"""
+    breakpoint()
     if application == 'nipt':
         NIPTSamplesheet(samplesheet).validate()
     elif application == 'wes':
@@ -33,11 +39,13 @@ def validate(samplesheet, application):
     elif application == 'wgs':
         HiSeqXSamplesheet(samplesheet).validate()
 
+
 @sheet.command()
 @click.argument('samplesheet')
 def massage(samplesheet):
     """create a NIPT ready SampleSheet"""
     click.echo(NIPTSamplesheet(samplesheet).massage())
+
 
 @sheet.command()
 @click.argument('samplesheet')
@@ -171,7 +179,7 @@ def fetch(context, flowcell, application, dualindex, indexlength, longest, short
         path = os.path.abspath(__file__)
         dir_path = os.path.dirname(path)
         # with open(f"{dir_path}/../../files/20181012_Indices.csv") as csv_file:
-        with open(f"/home/hiseq.clinical/SCRIPTS/git/demultiplexing/files/20181012_Indices.csv") as csv_file:
+        with open(f"{DUMMY_INDICES}") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=',')
             dummy_samples = [row for row in dummy_samples_csv]
             added_dummy_samples = []
