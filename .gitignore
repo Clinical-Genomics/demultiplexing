@@ -1,1 +1,8 @@
 *.pyc
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# vim
+*.swp
