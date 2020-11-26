@@ -1,5 +1,7 @@
 # demultiplexing
-
+![Build Status - Github][gh-actions-badge]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![Code style: black][black-image]][black-url]
 
 To keep scripts associated with execution of the Illumina demultiplexing pipeline
 
@@ -65,10 +67,11 @@ pre-commit install
 
 Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
 
+[coveralls-url]: https://coveralls.io/github/Clinical-Genomics/demultiplexing
 [black-url]: https://github.com/psf/black
 
 <!-- badges -->
 
 [gh-actions-badge]: https://github.com/Clinical-Genomics/demultiplexing/workflows/Tests%20and%20coveralls/badge.svg
-[![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/demultiplexing?branch=master)
+[coveralls-image]: https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master
 [black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
