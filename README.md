@@ -1,6 +1,5 @@
 # demultiplexing
-[![Build Status][travis-img]][travis-url]
-[![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/demultiplexing?branch=master)
+
 
 To keep scripts associated with execution of the Illumina demultiplexing pipeline
 
@@ -56,7 +55,7 @@ username: apiuser
 password: somepassword
 ```
 
-Files will be blacked automatically with each push to github. If you would like to automatically [Black][black] format your commits on your local machince:
+Files will be blacked automatically with each push to github. If you would like to automatically [Black][black-url] format your commits on your local machince:
 
 ```
 pre-commit install
@@ -66,7 +65,10 @@ pre-commit install
 
 Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
 
+[black-url]: https://github.com/psf/black
 
-[black]: https://black.readthedocs.io/en/stable/
-[travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
-[travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
+<!-- badges -->
+
+[gh-actions-badge]: https://github.com/Clinical-Genomics/demultiplexing/workflows/Tests%20and%20coveralls/badge.svg
+[![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/demultiplexing?branch=master)
+[black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
