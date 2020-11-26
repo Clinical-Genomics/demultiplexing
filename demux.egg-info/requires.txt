@@ -1,5 +1,0 @@
-psutil
-path.py
-click<7
-cglims
-six==1.12
