@@ -1,4 +1,7 @@
 *.pyc
 
+# Distribution / packaging
+dist/
+
 DEVELOP/
 .idea
