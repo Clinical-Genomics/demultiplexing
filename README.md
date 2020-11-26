@@ -1,4 +1,6 @@
-# demultiplexing [![Build Status][travis-img]][travis-url]
+# demultiplexing
+[![Build Status][travis-img]][travis-url]
+[![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/demultiplexing?branch=master)
 
 To keep scripts associated with execution of the Illumina demultiplexing pipeline
 
