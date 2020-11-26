@@ -56,9 +56,11 @@ with db.dbconnect(
     hits = dbc.generalquery(query)
     print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
     for hit in hits:
-        print hit["smp"] + "\t" + hit["flc"] + "\t" + hit["lanes"] + "\t" + hit["rds"] + "\t" + str(
-            hit["readsum"]
-        ) + "\t" + str(hit["yield"]) + "\t" + str(hit["yieldsum"]) + "\t" + str(
+        print hit["smp"] + "\t" + hit["flc"] + "\t" + hit["lanes"] + "\t" + hit[
+            "rds"
+        ] + "\t" + str(hit["readsum"]) + "\t" + str(hit["yield"]) + "\t" + str(
+            hit["yieldsum"]
+        ) + "\t" + str(
             hit["q30"]
         ) + "\t" + str(
             hit["meanq"]

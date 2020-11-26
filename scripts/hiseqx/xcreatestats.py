@@ -243,10 +243,20 @@ def main(argv):
                     str(summary["pf_clusters"]),
                     str(round(summary["pf_yield"] / 1000000, 0)),
                     str(round(summary["pf_q30"] / summary["pf_yield"] * 100, 2)),
-                    str(round(summary["pf_read1_q30"] / summary["pf_read1_yield"] * 100, 2)),
-                    str(round(summary["pf_read2_q30"] / summary["pf_read2_yield"] * 100, 2)),
+                    str(
+                        round(
+                            summary["pf_read1_q30"] / summary["pf_read1_yield"] * 100, 2
+                        )
+                    ),
+                    str(
+                        round(
+                            summary["pf_read2_q30"] / summary["pf_read2_yield"] * 100, 2
+                        )
+                    ),
                     str(round(summary["pf_qscore_sum"] / summary["pf_yield"], 2)),
-                    str(round(proc_undetermined[lane], 2)) if lane in proc_undetermined else "#NA",
+                    str(round(proc_undetermined[lane], 2))
+                    if lane in proc_undetermined
+                    else "#NA",
                 ]
             )
         )

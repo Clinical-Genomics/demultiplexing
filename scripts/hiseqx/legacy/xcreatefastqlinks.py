@@ -13,7 +13,9 @@ __version__ = "3.30.5"
 
 def getsamplesfromflowcell(demuxdir, flwc):
     samples = glob.glob(
-        "{demuxdir}*{flowcell}/l?t??/Project_*/Sample_*".format(demuxdir=demuxdir, flowcell=flwc)
+        "{demuxdir}*{flowcell}/l?t??/Project_*/Sample_*".format(
+            demuxdir=demuxdir, flowcell=flwc
+        )
     )
     fc_samples = {}
     for sample in samples:
@@ -143,15 +145,21 @@ def main(argv):
     for sample in smpls.iterkeys():
 
         if sample not in indexes:
-            print("ERROR '{}' not found in SampleSheet.csv! Skipping ...".format(sample))
+            print(
+                "ERROR '{}' not found in SampleSheet.csv! Skipping ...".format(sample)
+            )
             continue
 
         family_id = None
         cust_name = None
-        with lims.limsconnect(params["apiuser"], params["apipass"], params["baseuri"]) as lmc:
+        with lims.limsconnect(
+            params["apiuser"], params["apipass"], params["baseuri"]
+        ) as lmc:
             analysistype = lmc.getattribute("samples", sample, "Sequencing Analysis")
             if analysistype is None:
-                print("WARNING: Sequencing Analysis tag not defined for {}".format(sample))
+                print(
+                    "WARNING: Sequencing Analysis tag not defined for {}".format(sample)
+                )
                 # skip to the next sample
                 continue
             readcounts = 0.75 * float(
@@ -163,7 +171,11 @@ def main(argv):
             if cust_name is not None:
                 cust_name = cust_name.lower()
             if cust_name is None or not re.match(r"cust\d{3}", cust_name):
-                print("WARNING '{}' does not match an internal customer name".format(cust_name))
+                print(
+                    "WARNING '{}' does not match an internal customer name".format(
+                        cust_name
+                    )
+                )
                 cust_name = None
             if cust_name == None:
                 print("WARNING '{}' internal customer name is not set".format(sample))
@@ -175,12 +187,18 @@ def main(argv):
             if cust_name != None and family_id != None:
                 try:
                     os.makedirs(
-                        os.path.join(outputdir, cust_name, family_id, "genomes", sample, "fastq")
+                        os.path.join(
+                            outputdir, cust_name, family_id, "genomes", sample, "fastq"
+                        )
                     )
                 except OSError:
                     pass
                 try:
-                    os.makedirs(os.path.join(outputdir, cust_name, family_id, "genomes", family_id))
+                    os.makedirs(
+                        os.path.join(
+                            outputdir, cust_name, family_id, "genomes", family_id
+                        )
+                    )
                 except OSError:
                     pass
 

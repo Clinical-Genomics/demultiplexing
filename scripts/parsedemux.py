@@ -235,7 +235,9 @@ with db.dbconnect(
         datasourceid = outcome["datasource_id"]
     else:
         datasourceid = indbdatas[0]["datasource_id"]
-    print "Datasource " + demultistats + " exists in DB with datasource_id: " + str(datasourceid)
+    print "Datasource " + demultistats + " exists in DB with datasource_id: " + str(
+        datasourceid
+    )
 
     """ Set up data for table flowcell """
 
@@ -288,7 +290,9 @@ with db.dbconnect(
         cols = row.findAll("td")
         project = unicode(cols[6].string).encode("utf8")
         getprojquery = (
-            """ SELECT project_id, time FROM project WHERE projectname = '""" + project + """' """
+            """ SELECT project_id, time FROM project WHERE projectname = '"""
+            + project
+            + """' """
         )
         indbproj = dbc.generalquery(getprojquery)
         if not indbproj:
@@ -298,7 +302,9 @@ with db.dbconnect(
             projects[project] = outcome["project_id"]
         else:
             projects[project] = indbproj[0]["project_id"]
-        print "Project " + project + " exists in DB with project_id: " + str(projects[project])
+        print "Project " + project + " exists in DB with project_id: " + str(
+            projects[project]
+        )
 
     """ Set up data for table sample """
 
@@ -333,7 +339,9 @@ with db.dbconnect(
             samples[samplename] = outcome["sample_id"]
         else:
             samples[samplename] = indbsample[0]["sample_id"]
-        print "Sample " + samplename + " exists in DB with sample_id: " + str(samples[samplename])
+        print "Sample " + samplename + " exists in DB with sample_id: " + str(
+            samples[samplename]
+        )
 
     """ Set up data for table unaligned """
 

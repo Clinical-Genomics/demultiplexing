@@ -11,7 +11,9 @@ class SampleSheetValidationException(Exception):
         self.line_nr = line_nr
 
     def __str__(self):
-        return repr("Section '{}', Line '{}': {}".format(self.section, self.msg, self.line_nr))
+        return repr(
+            "Section '{}', Line '{}': {}".format(self.section, self.msg, self.line_nr)
+        )
 
 
 class SampleSheetParsexception(Exception):
@@ -27,7 +29,9 @@ class Line(dict):
     @property
     def dualindex(self, delim="-", revcomp=False):
         if "index2" in self and len(self["index2"]):
-            index2 = self._reverse_complement(self["index2"]) if revcomp else self["index2"]
+            index2 = (
+                self._reverse_complement(self["index2"]) if revcomp else self["index2"]
+            )
             return self["index"] + delim + index2
         return self["index"]
 
@@ -91,7 +95,9 @@ class Samplesheet(object):
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
         self.original_sheet = []  # all lines of hte samplesheet
-        self.section_markers = dict()  # [Name]: line; does this section have a named section
+        self.section_markers = (
+            dict()
+        )  # [Name]: line; does this section have a named section
         self.parse(samplesheet_path)
 
     def _get_data_header(self):
@@ -137,10 +143,14 @@ class Samplesheet(object):
             raise SampleSheetParsexception("No data found!")
 
         header = self._get_data_header()
-        self.samplesheet = [Line(dict(zip(header, line))) for line in self.section[self.DATA][1:]]
+        self.samplesheet = [
+            Line(dict(zip(header, line))) for line in self.section[self.DATA][1:]
+        ]
 
         header_r = self._get_data_header_r()
-        self.samplesheet_r = [dict(zip(header_r, line)) for line in self.section[self.DATA][1:]]
+        self.samplesheet_r = [
+            dict(zip(header_r, line)) for line in self.section[self.DATA][1:]
+        ]
 
     def lines(self):
         """ Yields all lines of the [Data] section. """
@@ -250,7 +260,9 @@ class Samplesheet(object):
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
                             return (
-                                "Same index for {} on lane {}".format(" , ".join(samples), lane),
+                                "Same index for {} on lane {}".format(
+                                    " , ".join(samples), lane
+                                ),
                                 index,
                             )
 
@@ -272,7 +284,9 @@ class Samplesheet(object):
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         for section_marker, section in self.section.items():
-            validation_section = section[:]  # only validate the content, not the [Data] header
+            validation_section = section[
+                :
+            ]  # only validate the content, not the [Data] header
             rs = _validate_length(validation_section)
             if type(rs) is tuple:
                 raise SampleSheetValidationException(section_marker, rs[1], rs[0])
@@ -489,7 +503,9 @@ class MiseqSamplesheet(Samplesheet):
         cur_date = self.sequencing_date
 
         header = self.section[self.DATA][0]  # '0' is the csv header
-        data_lines = []  # the new data section. Each line holds a dict with the right header keys
+        data_lines = (
+            []
+        )  # the new data section. Each line holds a dict with the right header keys
         data_lines.append(expected_header)
         for line in self.samplesheet:
             data_line = {}
@@ -675,7 +691,9 @@ class NIPTSamplesheet(Samplesheet):
         project_id = self._get_project_id()
 
         header = self.section[self.DATA][0]  # '0' is the csv header
-        data_lines = []  # the new data section. Each line holds a dict with the right header keys
+        data_lines = (
+            []
+        )  # the new data section. Each line holds a dict with the right header keys
         data_lines.append(expected_header)
         for i, line in enumerate(self.section[self.DATA][1:]):
             data_line = dict(zip(header, line))

@@ -45,7 +45,9 @@ cnx = mysql.connect(
 )
 cursor = cnx.cursor()
 
-cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
+cursor.execute(
+    """ SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """
+)
 row = cursor.fetchone()
 if row is not None:
     major = row[0]
@@ -92,9 +94,11 @@ ORDER BY lane, sample.samplename, flowcellname """,
 data = cursor.fetchall()
 print "sample\tFlowcell\tLanes\treadcounts/lane\tsum_readcounts\tyieldMB/lane\tsum_yield\t%Q30\tMeanQscore"
 for row in data:
-    print row[0] + "\t" + row[1] + "\t" + row[2] + "\t" + row[3] + "\t" + str(row[4]) + "\t" + str(
-        row[5]
-    ) + "\t" + str(row[6]) + "\t" + str(row[7]) + "\t" + str(row[8])
+    print row[0] + "\t" + row[1] + "\t" + row[2] + "\t" + row[3] + "\t" + str(
+        row[4]
+    ) + "\t" + str(row[5]) + "\t" + str(row[6]) + "\t" + str(row[7]) + "\t" + str(
+        row[8]
+    )
 
 
 cursor.close()

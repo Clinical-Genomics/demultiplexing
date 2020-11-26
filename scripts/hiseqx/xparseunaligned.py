@@ -72,7 +72,9 @@ def gather_supportparams(run_dir):
     rs = {}  # result set
 
     # get some info from bcl2 fastq
-    logfilenames = glob(os.path.join(run_dir, "LOG", "Xdem-l?t??-*.log"))  # should yield one result
+    logfilenames = glob(
+        os.path.join(run_dir, "LOG", "Xdem-l?t??-*.log")
+    )  # should yield one result
     if len(logfilenames) == 0:
         logger.error(
             "No log files found! Looking for %s",
@@ -88,8 +90,12 @@ def gather_supportparams(run_dir):
             if "--use-bases-mask" in line:
                 line = line.strip()
                 split_line = line.split(" ")
-                rs["commandline"] = " ".join(split_line[1:])  # remove the leading [date]
-                rs["time"] = split_line[0].strip("[]")  # remove the brackets around the date
+                rs["commandline"] = " ".join(
+                    split_line[1:]
+                )  # remove the leading [date]
+                rs["time"] = split_line[0].strip(
+                    "[]"
+                )  # remove the brackets around the date
                 rs["program"] = split_line[1]  # get the executed program
 
     # get the sample sheet and it's contents
@@ -236,7 +242,9 @@ def sanitize_sample(sample):
 
 def get_sample_sheet(demux_dir):
     sample_sheet = []
-    samplesheet_file_name = glob("{demux_dir}/SampleSheet.csv".format(demux_dir=demux_dir))[0]
+    samplesheet_file_name = glob(
+        "{demux_dir}/SampleSheet.csv".format(demux_dir=demux_dir)
+    )[0]
     with open(samplesheet_file_name, "r") as samplesheet_fh:
         lines = [line.strip().split(",") for line in samplesheet_fh.readlines()]
         header = []
@@ -316,7 +324,9 @@ def main(argv):
         SQL.flush()
         supportparams_id = supportparams.supportparams_id
 
-    datasource_id = Datasource.exists(os.path.join(demux_dir, "l1t11/Stats/ConversionStats.xml"))
+    datasource_id = Datasource.exists(
+        os.path.join(demux_dir, "l1t11/Stats/ConversionStats.xml")
+    )
     if not datasource_id:
         new_datasource = gather_datasouce(demux_dir)
         datasource = Datasource()
@@ -411,10 +421,14 @@ def main(argv):
                 u.q30_bases_pct = stats_sample["pf_Q30"]
                 u.mean_quality_score = stats_sample["pf_qscore"]
             else:
-                u.yield_mb = round(int(stats[sample["SampleID"]]["pf_yield"]) / 1000000, 2)
+                u.yield_mb = round(
+                    int(stats[sample["SampleID"]]["pf_yield"]) / 1000000, 2
+                )
                 u.passed_filter_pct = stats[sample["SampleID"]]["pf_yield_pc"]
                 u.readcounts = stats[sample["SampleID"]]["pf_clusters"] * 2
-                u.raw_clusters_per_lane_pct = stats[sample["SampleID"]]["raw_clusters_pc"]
+                u.raw_clusters_per_lane_pct = stats[sample["SampleID"]][
+                    "raw_clusters_pc"
+                ]
                 u.perfect_indexreads_pct = round(
                     stats[sample["SampleID"]]["perfect_barcodes"]
                     / stats[sample["SampleID"]]["barcodes"]

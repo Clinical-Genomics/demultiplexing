@@ -28,7 +28,9 @@ def main(argv):
             l = line.partition(" ")
             for time_point in time_points:
                 if l[2].startswith(time_point):
-                    times[time_point] = datetime.strptime(l[0].strip("[]"), "%Y%m%d%H%M%S")
+                    times[time_point] = datetime.strptime(
+                        l[0].strip("[]"), "%Y%m%d%H%M%S"
+                    )
 
                 if l[2].startswith("starting demultiplexing"):
                     lane_id = l[2].partition("lane")[2]
