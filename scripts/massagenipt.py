@@ -4,6 +4,7 @@
 import sys
 from samplesheet import SampleSheet
 
+
 def main(argv):
     """Makes a SampleSheet NIPT compliant.
 
@@ -12,11 +13,12 @@ def main(argv):
 
     """
     ss = SampleSheet(argv[0])
-    if 'nuru' in argv:
+    if "nuru" in argv:
         ss.massage_normal()
     else:
         ss.massage()
     ss.write()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main(sys.argv[1:])
