@@ -54,9 +54,16 @@ username: apiuser
 password: somepassword
 ```
 
+Files will be blacked automatically with each push to github. If you would like to automatically [Black][black] format your commits on your local machince:
+
+```
+pre-commit install
+```
+
 ## Contributing
 
 Demux is using github flow branching model as described in our [development manual][development manual].
 
+[black]: https://black.readthedocs.io/en/stable/
 [travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
 [travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
