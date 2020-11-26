@@ -860,8 +860,7 @@ Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Pro
 
     massaged_samplesheet = samplesheet.massage()
     assert (
-        massaged_samplesheet.split("\n")[2]
-        == "Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,"
+        massaged_samplesheet.split("\n")[2] == "Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,"
     )
 
     assert (

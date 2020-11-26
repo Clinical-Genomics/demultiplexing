@@ -41,7 +41,7 @@ def get_sample_sheet(demux_dir):
 
 
 def get_reads(logfile, index=None):
-    """ Gets the amount of reads for index
+    """Gets the amount of reads for index
 
     Args:
         logfile (path): path to log file that holds requested index
@@ -60,7 +60,7 @@ def get_reads(logfile, index=None):
 
 
 def get_lane(logfilename):
-    """ Gets the lane number from the file name
+    """Gets the lane number from the file name
 
     Args:
         logfilename (string): name of the log file

@@ -78,7 +78,9 @@ setup(
     ],
     platforms="any",
     entry_points={
-        "console_scripts": ["demux = demux.cli:demux",],
+        "console_scripts": [
+            "demux = demux.cli:demux",
+        ],
         "demux.subcommands.1": [],
     },
 )

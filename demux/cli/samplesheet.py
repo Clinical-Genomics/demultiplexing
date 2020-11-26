@@ -55,9 +55,7 @@ def massage(samplesheet):
 
 @sheet.command()
 @click.argument("samplesheet")
-@click.option(
-    "-a", "--application", type=click.Choice(["miseq", "nipt"]), help="sequencing type"
-)
+@click.option("-a", "--application", type=click.Choice(["miseq", "nipt"]), help="sequencing type")
 @click.option("-f", "--flowcell", help="for miseq, please provide a flowcell id")
 def demux(samplesheet, application, flowcell):
     if application == "nipt":
@@ -93,18 +91,14 @@ def demux(samplesheet, application, flowcell):
     default=None,
     help="2500 and NovaSeq: only return this index length",
 )
-@click.option(
-    "-L", "--longest", is_flag=True, help="2500 and NovaSeq: only return longest index"
-)
+@click.option("-L", "--longest", is_flag=True, help="2500 and NovaSeq: only return longest index")
 @click.option(
     "-S",
     "--shortest",
     is_flag=True,
     help="2500 and NovaSeq: only return shortest index",
 )
-@click.option(
-    "-d", "--delimiter", default=",", show_default=True, help="column delimiter"
-)
+@click.option("-d", "--delimiter", default=",", show_default=True, help="column delimiter")
 @click.option("-e", "--end", default="\n", show_default=True, help="line delimiter")
 @click.option(
     "-p",
@@ -149,15 +143,11 @@ def fetch(
         context.abort()
 
     if longest:
-        longest_row = max(
-            raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
-        )
+        longest_row = max(raw_samplesheet, key=lambda x: len(x["index"].replace("-", "")))
         indexlength = len(longest_row["index"].replace("-", ""))
 
     if shortest:
-        shortest_row = min(
-            raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
-        )
+        shortest_row = min(raw_samplesheet, key=lambda x: len(x["index"].replace("-", "")))
         indexlength = len(shortest_row["index"].replace("-", ""))
 
     # ... fix some 2500 specifics
@@ -227,9 +217,7 @@ def fetch(
             if len(index.split("-")) == 4:
                 for tenx_index in index.split("-"):
                     tenx_line = copy.deepcopy(line)
-                    tenx_line["sample_id"] = "{}_{}".format(
-                        line["sample_id"], tenx_index
-                    )
+                    tenx_line["sample_id"] = "{}_{}".format(line["sample_id"], tenx_index)
                     tenx_line["index"] = tenx_index
                     new_samplesheet.append(tenx_line)
             else:
@@ -241,9 +229,7 @@ def fetch(
             if not dualindex:
                 index = line["index"].split("-")[0]
                 raw_samplesheet[i]["index"] = index
-                raw_samplesheet[i]["sample_id"] = "{}_{}".format(
-                    line["sample_id"], index
-                )
+                raw_samplesheet[i]["sample_id"] = "{}_{}".format(line["sample_id"], index)
             else:
                 ori_index = line["index"]
                 indexes = ori_index.split("-")
@@ -251,9 +237,7 @@ def fetch(
                     (index1, index2) = indexes
                     raw_samplesheet[i]["index"] = index1
                     raw_samplesheet[i]["index2"] = reverse_complement(index2)
-                    raw_samplesheet[i]["sample_id"] = "{}_{}".format(
-                        line["sample_id"], ori_index
-                    )
+                    raw_samplesheet[i]["sample_id"] = "{}_{}".format(line["sample_id"], ori_index)
 
         # add [section] header
         click.echo("[Data]")
@@ -309,16 +293,11 @@ def fetch(
 
             for lane in lanes:
                 sample_indexes = [
-                    sample["index"]
-                    for sample in raw_samplesheet
-                    if sample["lane"] == lane
+                    sample["index"] for sample in raw_samplesheet if sample["lane"] == lane
                 ]
                 for name, dummy_index in dummy_samples:
                     if not (
-                        any(
-                            sample_index.startswith(dummy_index)
-                            for sample_index in sample_indexes
-                        )
+                        any(sample_index.startswith(dummy_index) for sample_index in sample_indexes)
                     ):
                         add_dummy_sample = {
                             "control": "N",
@@ -330,9 +309,7 @@ def fetch(
                             "operator": "script",
                             "project": "indexcheck",
                             "recipe": "R1",
-                            "sample_id": name.replace(" ", "-")
-                            .replace("(", "-")
-                            .replace(")", "-"),
+                            "sample_id": name.replace(" ", "-").replace("(", "-").replace(")", "-"),
                             "sample_name": "indexcheck",
                             "sample_ref": "hg19",
                         }

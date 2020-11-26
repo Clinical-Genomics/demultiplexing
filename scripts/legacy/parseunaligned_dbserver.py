@@ -70,9 +70,7 @@ cnx = mysql.connect(
 )
 cursor = cnx.cursor()
 
-cursor.execute(
-    """ SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """
-)
+cursor.execute(""" SELECT major, minor, patch FROM version ORDER BY time DESC LIMIT 1 """)
 row = cursor.fetchone()
 if row is not None:
     major = row[0]
@@ -81,9 +79,9 @@ if row is not None:
 else:
     sys.exit("Incorrect DB, version not found.")
 if str(major) + "." + str(minor) + "." + str(patch) == _VERSION_:
-    print params["STATSDB"] + " Correct database version " + str(
-        _VERSION_
-    ) + "   DB " + params["STATSDB"]
+    print params["STATSDB"] + " Correct database version " + str(_VERSION_) + "   DB " + params[
+        "STATSDB"
+    ]
 else:
     exit(
         params["STATSDB"]
@@ -121,15 +119,7 @@ runname = dirs[len(dirs) - 2]
 name_ = runname.split("_")
 rundate = list(name_[0])
 rundate = (
-    "20"
-    + rundate[0]
-    + rundate[1]
-    + "-"
-    + rundate[2]
-    + rundate[3]
-    + "-"
-    + rundate[4]
-    + rundate[5]
+    "20" + rundate[0] + rundate[1] + "-" + rundate[2] + rundate[3] + "-" + rundate[4] + rundate[5]
 )
 machine = name_[1]
 print runname, rundate, machine
@@ -295,9 +285,7 @@ else:
         (demultistats,),
     )
     datasourceid = cursor.fetchone()[0]
-    print "Data source " + demultistats + " exists in DB with datasource_id: " + str(
-        datasourceid
-    )
+    print "Data source " + demultistats + " exists in DB with datasource_id: " + str(datasourceid)
 
 # ADD flowcell if not present in DB
 cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc,))
@@ -306,7 +294,12 @@ if not cursor.fetchone():
     try:
         cursor.execute(
             """ INSERT INTO `flowcell` (datasource_id, flowcellname, flowcell_pos, time) VALUES (%s, %s, %s, %s) """,
-            (str(datasourceid), fc, Flowcellpos, now,),
+            (
+                str(datasourceid),
+                fc,
+                Flowcellpos,
+                now,
+            ),
         )
     except mysql.IntegrityError, e:
         print "Error %d: %s" % (e.args[0], e.args[1])
@@ -320,14 +313,10 @@ if not cursor.fetchone():
         exit("MySQL warning")
     # handle warnings, if the cursor you're using raises them
     cnx.commit()
-    print "Flowcell " + fc + " now added to DB with flowcell_id: " + str(
-        cursor.lastrowid
-    )
+    print "Flowcell " + fc + " now added to DB with flowcell_id: " + str(cursor.lastrowid)
     fcid = cursor.lastrowid
 else:
-    cursor.execute(
-        """ SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc,)
-    )
+    cursor.execute(""" SELECT flowcell_id FROM flowcell WHERE flowcellname = %s """, (fc,))
     fcid = cursor.fetchone()[0]
     print "Flowcell " + fc + " exists in DB with flowcell_id: " + str(fcid)
 
@@ -339,9 +328,7 @@ for row in rows:
     cols = row.findAll("td")
     project = unicode(cols[6].string).encode("utf8")
 
-    cursor.execute(
-        """ SELECT project_id, time FROM project WHERE projectname = %s """, (project,)
-    )
+    cursor.execute(""" SELECT project_id, time FROM project WHERE projectname = %s """, (project,))
     if not cursor.fetchone():
         print "Project not yet added"
         try:
@@ -361,14 +348,10 @@ for row in rows:
             exit("MySQL warning")
         # handle warnings, if the cursor you're using raises them
         cnx.commit()
-        print "Project " + project + " now added to DB with project_id: " + str(
-            cursor.lastrowid
-        )
+        print "Project " + project + " now added to DB with project_id: " + str(cursor.lastrowid)
         projects[project] = cursor.lastrowid
     else:
-        cursor.execute(
-            """ SELECT project_id FROM project WHERE projectname = %s """, (project,)
-        )
+        cursor.execute(""" SELECT project_id FROM project WHERE projectname = %s """, (project,))
         projid = cursor.fetchone()[0]
         print "Project " + project + " exists in DB with project_id: " + str(projid)
         projects[project] = projid
@@ -385,14 +368,22 @@ for row in rows:
     cursor.execute(
         """ SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
                           """,
-        (samplename, barcode,),
+        (
+            samplename,
+            barcode,
+        ),
     )
     if not cursor.fetchone():
         print "Sample not yet added"
         try:
             cursor.execute(
                 """ INSERT INTO `sample` (samplename, project_id, barcode, time) VALUES (%s, %s, %s, %s) """,
-                (samplename, projects[project], barcode, now,),
+                (
+                    samplename,
+                    projects[project],
+                    barcode,
+                    now,
+                ),
             )
         except mysql.IntegrityError, e:
             print "Error %d: %s" % (e.args[0], e.args[1])
@@ -406,15 +397,16 @@ for row in rows:
             exit("MySQL warning")
         # handle warnings, if the cursor you're using raises them
         cnx.commit()
-        print "Sample " + samplename + " now added to DB with sample_id: " + str(
-            cursor.lastrowid
-        )
+        print "Sample " + samplename + " now added to DB with sample_id: " + str(cursor.lastrowid)
         samples[samplename] = cursor.lastrowid
     else:
         cursor.execute(
             """ SELECT sample.sample_id FROM sample WHERE samplename = %s AND barcode = %s 
                         """,
-            (samplename, barcode,),
+            (
+                samplename,
+                barcode,
+            ),
         )
         sampleid = cursor.fetchone()[0]
         print "Sample " + samplename + " exists in DB with sample_id: " + str(sampleid)
@@ -439,7 +431,11 @@ for row in rows:
 
     cursor.execute(
         """ SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s AND flowcell_id = %s""",
-        (str(samples[samplename]), lane, str(fcid),),
+        (
+            str(samples[samplename]),
+            lane,
+            str(fcid),
+        ),
     )
     if not cursor.fetchone():
         print "UnalignedStats not yet added"
@@ -480,7 +476,10 @@ for row in rows:
     else:
         cursor.execute(
             """ SELECT unaligned_id FROM unaligned WHERE sample_id = %s AND lane = %s """,
-            (str(samples[samplename]), lane,),
+            (
+                str(samples[samplename]),
+                lane,
+            ),
         )
         unalignedid = cursor.fetchone()[0]
         print "Unaligned stats for sample " + samplename + " exists in DB with unaligned_id: " + str(
