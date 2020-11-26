@@ -56,10 +56,17 @@ username: apiuser
 password: somepassword
 ```
 
-### Contributing
+Files will be blacked automatically with each push to github. If you would like to automatically [Black][black] format your commits on your local machince:
+
+```
+pre-commit install
+```
+
+## Contributing
 
 Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
 
 
+[black]: https://black.readthedocs.io/en/stable/
 [travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
 [travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
