@@ -31,7 +31,7 @@ jobs:
 
     - name: Test with pytest & Coveralls
       run: |
-        pytest --cov=demultiplexing/
+        pytest --cov=demux/
         bash tests/test.bash
         coveralls
       env:
