@@ -37,7 +37,7 @@ def create(rundir, lane, application):
 
     # runParameters.xml
     def parse_run_parameters(run_parameters_file):
-        """ parse the run parameters file """   
+        """ parse the run parameters file """
         return xml_etree.parse(Path(rundir).joinpath(run_parameters_file))
 
     def create_basemask(sheet):
