@@ -71,7 +71,6 @@ Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
 [black-url]: https://github.com/psf/black
 
 <!-- badges -->
-
-[gh-actions-badge]: https://github.com/Clinical-Genomics/demultiplexing/workflows/Tests%20and%20coveralls/badge.svg
+[gh-actions-badge]: https://github.com/Clinical-Genomics/demultiplexing/workflows/Demultiplexing%20CI/badge.svg
 [coveralls-image]: https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master
 [black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
