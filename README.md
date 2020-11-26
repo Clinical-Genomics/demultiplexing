@@ -40,7 +40,19 @@ Commands:
 
 ## Installation
 
-You can install `demultiplexing` from source:
+You can install `demultiplexing` via pip
+
+````bash
+pip install demux
+```` 
+
+or via poetry:
+```
+$ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
+poetry install
+```
+
+or from source:
 
 ```bash
 $ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
