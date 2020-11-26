@@ -64,7 +64,8 @@ pre-commit install
 
 ## Contributing
 
-Demux is using github flow branching model as described in our [development manual][development manual].
+Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
+
 
 [black]: https://black.readthedocs.io/en/stable/
 [travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
