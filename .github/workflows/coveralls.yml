@@ -27,10 +27,6 @@ jobs:
       run: |
         poetry install
 
-    - name: Coveralls Dependencies
-      run: |
-        pip install pytest-cov coveralls
-
     - name: Test with pytest & Coveralls
       run: |
         pytest --cov=demux/
