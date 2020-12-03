@@ -17,6 +17,7 @@ six = "^1.15.0"
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"
 pytest-cov = "^2.10.1"
+coveralls = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
