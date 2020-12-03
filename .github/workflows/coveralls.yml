@@ -28,6 +28,7 @@ jobs:
         poetry install
 
     - name: Test with pytest & Coveralls
+      shell: bash -l {0}
       run: |
         pytest --cov=demux/
         bash tests/test.bash
