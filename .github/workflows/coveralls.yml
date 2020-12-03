@@ -26,13 +26,14 @@ jobs:
     - name: Demultiplexing dependencies
       run: |
         poetry install
+        poetry config virtualenvs.create false
 
     - name: Test with pytest & Coveralls
       shell: bash -l {0}
       run: |
-        poetry run pytest --cov=demux/
+        pytest --cov=demux/
+        coveralls
         bash tests/test.bash
-        poetry run coveralls
       env:
         GITHUB: 1
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
