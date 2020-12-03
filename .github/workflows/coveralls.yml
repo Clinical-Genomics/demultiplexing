@@ -30,7 +30,7 @@ jobs:
     - name: Test with pytest & Coveralls
       shell: bash -l {0}
       run: |
-        pytest --cov=demux/
+        poetry run pytest --cov=demux/
         bash tests/test.bash
         coveralls
       env:
