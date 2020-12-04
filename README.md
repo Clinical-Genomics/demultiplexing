@@ -51,13 +51,7 @@ or via poetry:
 ```
 $ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
 poetry install
-```
-
-or from source:
-
-```bash
-$ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
-$ pip install --editable .
+poetry run demux
 ```
 
 You also need a YAML config file describing how to connect to the LIMS instance. It should contain information like this:
