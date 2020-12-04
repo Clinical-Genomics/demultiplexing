@@ -38,7 +38,7 @@ setup(
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
     # see http://packaging.python.org/en/latest/tutorial.html#version
-    version="5.3.2",
+    version="5.3.3",
     description="Scripts and API handling demultiplexing",
     long_description=long_description,
     # What does your project relate to? Separate with spaces.
