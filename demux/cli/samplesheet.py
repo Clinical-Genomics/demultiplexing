@@ -1,26 +1,22 @@
 """ CLI points for samplesheeet action """
 
-import sys
-import logging
 import copy
-import csv
-import os
+import logging
+import sys
 
 import click
 
-from cglims.api import ClinicalLims, ClinicalSample
+from cglims.api import ClinicalLims
 from ..utils import (
     Samplesheet,
     HiSeqXSamplesheet,
     NIPTSamplesheet,
     HiSeq2500Samplesheet,
     MiseqSamplesheet,
+    CreateNovaseqSamplesheet,
 )
 
-log = logging.getLogger(__name__)
-
-# DUMMY_INDICES = "/home/hiseq.clinical/SCRIPTS/git/demultiplexing/files/20181012_Indices.csv"
-DUMMY_INDICES = "/home/barry.stokman/development/demultiplexing/files/20181012_Indices.csv"
+LOG = logging.getLogger(__name__)
 
 
 @click.group()
@@ -39,7 +35,6 @@ def sheet():
 )
 def validate(samplesheet, application):
     """validate a samplesheet"""
-    breakpoint()
     if application == "nipt":
         NIPTSamplesheet(samplesheet).validate()
     elif application == "wes":
@@ -69,7 +64,7 @@ def demux(samplesheet, application, flowcell):
         """convert MiSeq samplesheet to demux'able samplesheet """
         click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
     else:
-        log.error("no application provided!")
+        LOG.error("no application provided!")
         sys.exit(1)
 
 
@@ -249,94 +244,21 @@ def fetch(
         if pad and not indexlength:
             click.echo(
                 click.style(
-                    f"Please specify an index length when using the pad option!"
-                    f"Use --longest or --indexlength",
+                    f"Please specify an index length when using the pad option! "
+                    f"Use --longest or --indexlength.",
                     fg="red",
                 )
             )
             context.abort()
 
-        lims_keys = [
-            "fcid",
-            "lane",
-            "sample_id",
-            "sample_ref",
-            "index",
-            "index2",
-            "sample_name",
-            "control",
-            "recipe",
-            "operator",
-            "project",
-        ]
-        header = [Samplesheet.header_map[head] for head in lims_keys]
-
-        path = os.path.abspath(__file__)
-        dir_path = os.path.dirname(path)
-        # with open(f"{dir_path}/../../files/20181012_Indices.csv") as csv_file:
-        with open(f"{DUMMY_INDICES}") as csv_file:
-            dummy_samples_csv = csv.reader(csv_file, delimiter=",")
-            dummy_samples = [row for row in dummy_samples_csv]
-            added_dummy_samples = []
-            lanes = set([flowcell["lane"] for flowcell in raw_samplesheet])
-            flowcell_id = raw_samplesheet[0]["fcid"]
-
-            for lane in lanes:
-                sample_indexes = [
-                    sample["index"] for sample in raw_samplesheet if sample["lane"] == lane
-                ]
-                for name, dummy_index in dummy_samples:
-                    if not (
-                        any(sample_index.startswith(dummy_index) for sample_index in sample_indexes)
-                    ):
-                        add_dummy_sample = {
-                            "control": "N",
-                            "description": "",
-                            "fcid": flowcell_id,
-                            "index": dummy_index,
-                            "index2": "",
-                            "lane": lane,
-                            "operator": "script",
-                            "project": "indexcheck",
-                            "recipe": "R1",
-                            "sample_id": name.replace(" ", "-").replace("(", "-").replace(")", "-"),
-                            "sample_name": "indexcheck",
-                            "sample_ref": "hg19",
-                        }
-
-                        added_dummy_samples.append(add_dummy_sample)
-
-            raw_samplesheet.extend(added_dummy_samples)
-
-        if indexlength:
-            if pad and int(indexlength) in (16, 20):
-                raw_samplesheet = [
-                    line
-                    for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) in (16, int(indexlength))
-                ]
-            else:
-                raw_samplesheet = [
-                    line
-                    for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) == int(indexlength)
-                ]
-
-        for line in raw_samplesheet:
-            if "-" in line["index"]:
-                index1, index2 = line["index"].split("-")
-                if pad and len(index1) == 8:
-                    index1 += "AT"
-                    index2 += "AC"
-                line["index"] = index1
-                line["index2"] = index2
-            else:
-                if pad and len(line["index"]) == 8:
-                    line["index"] += "AT"
-                line["index2"] = ""
+        demux_samplesheet = CreateNovaseqSamplesheet(
+            flowcell, indexlength, pad, raw_samplesheet
+        ).construct_samplesheet()
 
         # add [section] header
         click.echo("[Data]")
+        click.echo(demux_samplesheet)
+        return
 
     if application == "iseq":
         if dualindex:
