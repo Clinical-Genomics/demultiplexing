@@ -17,7 +17,7 @@ from ..utils import (
     MiseqSamplesheet,
 )
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 @click.group()
@@ -67,7 +67,7 @@ def demux(samplesheet, application, flowcell):
         """convert MiSeq samplesheet to demux'able samplesheet """
         click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
     else:
-        log.error("no application provided!")
+        LOG.error("no application provided!")
         sys.exit(1)
 
 
