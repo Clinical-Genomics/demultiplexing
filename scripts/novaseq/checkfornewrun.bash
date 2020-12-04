@@ -48,7 +48,7 @@ for RUN_DIR in ${IN_DIR}/*; do
     FC=${FC:1}
     PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
-    if [[ -f ${RUN_DIR}/RTAComplete.txt && -f ${RUN_DIR}/CopyComplete.txt]]; then
+    if [[ -f ${RUN_DIR}/RTAComplete.txt && -f ${RUN_DIR}/CopyComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
             # start with a clean slate: remove empty sample sheets before continuing
