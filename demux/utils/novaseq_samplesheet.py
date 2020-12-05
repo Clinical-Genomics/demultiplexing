@@ -6,9 +6,6 @@ from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
 
 
-DUMMY_INDEXES = "/home/hiseq.clinical/SCRIPTS/git/demultiplexing/files/20181012_Indices.csv"
-
-
 class CreateNovaseqSamplesheet:
     """ Create a raw sample sheet for Novaseq flowcells """
 
@@ -26,12 +23,13 @@ class CreateNovaseqSamplesheet:
         "project",
     ]
 
-    def __init__(self, flowcell, indexlength, pad, raw_samplesheet):
+    def __init__(self, flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir):
         self.flowcell = flowcell
         self.indexlength = indexlength
         self.pad = pad
         self.raw_samplesheet = raw_samplesheet
-        self.runparameters = NovaseqRunParameters(self.flowcell)
+        self.dummy_indexes = dummy_indexes
+        self.runparameters = NovaseqRunParameters(self.flowcell, runs_dir)
 
     @property
     def header(self):
@@ -51,7 +49,7 @@ class CreateNovaseqSamplesheet:
 
     def add_dummy_indexes(self):
         """ Add all dummy indexes to raw sample sheet """
-        with open(f"{DUMMY_INDEXES}") as csv_file:
+        with open(f"{self.dummy_indexes}") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=",")
             dummy_samples = [row for row in dummy_samples_csv]
             added_dummy_samples = []
@@ -130,6 +128,8 @@ class CreateNovaseqSamplesheet:
                 )
             else:
                 line["index"], line["index2"] = index1, index2
+
+        return self
 
     def pad_and_rc_indexes(self, index1, index2, rev_comp):
         """ Pads and reverse complements indexes """

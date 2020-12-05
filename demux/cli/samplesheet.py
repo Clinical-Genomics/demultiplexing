@@ -251,8 +251,10 @@ def fetch(
             )
             context.abort()
 
+        dummy_indexes = context.obj["dummy_indexes"]
+        runs_dir = context.obj["runs_dir"]["novaseq"]
         demux_samplesheet = CreateNovaseqSamplesheet(
-            flowcell, indexlength, pad, raw_samplesheet
+            flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir
         ).construct_samplesheet()
 
         # add [section] header

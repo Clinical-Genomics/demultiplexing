@@ -7,18 +7,18 @@ import xml.etree.cElementTree as et
 class NovaseqRunParameters:
     """ Finds and parses the RunParameters.xml file for a NovaSeq flowcell """
 
-    RUNS_DIR = "/home/hiseq.clinical/novaseq/runs/"
     RUNPARAMETERS_FILE = "RunParameters.xml"
 
-    def __init__(self, flowcell):
+    def __init__(self, flowcell, runs_dir):
         self.flowcell = flowcell
+        self.runs_dir = runs_dir
         self.file = self.find_runparameters_file()
 
     def find_runparameters_file(self):
         """ Find the runparameters file of a based on the flowcell name """
 
         runparameters_file = None
-        for directory in os.scandir(self.RUNS_DIR):
+        for directory in os.scandir(self.runs_dir):
             if self.flowcell in directory.path:
                 runparameters_file = os.path.join(directory.path, self.RUNPARAMETERS_FILE)
                 break
