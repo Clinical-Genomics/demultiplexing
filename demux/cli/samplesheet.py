@@ -1,23 +1,31 @@
 """ CLI points for samplesheeet action """
 
-import sys
-import logging
 import copy
-import csv
-import os
+import logging
+import sys
 
 import click
 
+<<<<<<< HEAD
 from cglims.api import ClinicalLims, ClinicalSample
+=======
+from cglims.api import ClinicalLims
+>>>>>>> feat/reverse-complement-index
 from ..utils import (
     Samplesheet,
     HiSeqXSamplesheet,
     NIPTSamplesheet,
     HiSeq2500Samplesheet,
     MiseqSamplesheet,
+<<<<<<< HEAD
+)
+=======
+    CreateNovaseqSamplesheet,
 )
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
+>>>>>>> feat/reverse-complement-index
+
 
 
 @click.group()
@@ -55,9 +63,13 @@ def massage(samplesheet):
 
 @sheet.command()
 @click.argument("samplesheet")
+<<<<<<< HEAD
 @click.option(
     "-a", "--application", type=click.Choice(["miseq", "nipt"]), help="sequencing type"
 )
+=======
+@click.option("-a", "--application", type=click.Choice(["miseq", "nipt"]), help="sequencing type")
+>>>>>>> feat/reverse-complement-index
 @click.option("-f", "--flowcell", help="for miseq, please provide a flowcell id")
 def demux(samplesheet, application, flowcell):
     if application == "nipt":
@@ -67,7 +79,11 @@ def demux(samplesheet, application, flowcell):
         """convert MiSeq samplesheet to demux'able samplesheet """
         click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
     else:
+<<<<<<< HEAD
         log.error("no application provided!")
+=======
+        LOG.error("no application provided!")
+>>>>>>> feat/reverse-complement-index
         sys.exit(1)
 
 
@@ -88,6 +104,7 @@ def demux(samplesheet, application, flowcell):
               for NovaSeq!",
 )
 @click.option(
+<<<<<<< HEAD
     "-l",
     "--indexlength",
     default=None,
@@ -112,6 +129,16 @@ def demux(samplesheet, application, flowcell):
     is_flag=True,
     default=False,
     help="add 2 bases to indices with length 8",
+=======
+    "-l", "--indexlength", default=None, help="2500 and NovaSeq: only return this index length"
+)
+@click.option("-L", "--longest", is_flag=True, help="2500 and NovaSeq: only return longest index")
+@click.option("-S", "--shortest", is_flag=True, help="2500 and NovaSeq: only return shortest index")
+@click.option("-d", "--delimiter", default=",", show_default=True, help="column delimiter")
+@click.option("-e", "--end", default="\n", show_default=True, help="line delimiter")
+@click.option(
+    "-p", "--pad", is_flag=True, default=False, help="add 2 bases to indices with length 8"
+>>>>>>> feat/reverse-complement-index
 )
 @click.pass_context
 def fetch(
@@ -149,6 +176,7 @@ def fetch(
         context.abort()
 
     if longest:
+<<<<<<< HEAD
         longest_row = max(
             raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
         )
@@ -158,6 +186,13 @@ def fetch(
         shortest_row = min(
             raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
         )
+=======
+        longest_row = max(raw_samplesheet, key=lambda x: len(x["index"].replace("-", "")))
+        indexlength = len(longest_row["index"].replace("-", ""))
+
+    if shortest:
+        shortest_row = min(raw_samplesheet, key=lambda x: len(x["index"].replace("-", "")))
+>>>>>>> feat/reverse-complement-index
         indexlength = len(shortest_row["index"].replace("-", ""))
 
     # ... fix some 2500 specifics
@@ -227,9 +262,13 @@ def fetch(
             if len(index.split("-")) == 4:
                 for tenx_index in index.split("-"):
                     tenx_line = copy.deepcopy(line)
+<<<<<<< HEAD
                     tenx_line["sample_id"] = "{}_{}".format(
                         line["sample_id"], tenx_index
                     )
+=======
+                    tenx_line["sample_id"] = "{}_{}".format(line["sample_id"], tenx_index)
+>>>>>>> feat/reverse-complement-index
                     tenx_line["index"] = tenx_index
                     new_samplesheet.append(tenx_line)
             else:
@@ -241,9 +280,13 @@ def fetch(
             if not dualindex:
                 index = line["index"].split("-")[0]
                 raw_samplesheet[i]["index"] = index
+<<<<<<< HEAD
                 raw_samplesheet[i]["sample_id"] = "{}_{}".format(
                     line["sample_id"], index
                 )
+=======
+                raw_samplesheet[i]["sample_id"] = "{}_{}".format(line["sample_id"], index)
+>>>>>>> feat/reverse-complement-index
             else:
                 ori_index = line["index"]
                 indexes = ori_index.split("-")
@@ -251,9 +294,13 @@ def fetch(
                     (index1, index2) = indexes
                     raw_samplesheet[i]["index"] = index1
                     raw_samplesheet[i]["index2"] = reverse_complement(index2)
+<<<<<<< HEAD
                     raw_samplesheet[i]["sample_id"] = "{}_{}".format(
                         line["sample_id"], ori_index
                     )
+=======
+                    raw_samplesheet[i]["sample_id"] = "{}_{}".format(line["sample_id"], ori_index)
+>>>>>>> feat/reverse-complement-index
 
         # add [section] header
         click.echo("[Data]")
@@ -273,13 +320,19 @@ def fetch(
         if pad and not indexlength:
             click.echo(
                 click.style(
+<<<<<<< HEAD
                     f"Please specify an index length when using the pad option!"
                     f"Use --longest or --indexlength",
+=======
+                    f"Please specify an index length when using the pad option! "
+                    f"Use --longest or --indexlength.",
+>>>>>>> feat/reverse-complement-index
                     fg="red",
                 )
             )
             context.abort()
 
+<<<<<<< HEAD
         lims_keys = [
             "fcid",
             "lane",
@@ -370,6 +423,18 @@ def fetch(
 
         # add [section] header
         click.echo("[Data]")
+=======
+        dummy_indexes = context.obj["dummy_indexes"]
+        runs_dir = context.obj["runs_dir"]["novaseq"]
+        demux_samplesheet = CreateNovaseqSamplesheet(
+            flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir
+        ).construct_samplesheet()
+
+        # add [section] header
+        click.echo("[Data]")
+        click.echo(demux_samplesheet)
+        return
+>>>>>>> feat/reverse-complement-index
 
     if application == "iseq":
         if dualindex:

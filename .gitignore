@@ -2,3 +2,9 @@
 
 DEVELOP/
 .idea
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# vim
+*.swp

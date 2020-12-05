@@ -4,11 +4,17 @@ import click
 import yaml
 
 from .samplesheet import sheet
-from ..basemask import basemask
+
+# from ..basemask import basemask
+from .basemask import basemask
 
 log = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 __version__ = "5.3.3"
+=======
+__version__ = "5.3.1"
+>>>>>>> feat/reverse-complement-index
 
 
 @click.group()
