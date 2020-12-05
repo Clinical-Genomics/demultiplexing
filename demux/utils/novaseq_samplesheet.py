@@ -120,15 +120,16 @@ class CreateNovaseqSamplesheet:
 
         for line in self.raw_samplesheet:
             index1, index2 = line["index"].split("-")
-            line["index"], line["index2"] = index1, index2
             if self.pad and len(index1) == 8:
                 line["index"], line["index2"] = self.pad_and_rc_indexes(
                     index1, index2, is_reverse_complement
                 )
-            if len(index2) == 10:
+            elif len(index2) == 10:
                 line["index2"] = (
                     self.reverse_complement(index2) if is_reverse_complement else index2
                 )
+            else:
+                line["index"], line["index2"] = index1, index2
 
     def pad_and_rc_indexes(self, index1, index2, rev_comp):
         """ Pads and reverse complements indexes """
