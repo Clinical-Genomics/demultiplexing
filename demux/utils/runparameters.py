@@ -20,7 +20,9 @@ class NovaseqRunParameters:
         runparameters_file = None
         for directory in os.scandir(self.runs_dir):
             if self.flowcell in directory.path:
-                runparameters_file = os.path.join(directory.path, self.RUNPARAMETERS_FILE)
+                runparameters_file = os.path.join(
+                    directory.path, self.RUNPARAMETERS_FILE
+                )
                 break
         if not runparameters_file:
             raise Exception(f"Run parameters for flowcell {self.flowcell} not found!")

@@ -23,7 +23,9 @@ class CreateNovaseqSamplesheet:
         "project",
     ]
 
-    def __init__(self, flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir):
+    def __init__(
+        self, flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir
+    ):
         self.flowcell = flowcell
         self.indexlength = indexlength
         self.pad = pad
@@ -57,11 +59,16 @@ class CreateNovaseqSamplesheet:
 
             for lane in lanes:
                 sample_indexes = [
-                    sample["index"] for sample in self.raw_samplesheet if sample["lane"] == lane
+                    sample["index"]
+                    for sample in self.raw_samplesheet
+                    if sample["lane"] == lane
                 ]
                 for name, dummy_index in dummy_samples:
                     if not (
-                        any(sample_index.startswith(dummy_index) for sample_index in sample_indexes)
+                        any(
+                            sample_index.startswith(dummy_index)
+                            for sample_index in sample_indexes
+                        )
                     ):
                         add_dummy_sample = {
                             "control": "N",
@@ -73,7 +80,9 @@ class CreateNovaseqSamplesheet:
                             "operator": "script",
                             "project": "indexcheck",
                             "recipe": "R1",
-                            "sample_id": name.replace(" ", "-").replace("(", "-").replace(")", "-"),
+                            "sample_id": name.replace(" ", "-")
+                            .replace("(", "-")
+                            .replace(")", "-"),
                             "sample_name": "indexcheck",
                             "sample_ref": "hg19",
                         }
@@ -92,7 +101,8 @@ class CreateNovaseqSamplesheet:
                 self.raw_samplesheet = [
                     line
                     for line in self.raw_samplesheet
-                    if len(line["index"].replace("-", "")) in (16, int(self.indexlength))
+                    if len(line["index"].replace("-", ""))
+                    in (16, int(self.indexlength))
                 ]
             else:
                 self.raw_samplesheet = [
@@ -101,7 +111,9 @@ class CreateNovaseqSamplesheet:
                     if len(line["index"].replace("-", "")) == int(self.indexlength)
                 ]
         else:
-            self.raw_samplesheet = [line for line in self.raw_samplesheet if "-" in line["index"]]
+            self.raw_samplesheet = [
+                line for line in self.raw_samplesheet if "-" in line["index"]
+            ]
 
         return self
 
@@ -137,8 +149,12 @@ class CreateNovaseqSamplesheet:
         if self.runparameters.index_reads == 8:
             index2 = self.reverse_complement(index2) if rev_comp else index2
         if self.runparameters.index_reads == 10:
-            index1 = self.reverse_complement("AC" + index1) if rev_comp else index1 + "AT"
-            index2 = self.reverse_complement("AC" + index2) if rev_comp else index2 + "AC"
+            index1 = (
+                self.reverse_complement("AC" + index1) if rev_comp else index1 + "AT"
+            )
+            index2 = (
+                self.reverse_complement("AC" + index2) if rev_comp else index2 + "AC"
+            )
 
         return index1, index2
 
