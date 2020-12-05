@@ -9,7 +9,4 @@ from .samplesheet import (
     SampleSheetValidationException,
     iseqSampleSheet,
 )
-<<<<<<< HEAD
-=======
 from .novaseq_samplesheet import CreateNovaseqSamplesheet
->>>>>>> feat/reverse-complement-index
