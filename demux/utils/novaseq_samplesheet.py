@@ -149,9 +149,7 @@ class CreateNovaseqSamplesheet:
         if self.runparameters.index_reads == 8:
             index2 = self.reverse_complement(index2) if rev_comp else index2
         if self.runparameters.index_reads == 10:
-            index1 = (
-                self.reverse_complement("AC" + index1) if rev_comp else index1 + "AT"
-            )
+            index1 = index1 + "AT"
             index2 = (
                 self.reverse_complement("AC" + index2) if rev_comp else index2 + "AC"
             )
