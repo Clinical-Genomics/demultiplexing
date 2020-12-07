@@ -1,6 +1,15 @@
 psutil
 path.py
 click<7
-PyYAML
-cglims
+PyYAML~=5.3.1
+cglims~=1.3.4
 six==1.12
+
+coloredlogs~=14.0
+bs4~=0.0.1
+beautifulsoup4~=4.9.1
+pathlib~=1.0.1
+pytest~=6.0.2
+demux~=5.3.1
+SQLAlchemy~=1.3.19
+setuptools~=46.0.0
