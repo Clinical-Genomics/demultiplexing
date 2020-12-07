@@ -5,6 +5,7 @@ import yaml
 
 from .samplesheet import sheet
 from ..basemask import basemask
+from .indexreport import indexreport
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ __version__ = '5.3.1'
 def demux(context, log_level, config):
     """Making demuxing easier!"""
     setup_logging(level=log_level)
-    #log.info('{}: version {}'.format(__package__, __version__))
+    # log.info('{}: version {}'.format(__package__, __version__))
     context.obj = yaml.full_load(config) if config else {}
     context.obj['log_level'] = log_level
 
@@ -31,7 +32,7 @@ def setup_logging(level='INFO'):
     # customize formatter, align each column
     template = "[%(asctime)s] %(name)-25s %(levelname)-8s %(message)s"
     formatter = logging.Formatter(template)
-    
+
     # add a basic STDERR handler to the logger
     console = logging.StreamHandler()
     console.setLevel(level)
@@ -40,5 +41,7 @@ def setup_logging(level='INFO'):
     root_logger.addHandler(console)
     return root_logger
 
+
 demux.add_command(sheet)
 demux.add_command(basemask)
+demux.add_command(indexreport)
