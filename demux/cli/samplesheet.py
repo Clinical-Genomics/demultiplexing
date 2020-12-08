@@ -88,7 +88,7 @@ def demux(samplesheet, application, flowcell):
 )
 @click.option(
     "-l",
-    "--indexlength",
+    "--index-length",
     default=None,
     help="2500 and NovaSeq: only return this index length",
 )
@@ -118,7 +118,7 @@ def fetch(
     flowcell,
     application,
     dualindex,
-    indexlength,
+    index_length,
     longest,
     shortest,
     pad,
@@ -151,13 +151,13 @@ def fetch(
         longest_row = max(
             raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
         )
-        indexlength = len(longest_row["index"].replace("-", ""))
+        index_length = len(longest_row["index"].replace("-", ""))
 
     if shortest:
         shortest_row = min(
             raw_samplesheet, key=lambda x: len(x["index"].replace("-", ""))
         )
-        indexlength = len(shortest_row["index"].replace("-", ""))
+        index_length = len(shortest_row["index"].replace("-", ""))
 
     # ... fix some 2500 specifics
     if application == "wes":
@@ -176,11 +176,11 @@ def fetch(
         ]
         header = [HiSeq2500Samplesheet.header_map[head] for head in lims_keys]
 
-        if indexlength:
+        if index_length:
             raw_samplesheet = [
                 line
                 for line in raw_samplesheet
-                if len(line["index"].replace("-", "")) == int(indexlength)
+                if len(line["index"].replace("-", "")) == int(index_length)
             ]
         for line in raw_samplesheet:
             line["description"] = line["sample_id"]
@@ -262,18 +262,18 @@ def fetch(
             click.echo(
                 click.style(
                     f"No need to specify dual or single index for NovaSeq sample "
-                    f"sheets, please use --shortest, --longest, or --indexlength "
+                    f"sheets, please use --shortest, --longest, or --index_length."
                     f"only!",
                     fg="red",
                 )
             )
             context.abort()
 
-        if pad and not indexlength:
+        if pad and not index_length:
             click.echo(
                 click.style(
                     f"Please specify an index length when using the pad option! "
-                    f"Use --longest or --indexlength.",
+                    f"Use --longest or --index_length.",
                     fg="red",
                 )
             )
@@ -282,7 +282,7 @@ def fetch(
         dummy_indexes = context.obj["dummy_indexes"]
         runs_dir = context.obj["runs_dir"]["novaseq"]
         demux_samplesheet = CreateNovaseqSamplesheet(
-            flowcell, indexlength, pad, raw_samplesheet, dummy_indexes, runs_dir
+            flowcell, index_length, pad, raw_samplesheet, dummy_indexes, runs_dir
         ).construct_samplesheet()
 
         # add [section] header
@@ -295,18 +295,18 @@ def fetch(
             click.echo(
                 click.style(
                     f"No need to specify dual or single index for iSeq sample "
-                    f"sheets, please use --shortest, --longest, or --indexlength "
+                    f"sheets, please use --shortest, --longest, or --index_length."
                     f"only!",
                     fg="red",
                 )
             )
             context.abort()
 
-        if pad and not indexlength:
+        if pad and not index_length:
             click.echo(
                 click.style(
                     f"Please specify an index length when using the pad option!"
-                    f"Use --longest or --indexlength",
+                    f"Use --longest or --index_length.",
                     fg="red",
                 )
             )
@@ -332,18 +332,18 @@ def fetch(
             "Sample_Project",
         ]
 
-        if indexlength:
-            if pad and int(indexlength) in (16, 20):
+        if index_length:
+            if pad and int(index_length) in (16, 20):
                 raw_samplesheet = [
                     line
                     for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) in (16, int(indexlength))
+                    if len(line["index"].replace("-", "")) in (16, int(index_length))
                 ]
             else:
                 raw_samplesheet = [
                     line
                     for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) == int(indexlength)
+                    if len(line["index"].replace("-", "")) == int(index_length)
                 ]
 
         for line in raw_samplesheet:
