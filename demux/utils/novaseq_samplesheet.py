@@ -6,6 +6,11 @@ from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
 
 
+SPACE = " "
+DASH = "-"
+COMMA = ","
+
+
 class CreateNovaseqSamplesheet:
     """ Create a raw sample sheet for Novaseq flowcells """
 
@@ -62,7 +67,7 @@ class CreateNovaseqSamplesheet:
         return add_dummy_sample
 
     @staticmethod
-    def get_project_name(project: str, delimiter=" ") -> str:
+    def get_project_name(project: str, delimiter=SPACE) -> str:
         """ Only keeps the first part of the project name """
         return project.split(delimiter)[0]
 
@@ -73,7 +78,7 @@ class CreateNovaseqSamplesheet:
         return "".join([complement[base] for base in reversed(dna)])
 
     @staticmethod
-    def is_dual_index(index: str, delimiter="-") -> bool:
+    def is_dual_index(index: str, delimiter=DASH) -> bool:
         """ Determines if an index in the raw samplesheet is dual index or not """
         return delimiter in index
 
@@ -102,7 +107,7 @@ class CreateNovaseqSamplesheet:
         """Add all dummy indexes to raw sample sheet. Dummy indexes are used to check for index
         contamination"""
         with open(f"{self.dummy_indexes_file}") as csv_file:
-            dummy_samples_csv = csv.reader(csv_file, delimiter=",")
+            dummy_samples_csv = csv.reader(csv_file, delimiter=COMMA)
             dummy_samples = [row for row in dummy_samples_csv]
             added_dummy_samples = []
             lanes = {sample["lane"] for sample in self.raw_samplesheet}
@@ -178,7 +183,7 @@ class CreateNovaseqSamplesheet:
 
         return parameter_to_version.get(self.runparameters.reagent_kit_version)
 
-    def construct_samplesheet(self, end="\n", delimiter=",") -> str:
+    def construct_samplesheet(self, end="\n", delimiter=COMMA) -> str:
         """ Construct the sample sheet """
 
         demux_samplesheet = [delimiter.join(self.header)]
