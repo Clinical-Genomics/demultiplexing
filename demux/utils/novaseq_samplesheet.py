@@ -66,7 +66,8 @@ class CreateNovaseqSamplesheet:
         )
 
     def add_dummy_indexes(self) -> "CreateNovaseqSamplesheet":
-        """ Add all dummy indexes to raw sample sheet """
+        """Add all dummy indexes to raw sample sheet. Dummy indexes are used to check for index
+        contamination"""
         with open(f"{self.dummy_indexes_file}") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=",")
             dummy_samples = [row for row in dummy_samples_csv]
