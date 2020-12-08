@@ -41,6 +41,27 @@ class CreateNovaseqSamplesheet:
         return list(Samplesheet.header_map.values())
 
     @staticmethod
+    def add_dummy_sample(flowcell: str, dummy_index: str, lane: int, name: str) -> str:
+        """ constructs a dummy sample to the samplesheet """
+
+        add_dummy_sample = {
+            "control": "N",
+            "description": "",
+            "fcid": flowcell,
+            "index": dummy_index,
+            "index2": "",
+            "lane": lane,
+            "operator": "script",
+            "project": "indexcheck",
+            "recipe": "R1",
+            "sample_id": name.replace(" ", "-").replace("(", "-").replace(")", "-"),
+            "sample_name": "indexcheck",
+            "sample_ref": "hg19",
+        }
+
+        return add_dummy_sample
+
+    @staticmethod
     def get_project_name(project: str, delimiter=" ") -> str:
         """ Only keeps the first part of the project name """
         return project.split(delimiter)[0]
@@ -55,6 +76,18 @@ class CreateNovaseqSamplesheet:
     def is_dual_index(index: str, delimiter="-") -> bool:
         """ Determines if an index in the raw samplesheet is dual index or not """
         return delimiter in index
+
+    @staticmethod
+    def is_dummy_sample_in_samplesheet(dummy_index: str, sample_indexes: list) -> bool:
+        """ Determines if a dummy sample is already present in the samplesheet """
+        return any(
+            sample_index.startswith(dummy_index) for sample_index in sample_indexes
+        )
+
+    @staticmethod
+    def sample_indexes_in_lane(samplesheet: list, lane: str) -> list:
+        """ Returns all sample indexes in a given lane """
+        return [sample["index"] for sample in samplesheet if sample["lane"] == lane]
 
     def is_reverse_complement(self) -> bool:
         """If the run used the new NovaSeq control software version (1.7.0) and the new
@@ -75,35 +108,14 @@ class CreateNovaseqSamplesheet:
             lanes = {sample["lane"] for sample in self.raw_samplesheet}
 
             for lane in lanes:
-                sample_indexes = [
-                    sample["index"]
-                    for sample in self.raw_samplesheet
-                    if sample["lane"] == lane
-                ]
+                sample_indexes = self.sample_indexes_in_lane(self.raw_samplesheet, lane)
                 for name, dummy_index in dummy_samples:
-                    if not (
-                        any(
-                            sample_index.startswith(dummy_index)
-                            for sample_index in sample_indexes
-                        )
+                    if not self.is_dummy_sample_in_samplesheet(
+                        dummy_index, sample_indexes
                     ):
-                        add_dummy_sample = {
-                            "control": "N",
-                            "description": "",
-                            "fcid": self.flowcell,
-                            "index": dummy_index,
-                            "index2": "",
-                            "lane": lane,
-                            "operator": "script",
-                            "project": "indexcheck",
-                            "recipe": "R1",
-                            "sample_id": name.replace(" ", "-")
-                            .replace("(", "-")
-                            .replace(")", "-"),
-                            "sample_name": "indexcheck",
-                            "sample_ref": "hg19",
-                        }
-
+                        add_dummy_sample = self.add_dummy_sample(
+                            self.flowcell, dummy_index, lane, name
+                        )
                         added_dummy_samples.append(add_dummy_sample)
 
             self.raw_samplesheet.extend(added_dummy_samples)
