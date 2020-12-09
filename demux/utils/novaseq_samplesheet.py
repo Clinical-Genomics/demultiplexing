@@ -103,17 +103,17 @@ class CreateNovaseqSamplesheet:
             and self.reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
         )
 
-    def add_dummy_indexes(self) -> "CreateNovaseqSamplesheet":
+    def add_dummy_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
         """Add all dummy indexes to raw sample sheet. Dummy indexes are used to check for index
         contamination"""
         with open(f"{self.dummy_indexes_file}") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=COMMA)
             dummy_samples = [row for row in dummy_samples_csv]
             added_dummy_samples = []
-            lanes = {sample["lane"] for sample in self.raw_samplesheet}
+            lanes = {sample["lane"] for sample in raw_samplesheet}
 
             for lane in lanes:
-                sample_indexes = self.sample_indexes_in_lane(self.raw_samplesheet, lane)
+                sample_indexes = self.sample_indexes_in_lane(raw_samplesheet, lane)
                 for name, dummy_index in dummy_samples:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
@@ -125,18 +125,17 @@ class CreateNovaseqSamplesheet:
 
             self.raw_samplesheet.extend(added_dummy_samples)
 
-            return self
+            return raw_samplesheet
 
-    def remove_unwanted_indexes(self) -> "CreateNovaseqSamplesheet":
+    def remove_unwanted_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
         """ Filter out indexes of unwanted length and single indexes """
 
-        self.raw_samplesheet = [
-            line for line in self.raw_samplesheet if self.is_dual_index(line["index"])
+        raw_samplesheet = [
+            line for line in raw_samplesheet if self.is_dual_index(line["index"])
         ]
+        return raw_samplesheet
 
-        return self
-
-    def adapt_indexes(self) -> "CreateNovaseqSamplesheet":
+    def adapt_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
         """Adapts the indexes: pads all indexes so that all indexes have a length equal to the
         number  of index reads, and takes the reverse complement of index 2 in case of the new
         novaseq software control version (1.7) in combination with the new reagent kit
@@ -144,7 +143,7 @@ class CreateNovaseqSamplesheet:
 
         reverse_complement = self.is_reverse_complement()
 
-        for line in self.raw_samplesheet:
+        for line in raw_samplesheet:
             index1, index2 = line["index"].split("-")
             if self.pad and len(index1) == 8:
                 line["index"], line["index2"] = self.pad_and_rc_indexes(
@@ -157,7 +156,7 @@ class CreateNovaseqSamplesheet:
             else:
                 line["index"], line["index2"] = index1, index2
 
-        return self
+        return raw_samplesheet
 
     def pad_and_rc_indexes(
         self, index1: str, index2: str, reverse_complement: bool
@@ -187,8 +186,11 @@ class CreateNovaseqSamplesheet:
         """ Construct the sample sheet """
 
         demux_samplesheet = [delimiter.join(self.header)]
-        self.add_dummy_indexes().remove_unwanted_indexes().adapt_indexes()
-        for line in self.raw_samplesheet:
+        raw_samplesheet = self.raw_samplesheet
+        raw_samplesheet = self.add_dummy_indexes(raw_samplesheet)
+        raw_samplesheet = self.remove_unwanted_indexes(raw_samplesheet)
+        raw_samplesheet = self.adapt_indexes(raw_samplesheet)
+        for line in raw_samplesheet:
             # fix the project content
             project = self.get_project_name(line["project"])
             line["project"] = project
