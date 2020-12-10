@@ -40,7 +40,7 @@ class NovaseqRunParameters:
 
     @property
     def index_reads(self) -> int:
-        """ Returns the number of index readss using number of cycles for read one """
+        """ Returns the number of index reads using number of cycles for read one """
         return int(self.parse_runparameters().findtext("IndexRead1NumberOfCycles"))
 
     @property
