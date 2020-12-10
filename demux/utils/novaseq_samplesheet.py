@@ -90,7 +90,7 @@ class CreateNovaseqSamplesheet:
         )
 
     @staticmethod
-    def sample_indexes_in_lane(samplesheet: list, lane: str) -> list:
+    def get_sample_indexes_in_lane(samplesheet: list, lane: str) -> list:
         """ Returns all sample indexes in a given lane """
         return [sample["index"] for sample in samplesheet if sample["lane"] == lane]
 
