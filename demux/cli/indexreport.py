@@ -1,7 +1,8 @@
 import click
 import logging
 
-from ..utils.indexreport import IndexReport
+from demux.utils.indexreport import IndexReport
+from demux.constants import INDEX_REPORT_HEADER
 
 log = logging.getLogger(__name__)
 
@@ -52,9 +53,11 @@ def summary(index_report_path, out_dir, flowcell_id, cluster_counts):
         index_report_path=index_report_path,
         flowcell_id=flowcell_id,
         cluster_counts=cluster_counts,
+        INDEX_REPORT_HEADER=INDEX_REPORT_HEADER
     )
     click.echo(
         f"Creating summary of laneBarcode.html for FC: {index_report.flowcell_id}"
     )
     index_report.parse_report()
+    index_report.validate()
     index_report.write_summary()
