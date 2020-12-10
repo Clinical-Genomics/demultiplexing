@@ -95,8 +95,8 @@ class CreateNovaseqSamplesheet:
         return [sample["index"] for sample in samplesheet if sample["lane"] == lane]
 
     def is_reverse_complement(self) -> bool:
-        """If the run used the new NovaSeq control software version (1.7.0) and the new
-        reagent kit version (1.5) the second index should be the reverse complement"""
+        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION ) and the new
+        reagent kit version (NEW_REAGENT_KIT_VERSION) the second index should be the reverse complement"""
         return (
             self.runparameters.control_software_version
             == self.NEW_CONTROL_SOFTWARE_VERSION
