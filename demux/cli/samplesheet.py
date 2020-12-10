@@ -66,7 +66,7 @@ def demux(samplesheet, application, flowcell):
         """convert MiSeq samplesheet to demux'able samplesheet """
         click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
     else:
-        LOG.error("no application provided!")
+        LOG.error("No application provided!")
         sys.exit(1)
 
 
