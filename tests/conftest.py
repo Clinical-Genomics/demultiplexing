@@ -14,10 +14,11 @@ def fixture_fixtures_dir() -> Path:
 @pytest.fixture(name="files_dir")
 def fixture_analysis_dir(fixtures_dir: Path) -> Path:
     """ Return the path to the files directory """
+    return fixtures_dir / "files"
 
 
 @pytest.fixture(name="dummy_indexes_file")
-def fixture_novaseq_runparameters_file(files_dir: Path) -> Path:
+def fixture_dummy_indexes_file(files_dir: Path) -> Path:
     """ Fixture for the dummy index file """
     return files_dir / "20181012_Indices.csv"
 
@@ -32,12 +33,6 @@ def fixture_novaseq_dir(fixtures_dir: Path) -> Path:
 def fixture_runs_dir(novaseq_dir: Path) -> Path:
     """ Return the path to the novaseq runs directory """
     return novaseq_dir / "runs"
-
-
-# @pytest.fixture(name="novaseq_test_runs_dir")
-# def fixture_runs_dir(novaseq_runs_dir: Path) -> Path:
-#     """ Return the path to the novaseq runs directory """
-#     return novaseq_runs_dir / "test_run_dir_HGJJKDSXY"
 
 
 @pytest.fixture(name="run_parameters_file")
