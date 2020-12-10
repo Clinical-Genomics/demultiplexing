@@ -11,7 +11,7 @@ def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
     # WHEN a runs folder exists for the flowcell
     result = novaseq_runparameters_api.find_runparameters_file()
 
-    # THEN a RunParameters.xml should be found for the run of thay flowcell
+    # THEN a RunParameters.xml file should be found for the run of the flowcell
     assert (
         result
         == str(novaseq_runs_dir) + "/test_run_dir_" + flowcell_id + "/RunParameters.xml"
