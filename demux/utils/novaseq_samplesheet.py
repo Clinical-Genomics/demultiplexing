@@ -46,7 +46,7 @@ class CreateNovaseqSamplesheet:
         return list(Samplesheet.header_map.values())
 
     @staticmethod
-    def add_dummy_sample(flowcell: str, dummy_index: str, lane: int, name: str) -> str:
+    def get_dummy_samplesheet_sample(flowcell: str, dummy_index: str, lane: int, name: str) -> str:
         """ Constructs and returns a dummy sample in novaseq samplesheet format"""
 
         add_dummy_sample = {
