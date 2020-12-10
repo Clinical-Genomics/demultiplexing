@@ -3,7 +3,7 @@ import pytest
 
 
 def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
-    """ tests find runparameters_file method """
+    """ Tests find runparameters_file method """
 
     # GIVEN a flowcell id
     flowcell_id = novaseq_runparameters_api.flowcell
