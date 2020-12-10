@@ -73,7 +73,7 @@ class CreateNovaseqSamplesheet:
 
     @staticmethod
     def reverse_complement(dna: str) -> str:
-        """ Generates the reverse complement """
+        """ Generates the reverse complement of a DNA sequence"""
         complement = {"A": "T", "C": "G", "G": "C", "T": "A"}
         return "".join([complement[base] for base in reversed(dna)])
 
