@@ -262,7 +262,7 @@ def fetch(
             click.echo(
                 click.style(
                     f"No need to specify dual or single index for NovaSeq sample "
-                    f"sheets, please use --shortest, --longest, or --index_length."
+                    f"sheets, please use --shortest, --longest, or --index-length."
                     f"only!",
                     fg="red",
                 )
