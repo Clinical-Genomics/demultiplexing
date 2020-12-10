@@ -175,7 +175,7 @@ class CreateNovaseqSamplesheet:
 
         return index1, index2
 
-    def reagent_kit_version(self) -> int:
+    def get_reagent_kit_version(self) -> int:
         """ Derives the reagent kit version from the run parameters """
 
         parameter_to_version = {"1": 1.0, "3": 1.5}
