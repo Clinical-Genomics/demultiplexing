@@ -46,10 +46,12 @@ class CreateNovaseqSamplesheet:
         return list(Samplesheet.header_map.values())
 
     @staticmethod
-    def get_dummy_samplesheet_sample(flowcell: str, dummy_index: str, lane: int, name: str) -> str:
+    def get_dummy_samplesheet_sample(
+        flowcell: str, dummy_index: str, lane: int, name: str
+    ) -> str:
         """ Constructs and returns a dummy sample in novaseq samplesheet format"""
 
-        add_dummy_sample = {
+        dummy_samplesheet_sample = {
             "control": "N",
             "description": "",
             "fcid": flowcell,
@@ -64,7 +66,7 @@ class CreateNovaseqSamplesheet:
             "sample_ref": "hg19",
         }
 
-        return add_dummy_sample
+        return dummy_samplesheet_sample
 
     @staticmethod
     def get_project_name(project: str, delimiter=SPACE) -> str:
@@ -95,12 +97,13 @@ class CreateNovaseqSamplesheet:
         return [sample["index"] for sample in samplesheet if sample["lane"] == lane]
 
     def is_reverse_complement(self) -> bool:
-        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION ) and the new
-        reagent kit version (NEW_REAGENT_KIT_VERSION) the second index should be the reverse complement"""
+        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION)
+        and the new reagent kit version (NEW_REAGENT_KIT_VERSION) the second index should be the
+        reverse complement"""
         return (
             self.runparameters.control_software_version
             == self.NEW_CONTROL_SOFTWARE_VERSION
-            and self.reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
+            and self.get_reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
         )
 
     def add_dummy_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
@@ -113,17 +116,17 @@ class CreateNovaseqSamplesheet:
             lanes = {sample["lane"] for sample in raw_samplesheet}
 
             for lane in lanes:
-                sample_indexes = self.sample_indexes_in_lane(raw_samplesheet, lane)
+                sample_indexes = self.get_sample_indexes_in_lane(raw_samplesheet, lane)
                 for sample_name, dummy_index in dummy_samples:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
                     ):
-                        new_dummy_sample = self.add_dummy_sample(
-                            self.flowcell, dummy_index, lane, name
+                        new_dummy_sample = self.get_dummy_samplesheet_sample(
+                            self.flowcell, dummy_index, lane, sample_name
                         )
-                        added_dummy_samples.append(new_dummy_sample)
+                        new_dummy_samples.append(new_dummy_sample)
 
-            self.raw_samplesheet.extend(added_dummy_samples)
+            self.raw_samplesheet.extend(new_dummy_samples)
 
             return raw_samplesheet
 
@@ -141,17 +144,19 @@ class CreateNovaseqSamplesheet:
         novaseq software control version (1.7) in combination with the new reagent kit
         (version 1.5)"""
 
-        reverse_complement = self.is_reverse_complement()
+        is_reverse_complement = self.is_reverse_complement()
 
         for line in raw_samplesheet:
             index1, index2 = line["index"].split("-")
             if self.pad and len(index1) == 8:
                 line["index"], line["index2"] = self.pad_and_rc_indexes(
-                    index1, index2, reverse_complement
+                    index1, index2, is_reverse_complement
                 )
             elif len(index2) == 10:
                 line["index2"] = (
-                    self.reverse_complement(index2) if reverse_complement else index2
+                    self.get_reverse_complement_dna_seq(index2)
+                    if is_reverse_complement
+                    else index2
                 )
             else:
                 line["index"], line["index2"] = index1, index2
@@ -159,17 +164,21 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def pad_and_rc_indexes(
-        self, index1: str, index2: str, reverse_complement: bool
+        self, index1: str, index2: str, is_reverse_complement: bool
     ) -> tuple:
         """ Pads and reverse complements indexes """
 
         if self.runparameters.index_reads == 8:
-            index2 = self.reverse_complement(index2) if reverse_complement else index2
+            index2 = (
+                self.get_reverse_complement_dna_seq(index2)
+                if is_reverse_complement
+                else index2
+            )
         if self.runparameters.index_reads == 10:
             index1 = index1 + "AT"
             index2 = (
-                self.reverse_complement("AC" + index2)
-                if reverse_complement
+                self.get_reverse_complement_dna_seq("AC" + index2)
+                if is_reverse_complement
                 else index2 + "AC"
             )
 
