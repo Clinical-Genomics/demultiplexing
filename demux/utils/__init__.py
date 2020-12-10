@@ -9,3 +9,4 @@ from .samplesheet import (
     SampleSheetValidationException,
     iseqSampleSheet,
 )
+from .novaseq_samplesheet import CreateNovaseqSamplesheet
