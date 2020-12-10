@@ -30,7 +30,9 @@ def test_find_runparameters_file_not_found(novaseq_runparameters_api):
         novaseq_runparameters_api.find_runparameters_file()
 
     # THEN a RunParameters.xml should be found for the run of thay flowcell
-    assert str(exc_info.value) == f"Run parameters for flowcell {flowcell_id} not found!"
+    assert (
+        str(exc_info.value) == f"Run parameters for flowcell {flowcell_id} not found!"
+    )
 
 
 def test_control_software_version_old_scv(
