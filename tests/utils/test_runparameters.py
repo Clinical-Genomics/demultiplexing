@@ -79,7 +79,7 @@ def test_control_software_version_index_reads_fluffy(
     api.file = run_parameters_file["novaseq_fluffy"]
     result = novaseq_runparameters_api.index_reads
 
-    # THEN the method should return the correct number of reads, 8
+    # THEN the method should return the 8 reads
     assert result == 8
 
 
