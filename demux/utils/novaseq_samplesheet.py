@@ -109,7 +109,7 @@ class CreateNovaseqSamplesheet:
         with open(f"{self.dummy_indexes_file}") as csv_file:
             dummy_samples_csv = csv.reader(csv_file, delimiter=COMMA)
             dummy_samples = [row for row in dummy_samples_csv]
-            added_dummy_samples = []
+            new_dummy_samples = []
             lanes = {sample["lane"] for sample in raw_samplesheet}
 
             for lane in lanes:
