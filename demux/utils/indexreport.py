@@ -13,13 +13,12 @@ class IndexReport:
     """Indexcheck report class, able to hold and process information out of bcl2fastq html reports"""
 
     def __init__(
-
-            self,
-            out_dir: Path,
-            index_report_path: Path,
-            flowcell_id: str,
-            cluster_counts: int,
-            INDEX_REPORT_HEADER: list
+        self,
+        out_dir: Path,
+        index_report_path: Path,
+        flowcell_id: str,
+        cluster_counts: int,
+        INDEX_REPORT_HEADER: list,
     ):
         self.INDEX_REPORT_HEADER = INDEX_REPORT_HEADER
         self.out_dir = out_dir
@@ -49,8 +48,8 @@ class IndexReport:
         tmp_headers = self.report_tables[1].tr.find_all("th")
 
         for column in tmp_headers:
-            column = re.sub('<br/>', '', str(column))
-            column = re.sub('<.*?>', '', column)
+            column = re.sub("<br/>", "", str(column))
+            column = re.sub("<.*?>", "", column)
             headers.append(column)
             header_index[column] = index_counter
             index_counter += 1
@@ -85,8 +84,9 @@ class IndexReport:
         """Parses bcl2fastq indexcheck report"""
 
         log.info(
-            f'Parsing file {self.index_report_path.name}, extracting top unkown barcodes and samples with cluster'
-            f'counts lower than {self.cluster_counts}')
+            f"Parsing file {self.index_report_path.name}, extracting top unkown barcodes and samples with cluster"
+            f"counts lower than {self.cluster_counts}"
+        )
 
         self._html_content()
         self._report_tables()
@@ -109,18 +109,20 @@ class IndexReport:
             fo.write(f"</table>")
             fo.write(str(self.html_content.find_all("h2")[2]))
             fo.write(str(self.top_unknown_barcodes))
-            log.info(f'Wrote indexcheck report summary for '
-                     f'{self.flowcell_id} to {self.out_dir}/laneBarcode_summary.html')
+            log.info(
+                f"Wrote indexcheck report summary for "
+                f"{self.flowcell_id} to {self.out_dir}/laneBarcode_summary.html"
+            )
 
     def validate(self, INDEX_REPORT_HEADER):
         """Validate that the structure of the report is the expected, if any changes are made to the structure of the
         report we need to be alerted and maintain the processing of the script"""
 
         try:
-            log.info(f'Validating report')
+            log.info(f"Validating report")
             # Should contain 3
             assert len(self.report_tables) == 3
             assert INDEX_REPORT_HEADER == list(self.header_index.keys())
         except AssertionError as e:
-            raise IndexReportError('Check format of index report')
-        log.info(f'Validation passed')
+            raise IndexReportError("Check format of index report")
+        log.info(f"Validation passed")

@@ -1,0 +1,6 @@
+[console_scripts]
+demux = demux.cli:demux
+
+[demux.subcommands.1]
+
+
