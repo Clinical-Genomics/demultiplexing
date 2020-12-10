@@ -2,12 +2,11 @@
 
 import logging
 import xml.etree.cElementTree as xml_etree
+from pathlib import Path
 
 import click
 
-from pathlib import Path
-
-from .utils import (
+from ..utils import (
     HiSeq2500Samplesheet,
     HiSeqXSamplesheet,
     MiseqSamplesheet,
