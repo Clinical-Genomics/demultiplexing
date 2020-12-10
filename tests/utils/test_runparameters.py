@@ -1,4 +1,5 @@
 """ Tests parsing of run parameters """
+import pytest
 
 
 def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
@@ -15,6 +16,21 @@ def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
         result
         == str(novaseq_runs_dir) + "/test_run_dir_" + flowcell_id + "/RunParameters.xml"
     )
+
+
+def test_find_runparameters_file_not_found(novaseq_runparameters_api):
+    """ tests find runparameters_file method """
+
+    # GIVEN a flowcell id
+    novaseq_runparameters_api.flowcell = "NO_FLOWCELL"
+    flowcell_id = novaseq_runparameters_api.flowcell
+
+    # WHEN a runs folder does not exist for the flowcell
+    with pytest.raises(Exception) as exc_info:
+        novaseq_runparameters_api.find_runparameters_file()
+
+    # THEN a RunParameters.xml should be found for the run of thay flowcell
+    assert str(exc_info.value) == f"Run parameters for flowcell {flowcell_id} not found!"
 
 
 def test_control_software_version_old_scv(
