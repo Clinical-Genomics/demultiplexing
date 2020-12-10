@@ -273,7 +273,7 @@ def fetch(
             click.echo(
                 click.style(
                     f"Please specify an index length when using the pad option! "
-                    f"Use --longest or --index_length.",
+                    f"Use --longest or --index-length.",
                     fg="red",
                 )
             )
