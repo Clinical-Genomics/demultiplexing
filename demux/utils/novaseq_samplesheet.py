@@ -47,7 +47,7 @@ class CreateNovaseqSamplesheet:
 
     @staticmethod
     def add_dummy_sample(flowcell: str, dummy_index: str, lane: int, name: str) -> str:
-        """ constructs a dummy sample to the samplesheet """
+        """ Constructs and returns a dummy sample in novaseq samplesheet format"""
 
         add_dummy_sample = {
             "control": "N",
