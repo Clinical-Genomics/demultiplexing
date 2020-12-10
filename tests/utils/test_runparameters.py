@@ -79,9 +79,7 @@ def test_index_reads(novaseq_runparameters_api, run_parameters_file):
     assert result == 10
 
 
-def test_reagent_kit_new(
-    novaseq_runparameters_api, run_parameters_file
-):
+def test_reagent_kit_new(novaseq_runparameters_api, run_parameters_file):
     """ tests reagent kit method """
 
     # GIVEN an instance of the runparameters API
@@ -96,9 +94,7 @@ def test_reagent_kit_new(
     assert result == "3"
 
 
-def test_reagent_kit_old(
-    novaseq_runparameters_api, run_parameters_file
-):
+def test_reagent_kit_old(novaseq_runparameters_api, run_parameters_file):
     """ tests reagent kit method """
 
     # GIVEN an instance of the runparameters API
