@@ -118,7 +118,7 @@ class CreateNovaseqSamplesheet:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
                     ):
-                        add_dummy_sample = self.add_dummy_sample(
+                        new_dummy_sample = self.add_dummy_sample(
                             self.flowcell, dummy_index, lane, name
                         )
                         added_dummy_samples.append(new_dummy_sample)
