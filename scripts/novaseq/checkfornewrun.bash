@@ -25,9 +25,9 @@ log () {
 }
 
 failed() {
-    cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname)" $EMAIL
+        cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname), line $1" $EMAIL
 }
-trap failed ERR
+trap 'failed ${LINENO}' ERR
 
 ########
 # MAIN #
@@ -48,7 +48,7 @@ for RUN_DIR in ${IN_DIR}/*; do
     FC=${FC:1}
     PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
-    if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
+    if [[ -f ${RUN_DIR}/RTAComplete.txt && -f ${RUN_DIR}/CopyComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
             # start with a clean slate: remove empty sample sheets before continuing

@@ -4,17 +4,18 @@ import click
 import yaml
 
 from .samplesheet import sheet
-from ..basemask import basemask
+
 from .indexreport import indexreport
+from .basemask import basemask
 
 log = logging.getLogger(__name__)
 
-__version__ = '5.3.1'
+__version__ = "5.4.0"
 
 
 @click.group()
-@click.option('-l', '--log-level', default='INFO', envvar='LOGLEVEL')
-@click.option('-c', '--config', type=click.File('r'))
+@click.option("-l", "--log-level", default="INFO", envvar="LOGLEVEL")
+@click.option("-c", "--config", type=click.File("r"))
 @click.version_option(version=__version__, prog_name="demux")
 @click.pass_context
 def demux(context, log_level, config):
@@ -22,10 +23,10 @@ def demux(context, log_level, config):
     setup_logging(level=log_level)
     # log.info('{}: version {}'.format(__package__, __version__))
     context.obj = yaml.full_load(config) if config else {}
-    context.obj['log_level'] = log_level
+    context.obj["log_level"] = log_level
 
 
-def setup_logging(level='INFO'):
+def setup_logging(level="INFO"):
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
 
