@@ -114,7 +114,7 @@ class CreateNovaseqSamplesheet:
 
             for lane in lanes:
                 sample_indexes = self.sample_indexes_in_lane(raw_samplesheet, lane)
-                for name, dummy_index in dummy_samples:
+                for sample_name, dummy_index in dummy_samples:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
                     ):
