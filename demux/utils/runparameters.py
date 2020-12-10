@@ -29,7 +29,7 @@ class NovaseqRunParameters:
 
         return runparameters_file
 
-    def parse_runparameters(self) -> "xml.etree.ElementTree.ElementTree":
+    def parse_runparameters(self) -> "et":
         """ Parse the runparameters file """
         return et.parse(Path(self.file))
 
