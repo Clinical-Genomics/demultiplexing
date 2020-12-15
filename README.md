@@ -63,7 +63,7 @@ username: apiuser
 password: somepassword
 ```
 
-Files will be blacked automatically with each push to github. If you would like to automatically [Black][black-url] format your commits on your local machince:
+Files will be blacked automatically with each push to github. If you would like to automatically [Black][black-url] format your commits on your local machine:
 
 ```
 pre-commit install
