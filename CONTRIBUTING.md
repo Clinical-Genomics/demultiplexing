@@ -9,10 +9,12 @@ Demultiplexing is using github flow branching model as described in our [develop
 
 ## Publishing to PyPi
 
-Bump the version according to semantic versioning locally on branch `master` using poetry:
+Bump the version according to semantic versioning locally on branch `master` using bumpversion:
 
 ```
-poetry version [major | minor | patch ]
+bumpversion [major | minor | patch ]
+git push
+git push --tag
 ```
 
 Reinstall the application with the new version:
