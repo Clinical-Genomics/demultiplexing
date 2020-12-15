@@ -8,7 +8,8 @@ import yaml
 
 from demux import __version__
 from .samplesheet import sheet
-from ..basemask import basemask
+
+from .basemask import basemask
 
 LOG = logging.getLogger(__name__)
 LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR"]

@@ -24,7 +24,7 @@ from clinstatsdb.db.models import (
 )
 from clinstatsdb.utils import xstats
 
-__version__ = "5.3.1"
+__version__ = "5.4.2"
 
 logger = logging.getLogger(__name__)
 
