@@ -1,5 +1,9 @@
 *.pyc
 
+# Distribution / packaging
+dist/
+demux.egg-info/
+
 DEVELOP/
 .idea
 # Distribution / packaging

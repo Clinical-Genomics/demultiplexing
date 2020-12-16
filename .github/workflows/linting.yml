@@ -1,6 +1,8 @@
+---
+
 name: Demultiplexing Linting and Black
 
-on: ["push"]
+"on": ["push"]
 
 jobs:
   linting:

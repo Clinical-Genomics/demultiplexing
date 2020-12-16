@@ -41,11 +41,17 @@ Commands:
 
 ## Installation
 
-You can install `demultiplexing` from source:
+You can install `demultiplexing` via pip
 
-```bash
+````bash
+pip install demux
+```` 
+
+or via poetry:
+```
 $ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
-$ pip install --editable .
+poetry install
+poetry run demux
 ```
 
 You also need a YAML config file describing how to connect to the LIMS instance. It should contain information like this:
@@ -57,12 +63,13 @@ username: apiuser
 password: somepassword
 ```
 
-Files will be blacked automatically with each push to github. If you would like to automatically [Black][black-url] format your commits on your local machince:
+Files will be blacked automatically with each push to github. You can use pre-commit if you would like to automatically [Black][black-url] format your commits on your local machine before pushing to github. Pre-commit is installed using: 
 
 ```
 pre-commit install
 ```
 
+Precommit will then use the `.pre-commit-config.yaml` and run the pre-commit hooks defined there before committing the results.
 ## Contributing
 
 Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)

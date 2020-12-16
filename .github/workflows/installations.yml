@@ -1,6 +1,8 @@
+---
+
 name: Demultiplex installation tests
 
-on: ["pull_request"]
+"on": ["pull_request"]
 
 jobs:
 
@@ -22,7 +24,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version}}
 
-    - name: Intall pip
+    - name: Install pip
       # Make sure that we have correct python version and pip version
       # For details see .github/workflows/server_info.md
       run: |
@@ -39,5 +41,7 @@ jobs:
 
     - name: Production Dependencies
       run: |
-        pip install .
+        pip install micropipenv[toml]
+        micropipenv requirements --method poetry > requirements.txt
+        pip install -r requirements.txt
         pip check
