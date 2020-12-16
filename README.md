@@ -63,12 +63,13 @@ username: apiuser
 password: somepassword
 ```
 
-Files will be blacked automatically with each push to github. If you would like to automatically [Black][black-url] format your commits on your local machine:
+Files will be blacked automatically with each push to github. You can use pre-commit if you would like to automatically [Black][black-url] format your commits on your local machine before pushing to github. Pre-commit is installed using: 
 
 ```
 pre-commit install
 ```
 
+Precommit will then use the `.pre-commit-config.yaml` and run the pre-commit hooks defined there before committing the results.
 ## Contributing
 
 Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
