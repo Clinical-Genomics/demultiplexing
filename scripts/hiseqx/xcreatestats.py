@@ -9,7 +9,7 @@ import glob
 import re
 import os
 
-__version__ = "5.4.2"
+__version__ = "5.4.3"
 
 
 def xpathsum(tree, xpath):
