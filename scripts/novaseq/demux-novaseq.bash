@@ -62,6 +62,8 @@ JOB_TITLE="Demux_${RUN}"
 log "sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'"
 sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'
 
+log "bcl2fastq finished!"
+
 # add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
