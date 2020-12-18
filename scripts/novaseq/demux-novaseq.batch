@@ -1,0 +1,59 @@
+#!/bin/bash
+#SBATCH -c 18
+#SBATCH -J novaseq-demux
+#SBATCH --qos=high
+#SBATCH --output=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.out
+#SBATCH --error=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.err
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=barry.stokman@scilifelab.se
+
+set -eu -o pipefail
+
+##########
+# PARAMS #
+##########
+
+RUN_DIR=${1?'Run dir'}
+DEMUX_DIR=${2?'Demux dir'}
+BASEMASK=${3?'Basemask'}
+UNALIGNED_DIR=${4?'Unaligned directory'}
+EMAIL=barry.stokman@scilifelab.se
+
+#############
+# FUNCTIONS #
+#############
+
+log() {
+    NOW=$(date +"%Y%m%d%H%M%S")
+    echo "[${NOW}] $*"
+
+}
+
+failed() {
+    mail -s "ERROR demultiplexing of $(basename "$RUN_DIR")" ${EMAIL} < "${DEMUX_DIR}/LOG/*-${SLURM_JOB_ID}.err"
+
+}
+trap failed ERR
+
+########
+# INIT #
+########
+
+log "On node: $(hostname)"
+log "starting, will use ${TMPDIR}"
+log "Run directory: ${RUN_DIR}"
+log "Demux directory: ${DEMUX_DIR}"
+
+################
+# RUN BCL2FASTQ#
+################
+
+log "start demultiplexing ${RUN_DIR}"
+log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+
+############
+# CLEAN UP #
+############
+
+log "bcl2fastq finished!"

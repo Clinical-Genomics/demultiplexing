@@ -13,7 +13,8 @@ source ~/.aliases
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
-EMAIL=clinical-demux@scilifelab.se
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=barry.stokman@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -74,7 +75,7 @@ for RUN_DIR in ${IN_DIR}/*; do
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
-            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
+            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} ${FC} ${PROJECTLOG} &>> ${PROJECTLOG}
 
             if [[ $? == 0 ]]; then
                 log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"

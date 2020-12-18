@@ -3,7 +3,7 @@
 set -eu
 
 shopt -s expand_aliases
-source $HOME/.bashrc
+#source $HOME/.bashrc
 ulimit -n 4096
 
 ##########
@@ -12,12 +12,22 @@ ulimit -n 4096
 
 IN_DIR=${1?'please provide a run dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
+FC=${3?'fc_id needed'}
+PROJECTLOG=${4?'projectlog needed'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
-EMAIL=clinical-demux@scilifelab.se
+LOGDIR="${OUTDIR}/LOG"
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=barry.stokman@scilifelab.se
 
-BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
+#BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
+BCL2FASTQ_BIN=/usr/local/bin/bcl2fastq
+
+SLURM_ACCOUNT=development
+if [[ ${ENVIRONMENT} == 'P_main' ]]; then
+    SLURM_ACCOUNT=production
+fi
 
 #############
 # FUNCTIONS #
@@ -48,8 +58,9 @@ BASEMASK=$(demux basemask create --application nova ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1
+JOB_TITLE="Demux_${RUN}"
+log "sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'"
+sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'
 
 # add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
