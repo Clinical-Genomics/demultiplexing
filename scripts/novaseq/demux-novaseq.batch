@@ -1,6 +1,5 @@
 #!/bin/bash
 #SBATCH -c 18
-#SBATCH -J novaseq-demux
 #SBATCH --qos=high
 #SBATCH --output=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.out
 #SBATCH --error=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.err
