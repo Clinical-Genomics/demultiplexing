@@ -5,30 +5,52 @@ import os
 from pathlib import Path
 
 from demux.constants import INDEX_REPORT_HEADER
+from demux.exc import IndexReportError
 from demux.utils.indexreport import IndexReport
 
-log = logging.getLogger(__name__)
-
-# TO DO:
-# tempdir in conftest
+LOG = logging.getLogger(__name__)
 
 
-def test_parse_indexreport(novaseq_valid_indexcheck_report: Path):
-    """ Test the function to parse a bcl2fastq indextcheck html report"""
-    with open(novaseq_valid_indexcheck_report, 'r') as fh:
-        index_report = IndexReport(
-            out_dir=Path('.'),
-            index_report_path=fh,
-            flowcell_id='HX1234DSXY',
-            INDEX_REPORT_HEADER=INDEX_REPORT_HEADER,
-            cluster_counts=100000,
-            log=log
-        )
+def test_parse_indexreport(valid_indexreport: IndexReport, caplog):
+    """ Test the function to parse a bcl2fastq indextcheck html report """
+
+    caplog.set_level(logging.INFO)
+
+    valid_indexreport.parse_report()
+
+    assert 'Parsing complete!' in caplog.text
 
 
-        index_report.parse_report()
-        print(index_report.log.info)
+def test_validate_valid_indexreport(parsed_valid_indexreport: IndexReport, caplog):
+    """ Test validation on valid indexcheck report """
 
+    caplog.set_level(logging.INFO)
+
+    parsed_valid_indexreport.validate()
+
+    assert "Validation passed" in caplog.text
+
+
+def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
+    """ Test validation of faulty headers in Report Table 1 """
+
+    caplog.set_level(logging.INFO)
+
+    with pytest.raises(IndexReportError) as e:
+        indexreport_wrong_header_rt1.validate()
+
+    print(e)
+    assert "Check format of index report" == str(e.value)
+
+
+def test_write_report(validated_indexreport: IndexReport, caplog):
+    """ Test writing function of a summary """
+
+    caplog.set_level(logging.INFO)
+
+    validated_indexreport.write_summary()
+
+    assert 'Wrote indexcheck report summary to' in caplog.text
 
 # test write function
 # test validation function
