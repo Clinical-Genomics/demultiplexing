@@ -3,8 +3,18 @@ from pathlib import Path
 from typing import Dict
 
 import pytest
+import shutil
 
 from demux.utils.runparameters import NovaseqRunParameters
+
+
+@pytest.fixture(scope="function", name="project_dir")
+def tmp_dir(tmp_path_factory) -> Path:
+    """ Yield temp dir """
+
+    my_tmpdir = Path(tmp_path_factory.mktemp("data"))
+    yield my_tmpdir
+    shutil.rmtree(str(my_tmpdir))
 
 
 @pytest.fixture(name="fixtures_dir")
@@ -37,10 +47,10 @@ def fixture_novaseq_valid_indexcheck_report(novaseq_dir: Path) -> Path:
     return novaseq_dir / "valid_laneBarcode.html"
 
 
-@pytest.fixture(name="novaseq_invalid_rt1_indexcheck_report")
+@pytest.fixture(name="novaseq_indexcheck_wrong_header_rt1")
 def fixture_novaseq_invalid_rt1_indexcheck_report(novaseq_dir: Path) -> Path:
     """ Return the path to valid indexcheck report """
-    return novaseq_dir / "valid_laneBarcode.html"
+    return novaseq_dir / "wrong_header_rt1.html"
 
 
 @pytest.fixture(name="novaseq_invalid_rt2_indexcheck_report")
