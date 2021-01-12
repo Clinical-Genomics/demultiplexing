@@ -1,10 +1,6 @@
 import pytest
 import logging
-import os
 
-from pathlib import Path
-
-from demux.constants import INDEX_REPORT_HEADER
 from demux.exc import IndexReportError
 from demux.utils.indexreport import IndexReport
 
