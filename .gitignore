@@ -1,7 +1,7 @@
 *.pyc
 
 DEVELOP/
-.idea
+.idea/
 # Distribution / packaging
 *.egg-info/
 *.egg
