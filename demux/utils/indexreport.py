@@ -49,7 +49,7 @@ class IndexReport:
         raw_sample_headers = self.report_tables[1].tr.find_all("th")
 
         for column in raw_sample_headers:
-            column = re.sub("<br/>", "", str(column))
+            column = re.sub("<br/>", " ", str(column))
             column = re.sub("<.*?>", "", column)
             headers.append(column)
             header_index[column] = index_counter
@@ -102,9 +102,8 @@ class IndexReport:
         try:
             assert len(self.report_tables) == 3
         except AssertionError:
-            raise IndexReportError(
-                message="The number of Report Tables are not the same"
-            )
+            LOG.error("The number of Report Tables are not the same")
+            raise IndexReportError
 
     def validate_index_report_header(self):
         """ Validate the index report headers """
@@ -112,12 +111,11 @@ class IndexReport:
         try:
             assert self.INDEX_REPORT_HEADER == list(self.header_index.keys())
         except AssertionError as e:
-            raise IndexReportError(
-                message=(
+            LOG.error(
                     f"The header in the cluster count sample table is not matching the\n"
                     f"control headers. Check if they need correction"
                 )
-            )
+            raise IndexReportError
 
     def validate_topunknown_barcodes_table(self):
         """ Validate the top unknown barcodes table """
@@ -132,22 +130,16 @@ class IndexReport:
                 == 5
             )
         except AssertionError as e:
-            raise IndexReportError(
-                message=(
-                    f"Top unkown barcode table is not matching the reference, please check the report"
-                )
-            )
+            LOG.error(f"Top unkown barcode table is not matching the reference, please check the report")
+            raise IndexReportError
 
     def validate(self):
         """Validate report structure"""
 
-        try:
-            LOG.info(f"Validating report")
-            self.validate_report_tables()
-            self.validate_index_report_header()
-            self.validate_topunknown_barcodes_table()
-        except AssertionError as e:
-            raise IndexReportError(message="Check format of index report")
+        LOG.info(f"Validating report")
+        self.validate_report_tables()
+        self.validate_index_report_header()
+        self.validate_topunknown_barcodes_table()
         LOG.info(f"Validation passed")
 
     def write_summary(self):
