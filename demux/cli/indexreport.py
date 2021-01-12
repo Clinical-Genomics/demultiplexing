@@ -1,8 +1,8 @@
 import click
 import logging
 
-from demux.utils.indexreport import IndexReport
 from demux.constants import INDEX_REPORT_HEADER
+from demux.utils.indexreport import IndexReport
 
 LOG = logging.getLogger(__name__)
 
@@ -10,33 +10,28 @@ LOG = logging.getLogger(__name__)
 @click.group()
 def indexreport():
     """Index report commands"""
-    pass
 
 
 @indexreport.command()
 @click.option(
-    "-i",
     "--index-report-path",
     type=click.File(mode="r"),
     required=True,
     help="Relative path to bcl2fastq indexcheck report (laneBarcode.html)",
 )
 @click.option(
-    "-o",
     "--out-dir",
     type=click.Path(exists=True),
     required=True,
-    help="Relative path to the output directory",
+    help="Absolute path of terminal directory for summary report",
 )
 @click.option(
-    "-f",
     "--flowcell-id",
     type=str,
     required=True,
     help="Flowcell id of given indexcheck report",
 )
 @click.option(
-    "-c",
     "--cluster-counts",
     type=int,
     default=1000000,
@@ -45,7 +40,7 @@ def indexreport():
         f" included in the summary"
     ),
 )
-def summary(index_report_path, out_dir, flowcell_id, cluster_counts):
+def summary(index_report_path, out_dir, flowcell_id: str, cluster_counts: int):
     """Create a summary of the indexcheck report, extracting information on samples with low number of clusters
     and the topmost common unkown indexes"""
     index_report = IndexReport(

@@ -1,7 +1,0 @@
-psutil
-path.py
-click<7
-PyYAM
-cglims
-six==1.12
-bs4~=0.0.1

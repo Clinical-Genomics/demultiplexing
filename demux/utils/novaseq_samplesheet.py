@@ -153,6 +153,7 @@ class CreateNovaseqSamplesheet:
                     index1, index2, is_reverse_complement
                 )
             elif len(index2) == 10:
+                line["index"] = index1
                 line["index2"] = (
                     self.get_reverse_complement_dna_seq(index2)
                     if is_reverse_complement
