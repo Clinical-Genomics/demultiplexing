@@ -1,17 +1,17 @@
 import pytest
 
-from copy import deepcopy
+from copy import copy
 
 from demux.constants import INDEX_REPORT_HEADER
 from demux.utils.indexreport import IndexReport
 
 
 @pytest.fixture(name="valid_indexreport")
-def fixture_index_check_report(
+def fixture_valid_indexreport(
     novaseq_valid_indexcheck_report, project_dir
 ) -> IndexReport:
     """ Fixture of a valid bcl2fastq indexcheck report """
-    index_check_report = IndexReport(
+    valid_indexreport = IndexReport(
         out_dir=project_dir,
         index_report_path=novaseq_valid_indexcheck_report,
         flowcell_id="HFKF7DSXY",
@@ -19,25 +19,25 @@ def fixture_index_check_report(
         INDEX_REPORT_HEADER=INDEX_REPORT_HEADER,
     )
 
-    return index_check_report
+    return valid_indexreport
 
 
-@pytest.fixture(name="parsed_valid_indexreport")
-def fixture_parsed_valid_indexreport(valid_indexreport) -> IndexReport:
-    """ Fixture of a parsed bcl2fastq indexcheck report """
-    parsed_valid_indexreport = deepcopy(valid_indexreport)
-    parsed_valid_indexreport.parse_report()
+@pytest.fixture(name="parsed_indexreport")
+def fixture_parsed_indexreport(valid_indexreport) -> IndexReport:
+    """ Fixture of a parsed IndexReport class """
+    parsed_indexreport = copy(valid_indexreport)
+    parsed_indexreport.parse_report()
 
-    return parsed_valid_indexreport
+    return parsed_indexreport
 
 
 @pytest.fixture(name="validated_indexreport")
-def fixture_parsed_valid_indexreport(parsed_valid_indexreport) -> IndexReport:
-    """ Fixture of a validated bcl2fastq indexcheck report """
-    parsed_valid_indexreport = deepcopy(parsed_valid_indexreport)
-    parsed_valid_indexreport.validate()
+def fixture_validated_indexreport(parsed_indexreport) -> IndexReport:
+    """ Fixture of a parsed IndexReport class """
+    validated_indexreport = copy(parsed_indexreport)
+    validated_indexreport.validate()
 
-    return parsed_valid_indexreport
+    return validated_indexreport
 
 
 @pytest.fixture(name="indexreport_wrong_header_rt1")
