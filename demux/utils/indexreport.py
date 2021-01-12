@@ -13,12 +13,12 @@ class IndexReport:
     """Indexcheck report class, able to hold and process information out of bcl2fastq html reports"""
 
     def __init__(
-            self,
-            out_dir: Path,
-            index_report_path: Path,
-            flowcell_id: str,
-            cluster_counts: int,
-            INDEX_REPORT_HEADER: list,
+        self,
+        out_dir: Path,
+        index_report_path: Path,
+        flowcell_id: str,
+        cluster_counts: int,
+        INDEX_REPORT_HEADER: list,
     ):
         self.INDEX_REPORT_HEADER = INDEX_REPORT_HEADER
         self.out_dir = out_dir
@@ -103,8 +103,10 @@ class IndexReport:
         try:
             assert len(self.report_tables) == 3
         except AssertionError:
-            raise IndexReportError(message="The number of Report Tables are not the same")
-            
+            raise IndexReportError(
+                message="The number of Report Tables are not the same"
+            )
+
     def validate_index_report_header(self):
         """ Validate the index report headers """
 
@@ -117,19 +119,26 @@ class IndexReport:
                     f"control headers. Check if they need correction"
                 )
             )
-        
+
     def validate_topunknown_barcodes_table(self):
         """ Validate the top unknown barcodes table """
-        
+
         try:
-            assert len(re.sub("<.*?>", "", str(self.report_tables[2].tr)).strip().split('Lane')) == 5
+            assert (
+                len(
+                    re.sub("<.*?>", "", str(self.report_tables[2].tr))
+                    .strip()
+                    .split("Lane")
+                )
+                == 5
+            )
         except AssertionError as e:
             raise IndexReportError(
                 message=(
                     f"Top unkown barcode table is not matching the reference, please check the report"
                 )
             )
-    
+
     def validate(self):
         """Validate report structure"""
 

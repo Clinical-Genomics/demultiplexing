@@ -18,7 +18,7 @@ def test_parse_indexreport(valid_indexreport: IndexReport, caplog):
 
     valid_indexreport.parse_report()
 
-    assert 'Parsing complete!' in caplog.text
+    assert "Parsing complete!" in caplog.text
 
 
 def test_validate_valid_indexreport(parsed_valid_indexreport: IndexReport, caplog):
@@ -50,7 +50,8 @@ def test_write_report(validated_indexreport: IndexReport, caplog):
 
     validated_indexreport.write_summary()
 
-    assert 'Wrote indexcheck report summary to' in caplog.text
+    assert "Wrote indexcheck report summary to" in caplog.text
+
 
 # test write function
 # test validation function
