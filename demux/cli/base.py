@@ -3,10 +3,9 @@ import coloredlogs, logging
 import click
 import yaml
 
-from .samplesheet import sheet
-
-from .indexreport import indexreport
 from .basemask import basemask
+from .indexreport import indexreport
+from .samplesheet import sheet
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +41,6 @@ def setup_logging(level="INFO"):
     root_logger.addHandler(console)
     return root_logger
 
-
-demux.add_command(sheet)
 demux.add_command(basemask)
 demux.add_command(indexreport)
+demux.add_command(sheet)
