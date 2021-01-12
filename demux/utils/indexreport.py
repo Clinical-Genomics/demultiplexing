@@ -112,9 +112,9 @@ class IndexReport:
             assert self.INDEX_REPORT_HEADER == list(self.header_index.keys())
         except AssertionError as e:
             LOG.error(
-                    f"The header in the cluster count sample table is not matching the\n"
-                    f"control headers. Check if they need correction"
-                )
+                f"The header in the cluster count sample table is not matching the\n"
+                f"control headers. Check if they need correction"
+            )
             raise IndexReportError
 
     def validate_topunknown_barcodes_table(self):
@@ -130,7 +130,9 @@ class IndexReport:
                 == 5
             )
         except AssertionError as e:
-            LOG.error(f"Top unkown barcode table is not matching the reference, please check the report")
+            LOG.error(
+                f"Top unkown barcode table is not matching the reference, please check the report"
+            )
             raise IndexReportError
 
     def validate(self):
