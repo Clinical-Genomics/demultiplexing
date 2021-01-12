@@ -17,26 +17,14 @@ def test_parse_indexreport(valid_indexreport: IndexReport, caplog):
     assert "Parsing complete!" in caplog.text
 
 
-def test_validate_valid_indexreport(parsed_valid_indexreport: IndexReport, caplog):
+def test_validate_valid_indexreport(parsed_indexreport: IndexReport, caplog):
     """ Test validation on valid indexcheck report """
 
     caplog.set_level(logging.INFO)
 
-    parsed_valid_indexreport.validate()
+    parsed_indexreport.validate()
 
     assert "Validation passed" in caplog.text
-
-
-def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
-    """ Test validation of faulty headers in Report Table 1 """
-
-    caplog.set_level(logging.INFO)
-
-    with pytest.raises(IndexReportError) as e:
-        indexreport_wrong_header_rt1.validate()
-
-    print(e)
-    assert "Check format of index report" == str(e.value)
 
 
 def test_write_report(validated_indexreport: IndexReport, caplog):
@@ -49,5 +37,15 @@ def test_write_report(validated_indexreport: IndexReport, caplog):
     assert "Wrote indexcheck report summary to" in caplog.text
 
 
-# test write function
-# test validation function
+def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
+    """ Test validation of faulty headers in Report Table 1 """
+
+    caplog.set_level(logging.ERROR)
+
+    with pytest.raises(IndexReportError) as e:
+        indexreport_wrong_header_rt1.validate()
+
+    assert (
+        f"The header in the cluster count sample table is not matching the\n"
+        f"control headers. Check if they need correction"
+    ) in caplog.text
