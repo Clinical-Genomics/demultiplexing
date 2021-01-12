@@ -46,9 +46,9 @@ class IndexReport:
         header_index = {}
 
         index_counter = 0
-        tmp_headers = self.report_tables[1].tr.find_all("th")
+        raw_sample_headers = self.report_tables[1].tr.find_all("th")
 
-        for column in tmp_headers:
+        for column in raw_sample_headers:
             column = re.sub("<br/>", "", str(column))
             column = re.sub("<.*?>", "", column)
             headers.append(column)
@@ -70,15 +70,14 @@ class IndexReport:
         low_cluster_counts = []
 
         for row in self.report_tables[1].find_all("tr")[1:]:
-            tmp_row = row.find_all("td")
-            tmp_project = re.sub(
-                "<.*?>", "", str(tmp_row[self.header_index["Project"]])
+            project = re.sub(
+                "<.*?>", "", str(row.find_all("td")[self.header_index["Project"]])
             )
-            tmp_cluster_count = re.sub(
-                "<.*?>", "", str(tmp_row[self.header_index["PF Clusters"]])
+            cluster_count = re.sub(
+                "<.*?>", "", str(row.find_all("td")[self.header_index["PF Clusters"]])
             )
-            if tmp_project != "indexcheck":
-                if int(tmp_cluster_count.replace(",", "")) < self.cluster_counts:
+            if project != "indexcheck":
+                if int(cluster_count.replace(",", "")) < self.cluster_counts:
                     low_cluster_counts.append(row)
 
         self.low_cluster_counts: list = low_cluster_counts
