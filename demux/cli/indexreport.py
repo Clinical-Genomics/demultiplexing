@@ -41,7 +41,9 @@ def indexreport():
         f" included in the summary"
     ),
 )
-def summary(index_report_path: str, out_dir: str, flowcell_id: str, cluster_counts: int):
+def summary(
+    index_report_path: str, out_dir: str, flowcell_id: str, cluster_counts: int
+):
     """Create a summary of the indexcheck report, extracting information on samples with low number of clusters
     and the topmost common unkown indexes"""
     index_report = IndexReport(
