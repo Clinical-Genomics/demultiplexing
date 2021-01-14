@@ -54,3 +54,17 @@ def fixture_indexreport_wrong_header_rt1(
     indexreport_wrong_header_rt1.parse_report()
 
     return indexreport_wrong_header_rt1
+
+
+@pytest.fixture(name="indexreport_missing_lanes_rt2")
+def fixture_indexreport_missing_lanes_rt2(novaseq_indexcheck_invalid_rt2, project_dir):
+    indexreport_missing_lanes_rt2 = IndexReport(
+        out_dir=project_dir,
+        index_report_path=novaseq_indexcheck_invalid_rt2,
+        flowcell_id="HFKF7DSXY",
+        cluster_counts=100000,
+        INDEX_REPORT_HEADER=INDEX_REPORT_HEADER,
+    )
+    indexreport_missing_lanes_rt2.parse_report()
+
+    return indexreport_missing_lanes_rt2

@@ -43,13 +43,27 @@ def test_write_report(validated_indexreport: IndexReport, caplog):
 def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
     """ Test validation of faulty headers in Report Table 1 """
 
-    # GIVEN a corrupt bcl2fastq report
+    # GIVEN a corrupt bcl2fastq indexcheck report with faulty headers
     caplog.set_level(logging.ERROR)
-    # WHEN said "corrupt" bcl2fastq report is validated
+    # WHEN the corrupt bcl2fastq indexcheck report is validated
     with pytest.raises(IndexReportError) as e:
         indexreport_wrong_header_rt1.validate()
     # THEN an exception is raised and a message is reported
     assert (
         f"The header in the cluster count sample table is not matching the\n"
         f"control headers. Check if they need correction"
+    ) in caplog.text
+
+
+def test_validate_missing_lanes_rt2(indexreport_missing_lanes_rt2, caplog):
+    """ Test the validation of missing lanes and thus structure in Report table 2 """
+
+    # GIVEN a corrupt bcl2fastq indexcheck report with missing lanes
+    caplog.set_level(logging.ERROR)
+    # WHEN the corrupt bcl2fastq indexcheck report is validated
+    with pytest.raises(IndexReportError) as e:
+        indexreport_missing_lanes_rt2.validate()
+    # THEN an report error should be raised and the following message prompted
+    assert (
+        f"Top unkown barcode table is not matching the reference, please check the report"
     ) in caplog.text

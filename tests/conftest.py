@@ -53,10 +53,10 @@ def fixture_novaseq_invalid_rt1_indexcheck_report(novaseq_dir: Path) -> Path:
     return novaseq_dir / "wrong_header_rt1.html"
 
 
-@pytest.fixture(name="novaseq_invalid_rt2_indexcheck_report")
+@pytest.fixture(name="novaseq_indexcheck_invalid_rt2")
 def fixture_novaseq_invalid_rt2_indexcheck_report(novaseq_dir: Path) -> Path:
     """ Return the path to valid indexcheck report """
-    return novaseq_dir / "valid_laneBarcode.html"
+    return novaseq_dir / "indexcheck_invalid_rt2.html"
 
 
 @pytest.fixture(name="novaseq_runs_dir")
