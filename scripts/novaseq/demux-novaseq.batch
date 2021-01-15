@@ -1,9 +1,8 @@
 #!/bin/bash
 #SBATCH -c 18
-#SBATCH --qos=high
-#SBATCH --output=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.out
-#SBATCH --error=/home/barry.stokman/development/testdata/log/demux-novaseq-%j.err
-#SBATCH --mail-type=FAIL
+#SBATCH --qos=low
+#SBATCH --time=600
+#SBATCH --mail-type=ALL
 #SBATCH --mail-user=barry.stokman@scilifelab.se
 
 set -eu -o pipefail
@@ -17,6 +16,7 @@ DEMUX_DIR=${2?'Demux dir'}
 BASEMASK=${3?'Basemask'}
 UNALIGNED_DIR=${4?'Unaligned directory'}
 EMAIL=barry.stokman@scilifelab.se
+BCL2FASTQ_BIN=/usr/local/bin/bcl2fastq
 
 #############
 # FUNCTIONS #

@@ -17,12 +17,10 @@ PROJECTLOG=${4?'projectlog needed'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
-LOGDIR="${OUTDIR}/LOG"
+LOG_DIR="${OUT_DIR}/LOG"
+SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
 #EMAIL=clinical-demux@scilifelab.se
 EMAIL=barry.stokman@scilifelab.se
-
-#BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
-BCL2FASTQ_BIN=/usr/local/bin/bcl2fastq
 
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'P_main' ]]; then
@@ -44,10 +42,7 @@ log() {
 
 # init
 mkdir -p ${OUT_DIR}
-
-# log the version
-demux --version
-${BCL2FASTQ_BIN} --version
+mkdir -p ${LOG_DIR}
 
 # Here we go!
 log "Starting NovaSeq demultiplexing"
@@ -58,16 +53,16 @@ BASEMASK=$(demux basemask create --application nova ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-JOB_TITLE="Demux_${RUN}"
-log "sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'"
-sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/demux-novaseq.batch' '${IN_DIR}' '${OUT_DIR}' 'S{BASEMASK}' '${UNALIGNED_DIR}'
+JOB_TITLE=Demux_${RUN}
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${LOG_DIR}/${JOB_TITLE}-%j.log -e ${LOG_DIR}/${JOB_TITLE}-%j.err ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${LOG_DIR}/${JOB_TITLE}-%j.log -e ${LOG_DIR}/${JOB_TITLE}-%j.err ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
 log "bcl2fastq finished!"
 
-# add samplesheet to unaligned folder
+#add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
-# Restructure the output dir!
+#Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
 shopt -s nullglob
@@ -99,7 +94,7 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
-# Need to add stats code here :)
+#Add stats to cgstats database
 log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
 cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
 
