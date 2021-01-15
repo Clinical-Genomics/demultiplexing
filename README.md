@@ -1,4 +1,7 @@
-# demultiplexing [![Build Status][travis-img]][travis-url]
+# demultiplexing
+![Build Status - Github][gh-actions-badge]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![Code style: black][black-image]][black-url]
 
 To keep scripts associated with execution of the Illumina demultiplexing pipeline
 
@@ -38,11 +41,17 @@ Commands:
 
 ## Installation
 
-You can install `demultiplexing` from source:
+You can install `demultiplexing` via pip
 
-```bash
+````bash
+pip install demux
+```` 
+
+or via poetry:
+```
 $ git clone https://github.com/Clinical-Genomics/demultiplexing && cd demultiplexing
-$ pip install --editable .
+poetry install
+poetry run demux
 ```
 
 You also need a YAML config file describing how to connect to the LIMS instance. It should contain information like this:
@@ -54,9 +63,21 @@ username: apiuser
 password: somepassword
 ```
 
+Files will be blacked automatically with each push to github. You can use pre-commit if you would like to automatically [Black][black-url] format your commits on your local machine before pushing to github. Pre-commit is installed using: 
+
+```
+pre-commit install
+```
+
+Precommit will then use the `.pre-commit-config.yaml` and run the pre-commit hooks defined there before committing the results.
 ## Contributing
 
-Demux is using github flow branching model as described in our [development manual][development manual].
+Please check out our [guide for contributing to demultiplexing](CONTRIBUTING.md)
 
-[travis-img]: https://travis-ci.org/Clinical-Genomics/demultiplexing.svg?branch=master
-[travis-url]: https://travis-ci.org/Clinical-Genomics/demultiplexing
+[coveralls-url]: https://coveralls.io/github/Clinical-Genomics/demultiplexing
+[black-url]: https://github.com/psf/black
+
+<!-- badges -->
+[gh-actions-badge]: https://github.com/Clinical-Genomics/demultiplexing/workflows/Demultiplexing%20CI/badge.svg
+[coveralls-image]: https://coveralls.io/repos/github/Clinical-Genomics/demultiplexing/badge.svg?branch=master
+[black-image]: https://img.shields.io/badge/code%20style-black-000000.svg

@@ -246,7 +246,7 @@ class Samplesheet(object):
                         return (msg, i + 2)
             return True
 
-        def _validate_uniq_index():
+        def _validate_uniq_index(samplesheet):
             lanes = list(set(self.column("lane")))
             for lane in lanes:
                 if self.is_pooled_lane(lane, column="lane"):
@@ -279,7 +279,7 @@ class Samplesheet(object):
                         i + 2,
                     )
 
-        rs = _validate_uniq_index()
+        rs = _validate_uniq_index(self.samplesheet)
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 

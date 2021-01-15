@@ -1,1 +1,14 @@
 *.pyc
+
+# Distribution / packaging
+dist/
+demux.egg-info/
+
+DEVELOP/
+.idea
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# vim
+*.swp

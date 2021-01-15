@@ -25,9 +25,9 @@ log () {
 }
 
 failed() {
-    cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname)" $EMAIL
+        cat ${PROJECTLOG} | mail -s "ERROR starting novaseq ${FC} on $(hostname), line $1" $EMAIL
 }
-trap failed ERR
+trap 'failed ${LINENO}' ERR
 
 ########
 # MAIN #
@@ -48,11 +48,11 @@ for RUN_DIR in ${IN_DIR}/*; do
     FC=${FC:1}
     PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
 
-    if [[ -f ${RUN_DIR}/RTAComplete.txt ]]; then
+    if [[ -f ${RUN_DIR}/RTAComplete.txt && -f ${RUN_DIR}/CopyComplete.txt ]]; then
         if [[ ! -f ${RUN_DIR}/demuxstarted.txt ]]; then
 
             # start with a clean slate: remove empty sample sheets before continuing
-            if [[ ! -s ${RUN_DIR}/SampleSheet.csv  ]]; then
+            if [[ -e ${RUN_DIR}/SampleSheet.csv && ! -s ${RUN_DIR}/SampleSheet.csv  ]]; then
                 rm ${RUN_DIR}/SampleSheet.csv
             fi
 
@@ -62,7 +62,7 @@ for RUN_DIR in ${IN_DIR}/*; do
             fi
 
             # exit if samplesheet is still empty after running demux sheet fetch
-            if [[ ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
+            if [[ -e ${RUN_DIR}/SampleSheet.csv && ! -s ${RUN_DIR}/SampleSheet.csv ]]; then
                 echo "Sample sheet empty! Exiting!" 1>&2
                 continue
             fi
