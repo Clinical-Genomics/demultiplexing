@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from demux.utils.runparameters import NovaseqRunParameters
+from demux.utils.samplesheet import HiSeqXSamplesheet
 
 
 @pytest.fixture(name="fixtures_dir")
@@ -33,6 +34,14 @@ def fixture_novaseq_dir(fixtures_dir: Path) -> Path:
 def fixture_runs_dir(novaseq_dir: Path) -> Path:
     """ Return the path to the novaseq runs directory """
     return novaseq_dir / "runs"
+
+
+@pytest.fixture(name="hiseqx_samplesheet_multiple_index")
+def fixture_hiseqx_samplesheet_multiple_index(fixtures_dir: Path) -> HiSeqXSamplesheet:
+    """ Return a hiseqx sample sheet containing multiple indexes """
+    hiseqx_samplesheet_multiple_index = HiSeqXSamplesheet(fixtures_dir / "x_samplesheet_multiple_index.csv")
+
+    return hiseqx_samplesheet_multiple_index
 
 
 @pytest.fixture(name="run_parameters_file")
