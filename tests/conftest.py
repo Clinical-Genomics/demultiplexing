@@ -39,7 +39,9 @@ def fixture_runs_dir(novaseq_dir: Path) -> Path:
 @pytest.fixture(name="hiseqx_samplesheet_multiple_index")
 def fixture_hiseqx_samplesheet_multiple_index(fixtures_dir: Path) -> HiSeqXSamplesheet:
     """ Return a hiseqx sample sheet containing multiple indexes """
-    hiseqx_samplesheet_multiple_index = HiSeqXSamplesheet(fixtures_dir / "x_samplesheet_multiple_index.csv")
+    hiseqx_samplesheet_multiple_index = HiSeqXSamplesheet(
+        fixtures_dir / "x_samplesheet_multiple_index.csv"
+    )
 
     return hiseqx_samplesheet_multiple_index
 

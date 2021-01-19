@@ -19,8 +19,8 @@ def test_nipt_samplesheet():
     assert samplesheet._get_flowcell() == "HFNC5BCXY"
     assert samplesheet._get_project_id() == "666666"
     assert (
-            samplesheet.raw()
-            == """[Header],,,,,,,,,,
+        samplesheet.raw()
+        == """[Header],,,,,,,,,,
 IEMFileVersion,4,,,,,,,,,
 Investigator Name,9999999_666666,,,,,,,,,
 Experiment Name,HFNC5BCXY,,,,,,,,,
@@ -862,13 +862,13 @@ Lane,Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Pro
 
     massaged_samplesheet = samplesheet.massage()
     assert (
-            massaged_samplesheet.split("\n")[2]
-            == "Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,"
+        massaged_samplesheet.split("\n")[2]
+        == "Investigator Name,9999999_666666_HFNC5BCXY,,,,,,,,,"
     )
 
     assert (
-            samplesheet.to_demux()
-            == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+        samplesheet.to_demux()
+        == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
 HFNC5BCXY,1,test-1705166-05,hg19,CGATGT,Test,666666,R1,NN,666666
 HFNC5BCXY,1,test-1705169-05,hg19,ACAGTG,Test,666666,R1,NN,666666
 HFNC5BCXY,1,test-1705170-05,hg19,CAGATC,Test,666666,R1,NN,666666
@@ -1355,8 +1355,8 @@ def test_x_samplesheet():
     samplesheet = Samplesheet("tests/fixtures/x_samplesheet.csv")
 
     assert (
-            samplesheet.raw()
-            == """[Data]
+        samplesheet.raw()
+        == """[Data]
 FCID,Lane,SampleID,SampleRef,index,SampleName,Control,Recipe,Operator,Project
 HC7H2ALXX,1,SVE2274A2_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
 HC7H2ALXX,2,SVE2274A4_TCCGCGAA,hg19,TCCGCGAA,659262,N,R1,NN,659262
@@ -1647,7 +1647,9 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert lines[0].dualindex == "TCCGCGAA"
 
 
-def test_x_validate_multiple_index(hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet, caplog):
+def test_x_validate_multiple_index(
+    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet, caplog
+):
     """ Test validation function to detect multiple index in sample sheet """
 
     # GIVEN a sample sheet with multiple types of index in it.
@@ -1677,8 +1679,8 @@ def test_2500_samplesheet():
     samplesheet = HiSeq2500Samplesheet("tests/fixtures/2500_samplesheet.csv")
 
     assert (
-            samplesheet.raw()
-            == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
+        samplesheet.raw()
+        == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
 HB07NADXX,1,SIB911A1_sureselect4,hg19,TGACCA,959191,N,R1,NN,959191
 HB07NADXX,1,SIB911A2_sureselect5,hg19,ACAGTG,959191,N,R1,NN,959191
 HB07NADXX,1,SIB910A3_sureselect6,hg19,GCCAAT,454557,N,R1,NN,454557
@@ -2088,6 +2090,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     lanes_r = [lane for lane in samplesheet.column_r("Lane")]
     assert lanes == expected_lanes
     assert lanes_r == expected_lanes
+
 
 # def test_miseq_samplesheet():
 #    samplesheet = MiseqSamplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv')

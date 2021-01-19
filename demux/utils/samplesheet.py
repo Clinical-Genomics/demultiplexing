@@ -6,6 +6,7 @@ from pathlib import Path
 
 LOG = logging.getLogger(__name__)
 
+
 class SampleSheetValidationException(Exception):
     def __init__(self, section, msg, line_nr):
         self.section = section
@@ -362,7 +363,7 @@ class HiSeqXSamplesheet(Samplesheet):
         for rs in [
             _validate_index(),
             _validate_project_samplename(),
-            _validate_index_types()
+            _validate_index_types(),
         ]:
             if type(rs) is tuple:
                 LOG.error(rs[0])
@@ -754,6 +755,8 @@ class NIPTSamplesheet(Samplesheet):
         return end.join(rs)
 
 
-if __name__ == '__main__':
-    sample_sheet = HiSeqXSamplesheet("/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/x_samplesheet_multiple_index.csv")
+if __name__ == "__main__":
+    sample_sheet = HiSeqXSamplesheet(
+        "/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/x_samplesheet_multiple_index.csv"
+    )
     sample_sheet.validate()
