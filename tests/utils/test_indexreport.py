@@ -1,25 +1,32 @@
 import pytest
 import logging
 
+from pathlib import Path
+
 from demux.exc import IndexReportError
 from demux.utils.indexreport import IndexReport
 
 LOG = logging.getLogger(__name__)
 
 
-def test_parse_indexreport(valid_indexreport: IndexReport, caplog):
-    """ Test the function to parse a bcl2fastq indextcheck html report """
+def test_parse_indexreport(novaseq_valid_indexcheck_report: Path, project_dir: Path, caplog):
+    """Test the function to parse a bcl2fastq indexcheck html report"""
 
     # GIVEN a valid input bcl2fastq report
     caplog.set_level(logging.INFO)
     # WHEN parsing said report
-    valid_indexreport.parse_report()
+    IndexReport(
+        out_dir=project_dir,
+        index_report_path=novaseq_valid_indexcheck_report,
+        flowcell_id="HFKF7DSXY",
+        cluster_counts=100000,
+    )
     # THEN we should pass parsing and see
     assert "Parsing complete!" in caplog.text
 
 
 def test_validate_valid_indexreport(parsed_indexreport: IndexReport, caplog):
-    """ Test validation on valid indexcheck report """
+    """Test validation on valid indexcheck report"""
 
     # GIVEN a valid parsed bcl2fastq
     caplog.set_level(logging.INFO)
@@ -30,7 +37,7 @@ def test_validate_valid_indexreport(parsed_indexreport: IndexReport, caplog):
 
 
 def test_write_report(validated_indexreport: IndexReport, caplog):
-    """ Test writing function of a summary """
+    """Test writing function of a summary"""
 
     # GIVEN a validated bcl2fastq report
     caplog.set_level(logging.INFO)
@@ -41,7 +48,7 @@ def test_write_report(validated_indexreport: IndexReport, caplog):
 
 
 def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
-    """ Test validation of faulty headers in Report Table 1 """
+    """Test validation of faulty headers in Report Table 1"""
 
     # GIVEN a corrupt bcl2fastq indexcheck report with faulty headers
     caplog.set_level(logging.ERROR)
@@ -56,7 +63,7 @@ def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
 
 
 def test_validate_missing_lanes_rt2(indexreport_missing_lanes_rt2, caplog):
-    """ Test the validation of missing lanes and thus structure in Report table 2 """
+    """Test the validation of missing lanes and thus structure in Report table 2"""
 
     # GIVEN a corrupt bcl2fastq indexcheck report with missing lanes
     caplog.set_level(logging.ERROR)
@@ -65,5 +72,5 @@ def test_validate_missing_lanes_rt2(indexreport_missing_lanes_rt2, caplog):
         indexreport_missing_lanes_rt2.validate()
     # THEN an report error should be raised and the following message prompted
     assert (
-        f"Top unkown barcode table is not matching the reference, please check the report"
+        f"Top unknown barcode table is not matching the reference, please check the report"
     ) in caplog.text

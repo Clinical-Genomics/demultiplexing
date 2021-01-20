@@ -1,9 +1,10 @@
 import bs4
-import re
 import logging
+import re
 
 from pathlib import Path
 
+from demux.constants import INDEX_REPORT_HEADER
 from demux.exc import IndexReportError
 
 LOG = logging.getLogger(__name__)
@@ -18,130 +19,92 @@ class IndexReport:
         index_report_path: Path,
         flowcell_id: str,
         cluster_counts: int,
-        INDEX_REPORT_HEADER: list,
     ):
-        self.INDEX_REPORT_HEADER = INDEX_REPORT_HEADER
-        self.out_dir = out_dir
-        self.index_report_path = index_report_path
-        self.flowcell_id = flowcell_id
         self.cluster_counts = cluster_counts
-
-    def _html_content(self):
-        """Get the content of the report"""
-
-        with self.index_report_path.open() as f:
-            html_content = bs4.BeautifulSoup(f, "html.parser")
-            self.html_content: bs4.BeautifulSoup = html_content
-
-    def _report_tables(self):
-        """Get the ReportTables inside the html report"""
-
-        report_tables = self.html_content.find_all("table", id="ReportTable")
-        self.report_tables: bs4.ResultSet = report_tables
-
-    def _header_samples_table(self):
-        """Get the header from the large table with all sample clusters"""
-
-        headers = []
-        header_index = {}
-
-        index_counter = 0
-        raw_sample_headers = self.report_tables[1].tr.find_all("th")
-
-        for column in raw_sample_headers:
-            column = re.sub("<br/>", " ", str(column))
-            column = re.sub("<.*?>", "", column)
-            headers.append(column)
-            header_index[column] = index_counter
-            index_counter += 1
-
-        self.raw_headers = self.report_tables[1].tr
-        self.headers_report_tables: list = headers
-        self.header_index: dict = header_index
-
-    def _top_unknown_barcodes_table(self):
-        """Get the table with the top unknown barcodes"""
-
-        self.top_unknown_barcodes = self.report_tables[2]
-
-    def _get_low_cluster_counts(self):
-        """Find samples with low cluster counts"""
-
-        low_cluster_counts = []
-
-        for row in self.report_tables[1].find_all("tr")[1:]:
-            project = re.sub(
-                "<.*?>", "", str(row.find_all("td")[self.header_index["Project"]])
-            )
-            cluster_count = re.sub(
-                "<.*?>", "", str(row.find_all("td")[self.header_index["PF Clusters"]])
-            )
-            if project != "indexcheck":
-                if int(cluster_count.replace(",", "")) < self.cluster_counts:
-                    low_cluster_counts.append(row)
-
-        self.low_cluster_counts: list = low_cluster_counts
-
-    def parse_report(self):
-        """Parses bcl2fastq indexcheck report"""
+        self.flowcell_id = flowcell_id
+        self.INDEX_REPORT_HEADER: list = INDEX_REPORT_HEADER
+        self.index_report_path = index_report_path
+        self.out_dir = out_dir
 
         LOG.info(
             f"Parsing file {self.index_report_path}, extracting top unkown barcodes and samples with cluster"
             f"counts lower than {self.cluster_counts}"
         )
-
-        self._html_content()
-        self._report_tables()
-        self._header_samples_table()
-        self._top_unknown_barcodes_table()
-        self._get_low_cluster_counts()
+        self.html_content = self._get_html_content()
+        self.report_tables = self._get_report_tables()
+        self.samples_table_header = self._get_sample_table_header()
+        self.top_unknown_barcodes = self._get_top_unknown_barcodes_table()
+        self.low_cluster_counts = self._get_low_cluster_counts()
         LOG.info(f"Parsing complete!")
 
-    def validate_report_tables(self):
-        """ Validate the number of report tables """
-        try:
-            assert len(self.report_tables) == 3
-        except AssertionError:
-            LOG.error("The number of Report Tables are not the same")
-            raise IndexReportError
+    def _get_html_content(self) -> bs4.BeautifulSoup:
+        """Get the content of the report"""
 
-    def validate_index_report_header(self):
-        """ Validate the index report headers """
+        with self.index_report_path.open() as f:
+            html_content = bs4.BeautifulSoup(f, "html.parser")
+            return html_content
 
-        try:
-            assert self.INDEX_REPORT_HEADER == list(self.header_index.keys())
-        except AssertionError as e:
-            LOG.error(
-                f"The header in the cluster count sample table is not matching the\n"
-                f"control headers. Check if they need correction"
+    def _get_report_tables(self) -> bs4.ResultSet:
+        """Get the ReportTables inside the html report"""
+
+        html_content = self._get_html_content()
+        report_tables = html_content.find_all("table", id="ReportTable")
+        return report_tables
+
+    def _get_sample_table_header(self) -> dict:
+        """Get the header from the large table with all sample clusters"""
+
+        report_tables = self._get_report_tables()
+
+        header_index = {}
+
+        raw_sample_headers = report_tables[1].tr.find_all("th")
+
+        for index, html_column_header in enumerate(raw_sample_headers):
+            header = purify_html_header(html_column_header)
+            header_index[header] = index
+
+        return header_index
+
+    def _get_top_unknown_barcodes_table(self) -> bs4.element.Tag:
+        """Get the table with the top unknown barcodes"""
+
+        report_tables = self._get_report_tables()
+        return report_tables[2]
+
+    def _get_low_cluster_counts(self) -> list:
+        """Find samples with low cluster counts"""
+
+        report_tables = self._get_report_tables()
+        sample_table_header = self._get_sample_table_header()
+        low_cluster_counts = []
+
+        for html_project_cluster_count in report_tables[1].find_all("tr")[1:]:
+            project, cluster_count = purify_html_project_cluster_counts(
+                project_row=html_project_cluster_count, header_indeces=sample_table_header
             )
-            raise IndexReportError
+            if project != "indexcheck":
+                if cluster_count < self.cluster_counts:
+                    low_cluster_counts.append(html_project_cluster_count)
 
-    def validate_topunknown_barcodes_table(self):
-        """ Validate the top unknown barcodes table """
-
-        try:
-            assert (
-                len(
-                    re.sub("<.*?>", "", str(self.report_tables[2].tr))
-                    .strip()
-                    .split("Lane")
-                )
-                == 5
-            )
-        except AssertionError as e:
-            LOG.error(
-                f"Top unkown barcode table is not matching the reference, please check the report"
-            )
-            raise IndexReportError
+        return low_cluster_counts
 
     def validate(self):
         """Validate report structure"""
 
         LOG.info(f"Validating report")
-        self.validate_report_tables()
-        self.validate_index_report_header()
-        self.validate_topunknown_barcodes_table()
+        for valid, message in [
+            validate_report_tables(report_tables=self.report_tables),
+            validate_index_report_header(
+                reference_header=self.INDEX_REPORT_HEADER, samples_table_header=self.samples_table_header
+            ),
+            validate_top_unknown_barcodes_table(top_unknown_barcodes_table=self.top_unknown_barcodes)
+        ]:
+            if not valid:
+                LOG.error(message)
+                raise IndexReportError
+            elif valid:
+                LOG.info(message)
         LOG.info(f"Validation passed")
 
     def write_summary(self):
@@ -164,3 +127,71 @@ class IndexReport:
         LOG.info(
             f"Wrote indexcheck report summary to {self.out_dir}/laneBarcode_summary.html"
         )
+
+
+def purify_html_header(html_column_header) -> str:
+    """Purify html header into a string without html syntax"""
+
+    column_header = re.sub("<br/>", " ", str(html_column_header))
+    header = re.sub("<.*?>", "", column_header)
+
+    return header
+
+
+def purify_html_project_cluster_counts(project_row: bs4.element.Tag, header_indeces: dict) -> (str, int):
+    """Purify a html project cluster count row from html syntax"""
+
+    project = re.sub(
+        "<.*?>", "", str(project_row.find_all("td")[header_indeces["Project"]])
+    )
+    cluster_count = re.sub(
+        "<.*?>", "", str(project_row.find_all("td")[header_indeces["PF Clusters"]])
+    )
+    cluster_count = int(cluster_count.replace(",", ""))
+
+    return project, cluster_count
+
+
+def validate_top_unknown_barcodes_table(top_unknown_barcodes_table: bs4.element.Tag) -> (bool, str):
+    """Validate the top unknown barcodes table, checking that all lanes are present"""
+
+    try:
+        assert (
+            len(
+                re.sub("<.*?>", "", str(top_unknown_barcodes_table.tr))
+                .strip()
+                .split("Lane")
+            )
+            == 5
+        )
+    except AssertionError as e:
+        message = f"Top unknown barcode table is not matching the reference, please check the report"
+        return False, message
+    message = "Top Unknown Barcodes table: Passed!"
+    return True, message
+
+
+def validate_report_tables(report_tables: bs4.ResultSet) -> (bool, str):
+    """Validate the number of report tables"""
+    try:
+        assert len(report_tables) == 3
+    except AssertionError:
+        message = "The number of Report Tables are not the same"
+        return False, message
+    message = "Number of report tables: Passed!"
+    return True, message
+
+
+def validate_index_report_header(reference_header: list, samples_table_header: dict) -> (bool, str):
+    """Validate the index report headers"""
+
+    try:
+        assert reference_header == list(samples_table_header.keys())
+    except AssertionError as e:
+        message = (
+            f"The header in the cluster count sample table is not matching the\n"
+            f"control headers. Check if they need correction"
+        )
+        return False, message
+    message = f"Sample cluster count headers: Passed!"
+    return True, message
