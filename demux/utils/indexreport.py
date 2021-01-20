@@ -81,7 +81,8 @@ class IndexReport:
 
         for html_project_cluster_count in report_tables[1].find_all("tr")[1:]:
             project, cluster_count = purify_html_project_cluster_counts(
-                project_row=html_project_cluster_count, header_indeces=sample_table_header
+                project_row=html_project_cluster_count,
+                header_indeces=sample_table_header,
             )
             if project != "indexcheck":
                 if cluster_count < self.cluster_counts:
@@ -96,9 +97,12 @@ class IndexReport:
         for valid, message in [
             validate_report_tables(report_tables=self.report_tables),
             validate_index_report_header(
-                reference_header=self.INDEX_REPORT_HEADER, samples_table_header=self.samples_table_header
+                reference_header=self.INDEX_REPORT_HEADER,
+                samples_table_header=self.samples_table_header,
             ),
-            validate_top_unknown_barcodes_table(top_unknown_barcodes_table=self.top_unknown_barcodes)
+            validate_top_unknown_barcodes_table(
+                top_unknown_barcodes_table=self.top_unknown_barcodes
+            ),
         ]:
             if not valid:
                 LOG.error(message)
@@ -138,7 +142,9 @@ def purify_html_header(html_column_header) -> str:
     return header
 
 
-def purify_html_project_cluster_counts(project_row: bs4.element.Tag, header_indeces: dict) -> (str, int):
+def purify_html_project_cluster_counts(
+    project_row: bs4.element.Tag, header_indeces: dict
+) -> (str, int):
     """Purify a html project cluster count row from html syntax"""
 
     project = re.sub(
@@ -152,7 +158,9 @@ def purify_html_project_cluster_counts(project_row: bs4.element.Tag, header_inde
     return project, cluster_count
 
 
-def validate_top_unknown_barcodes_table(top_unknown_barcodes_table: bs4.element.Tag) -> (bool, str):
+def validate_top_unknown_barcodes_table(
+    top_unknown_barcodes_table: bs4.element.Tag,
+) -> (bool, str):
     """Validate the top unknown barcodes table, checking that all lanes are present"""
 
     try:
@@ -182,7 +190,9 @@ def validate_report_tables(report_tables: bs4.ResultSet) -> (bool, str):
     return True, message
 
 
-def validate_index_report_header(reference_header: list, samples_table_header: dict) -> (bool, str):
+def validate_index_report_header(
+    reference_header: list, samples_table_header: dict
+) -> (bool, str):
     """Validate the index report headers"""
 
     try:

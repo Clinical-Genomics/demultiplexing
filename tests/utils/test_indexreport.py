@@ -9,7 +9,9 @@ from demux.utils.indexreport import IndexReport
 LOG = logging.getLogger(__name__)
 
 
-def test_parse_indexreport(novaseq_valid_indexcheck_report: Path, project_dir: Path, caplog):
+def test_parse_indexreport(
+    novaseq_valid_indexcheck_report: Path, project_dir: Path, caplog
+):
     """Test the function to parse a bcl2fastq indexcheck html report"""
 
     # GIVEN a valid input bcl2fastq report
