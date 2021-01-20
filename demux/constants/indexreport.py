@@ -3,7 +3,7 @@
 """
 
 
-INDEX_REPORT_HEADER = [
+reference_report_header = [
     "Lane",
     "Project",
     "Sample",
@@ -17,3 +17,8 @@ INDEX_REPORT_HEADER = [
     "% &gt;= Q30 bases",
     "Mean Quality Score",
 ]
+
+report_tables_index = {
+    "cluster_count_table": 1,
+    "top_unknown_barcode_table": 2
+}
