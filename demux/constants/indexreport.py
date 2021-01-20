@@ -18,7 +18,4 @@ reference_report_header = [
     "Mean Quality Score",
 ]
 
-report_tables_index = {
-    "cluster_count_table": 1,
-    "top_unknown_barcode_table": 2
-}
+report_tables_index = {"cluster_count_table": 1, "top_unknown_barcode_table": 2}
