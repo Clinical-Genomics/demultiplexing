@@ -8,9 +8,6 @@ ulimit -n 4096
 # PARAMS #
 ##########
 
-# CGSTATS alias for testing TO BE REMOVED!
-CGSTATS="/home/proj/bin/conda/envs/${CONDA_DEFAULT_ENV}/bin/cgstats --database mysql+pymysql://stageuser:userstage@localhost:3308/cgstats-stage"
-
 IN_DIR=${1?'please provide a run dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 FC=${3?'fc_id needed'}
@@ -18,9 +15,7 @@ PROJECTLOG=${4?'projectlog needed'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
-LOG_DIR="${OUT_DIR}/LOG"
-#SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
-SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/novaseq/  # REMOVE AFTER TESTING
+SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
 #EMAIL=clinical-demux@scilifelab.se
 EMAIL=barry.stokman@scilifelab.se  # REMOVE AFTER TESTING
 
@@ -44,7 +39,6 @@ log() {
 
 # init
 mkdir -p ${OUT_DIR}
-mkdir -p ${LOG_DIR}
 
 # Here we go!
 log "Starting NovaSeq demultiplexing"
@@ -98,13 +92,11 @@ done
 
 #Add stats to cgstats database
 log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
-#cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
-${CGSTATS} add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR} # REMOVE AFTER TESTING
+cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
 
 PROJECTS=$(ls ${OUT_DIR}/${UNALIGNED_DIR}/ | grep Project_)
 for PROJECT_DIR in ${PROJECTS[@]}; do
     PROJECT=${PROJECT_DIR##*_}
     log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
-    #cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
-    ${CGSTATS} select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt # REMOVE AFTER TESTING
+    cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
 done
