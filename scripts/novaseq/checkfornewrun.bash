@@ -3,8 +3,6 @@
 set -u
 
 shopt -s nullglob
-shopt -s expand_aliases
-source ~/.aliases
 
 ########
 # VARS #

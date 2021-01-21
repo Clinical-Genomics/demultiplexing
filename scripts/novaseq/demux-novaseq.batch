@@ -1,9 +1,11 @@
 #!/bin/bash
 #SBATCH -c 18
+#SBATCH -p dragen # REMOVE AFTER TESTING
+##SBATCH -p gpu # REMOVE AFTER TESTING
 #SBATCH --qos=low
 #SBATCH --time=600
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=barry.stokman@scilifelab.se
+#SBATCH --mail-user=barry.stokman@scilifelab.se # REMOVE AFTER TESTING
 
 set -eu -o pipefail
 

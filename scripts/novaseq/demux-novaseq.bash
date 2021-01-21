@@ -2,13 +2,14 @@
 
 set -eu
 
-shopt -s expand_aliases
-#source $HOME/.bashrc
 ulimit -n 4096
 
 ##########
 # PARAMS #
 ##########
+
+# CGSTATS alias for testing TO BE REMOVED!
+CGSTATS="/home/proj/bin/conda/envs/${CONDA_DEFAULT_ENV}/bin/cgstats --database mysql+pymysql://stageuser:userstage@localhost:3308/cgstats-stage"
 
 IN_DIR=${1?'please provide a run dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
@@ -18,12 +19,13 @@ PROJECTLOG=${4?'projectlog needed'}
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
 LOG_DIR="${OUT_DIR}/LOG"
-SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
+#SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
+SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/novaseq/  # REMOVE AFTER TESTING
 #EMAIL=clinical-demux@scilifelab.se
-EMAIL=barry.stokman@scilifelab.se
+EMAIL=barry.stokman@scilifelab.se  # REMOVE AFTER TESTING
 
 SLURM_ACCOUNT=development
-if [[ ${ENVIRONMENT} == 'P_main' ]]; then
+if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
 fi
 
@@ -54,8 +56,8 @@ UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
-log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${LOG_DIR}/${JOB_TITLE}-%j.log -e ${LOG_DIR}/${JOB_TITLE}-%j.err ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
-RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${LOG_DIR}/${JOB_TITLE}-%j.log -e ${LOG_DIR}/${JOB_TITLE}-%j.err ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
 log "bcl2fastq finished!"
 
@@ -96,11 +98,13 @@ done
 
 #Add stats to cgstats database
 log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
-cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
+#cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
+${CGSTATS} add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR} # REMOVE AFTER TESTING
 
 PROJECTS=$(ls ${OUT_DIR}/${UNALIGNED_DIR}/ | grep Project_)
 for PROJECT_DIR in ${PROJECTS[@]}; do
     PROJECT=${PROJECT_DIR##*_}
     log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
-    cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
+    #cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
+    ${CGSTATS} select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt # REMOVE AFTER TESTING
 done
