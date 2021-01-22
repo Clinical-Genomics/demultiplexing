@@ -31,7 +31,7 @@ log() {
 }
 
 failed() {
-    mail -s "ERROR demultiplexing of $(basename "$RUN_DIR")" ${EMAIL} < "${DEMUX_DIR}/LOG/*-${SLURM_JOB_ID}.err"
+    mail -s "ERROR demultiplexing of $(basename "$RUN_DIR")" ${EMAIL} < "${DEMUX_DIR}/${UNALIGNED_DIR}/project.*.log"
 
 }
 trap failed ERR
