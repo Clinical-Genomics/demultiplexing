@@ -16,8 +16,7 @@ PROJECTLOG=${4?'projectlog needed'}
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
-#EMAIL=clinical-demux@scilifelab.se
-EMAIL=barry.stokman@scilifelab.se  # REMOVE AFTER TESTING
+EMAIL=clinical-demux@scilifelab.se
 
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
