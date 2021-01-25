@@ -54,10 +54,10 @@ RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIP
 
 log "bcl2fastq finished!"
 
-#add samplesheet to unaligned folder
+# Add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
-#Restructure the output dir!
+# Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
 shopt -s nullglob
@@ -89,7 +89,7 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
-#Add stats to cgstats database
+# Add stats to cgstats database
 log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
 cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
 
