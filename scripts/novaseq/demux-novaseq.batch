@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -c 18
-#SBATCH --qos=low
+#SBATCH --qos=high
 #SBATCH --time=600
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=clinical-demux@scilifelab.se
