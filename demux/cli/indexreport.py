@@ -32,7 +32,7 @@ def indexreport():
     "--index-report-path",
     type=str,
     required=True,
-    help="Relative path to bcl2fastq indexcheck report (laneBarcode.html)",
+    help="Path to bcl2fastq indexcheck report (laneBarcode.html)",
 )
 @click.option(
     "--out-dir",
