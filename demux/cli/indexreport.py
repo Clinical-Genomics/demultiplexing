@@ -46,10 +46,10 @@ def summary(
     """Create a summary of the indexcheck report, extracting information on samples with low number of clusters
     and the topmost common unknown indexes"""
     index_report = IndexReport(
-        out_dir=Path(out_dir),
-        index_report_path=Path(index_report_path),
-        flowcell_id=flowcell_id,
         cluster_counts=cluster_counts,
+        flowcell_id=flowcell_id,
+        index_report_path=Path(index_report_path),
+        out_dir=Path(out_dir)
     )
     LOG.info(f"Creating summary of laneBarcode.html for FC: {index_report.flowcell_id}")
     index_report.validate()

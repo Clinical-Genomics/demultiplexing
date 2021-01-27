@@ -15,10 +15,10 @@ class IndexReport:
 
     def __init__(
         self,
-        out_dir: Path,
-        index_report_path: Path,
-        flowcell_id: str,
         cluster_counts: int,
+        flowcell_id: str,
+        index_report_path: Path,
+        out_dir: Path,
     ):
         self.cluster_counts = cluster_counts
         self.flowcell_id = flowcell_id
