@@ -18,7 +18,7 @@ OUT_DIR=${DEMUXES_DIR}/${RUN}
 #SCRIPT_DIR=/home/proj/${CONDA_DEFAULT_ENV}/bin/git/demultiplexing/scripts/novaseq/  # use this when developing in a conda env
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/        # use this when testing on stage
 #EMAIL=clinical-demux@scilifelab.se
-EMAIL=your.name@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
