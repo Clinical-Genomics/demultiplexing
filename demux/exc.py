@@ -1,5 +1,5 @@
 """
-    Demulutplexing Exceptions
+    Demultiplexing exceptions
 """
 
 
