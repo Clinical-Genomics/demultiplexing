@@ -38,7 +38,7 @@ def indexreport():
     "--out-dir",
     type=str,
     required=True,
-    help="Absolute path of terminal directory for summary report",
+    help="Path of outdirectory for summary report",
 )
 def summary(
     cluster_counts: int, flowcell_id: str, index_report_path: str, out_dir: str
