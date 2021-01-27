@@ -51,8 +51,8 @@ UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
-log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
-RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.batch ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
 log "bcl2fastq finished!"
 
