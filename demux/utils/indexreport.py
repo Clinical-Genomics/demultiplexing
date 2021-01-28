@@ -5,11 +5,9 @@ import re
 from pathlib import Path
 
 from demux.utils.html import (
-    get_low_cluster_counts,
     get_html_content,
-    get_report_tables,
-    get_sample_table_header,
-    get_top_unknown_barcodes_table,
+    parse_html_header,
+    parse_html_project_cluster_counts
 )
 
 from demux.exc import IndexReportError
@@ -37,20 +35,77 @@ class IndexReport:
             f"counts lower than {cluster_counts}"
         )
         self.html_content = get_html_content(index_report_path=index_report_path)
-        self.report_tables = get_report_tables(html_content=self.html_content)
-        self.samples_table_header = get_sample_table_header(
+        self.report_tables = self.get_report_tables(html_content=self.html_content)
+        self.sample_table_header = self.get_sample_table_header(
             report_tables=self.report_tables, report_tables_index=report_tables_index
         )
-        self.low_cluster_counts = get_low_cluster_counts(
+        self.low_cluster_counts = self.get_low_cluster_counts(
             report_tables=self.report_tables,
-            sample_table_header=self.samples_table_header,
+            sample_table_header=self.sample_table_header,
             report_tables_index=report_tables_index,
             cluster_counts=cluster_counts,
         )
-        self.top_unknown_barcodes = get_top_unknown_barcodes_table(
+        self.top_unknown_barcodes = self.get_top_unknown_barcodes_table(
             report_tables=self.report_tables, report_tables_index=report_tables_index
         )
         LOG.info(f"Parsing complete!")
+
+    @staticmethod
+    def get_report_tables(html_content: bs4.BeautifulSoup) -> bs4.ResultSet:
+        """Get the ReportTables inside the html report"""
+
+        report_tables = html_content.find_all("table", id="ReportTable")
+        return report_tables
+
+    @staticmethod
+    def get_sample_table_header(
+            report_tables: bs4.ResultSet, report_tables_index: dict
+    ) -> dict:
+        """Get the header from the large table with all sample clusters"""
+
+        header_index = {}
+
+        html_sample_headers = report_tables[
+            report_tables_index["cluster_count_table"]
+        ].tr.find_all("th")
+
+        for index, html_column_header in enumerate(html_sample_headers):
+            header = parse_html_header(html_column_header)
+            header_index[header] = index
+
+        return header_index
+
+    @staticmethod
+    def get_low_cluster_counts(
+            cluster_counts: int,
+            report_tables: bs4.ResultSet,
+            report_tables_index: dict,
+            sample_table_header: dict,
+    ) -> list:
+        """Find samples with low cluster counts"""
+
+        low_cluster_counts = []
+
+        for html_project_cluster_count in report_tables[
+                                              report_tables_index["cluster_count_table"]
+                                          ].find_all("tr")[1:]:
+            project, cluster_count = parse_html_project_cluster_counts(
+                project_row=html_project_cluster_count,
+                header_index=sample_table_header,
+            )
+            if project != "indexcheck":
+                if cluster_count < cluster_counts:
+                    low_cluster_counts.append(html_project_cluster_count)
+
+        return low_cluster_counts
+
+    @staticmethod
+    def get_top_unknown_barcodes_table(
+            report_tables: bs4.ResultSet, report_tables_index: dict
+    ) -> bs4.element.Tag:
+        """Get the table with the top unknown barcodes"""
+
+        return report_tables[report_tables_index["top_unknown_barcode_table"]]
 
     def validate(self, reference_report_header: list):
         """Validate report structure"""
@@ -60,7 +115,7 @@ class IndexReport:
             validate_report_tables(report_tables=self.report_tables),
             validate_index_report_header(
                 reference_header=reference_report_header,
-                samples_table_header=self.samples_table_header,
+                sample_table_header=self.sample_table_header,
             ),
             validate_top_unknown_barcodes_table(
                 top_unknown_barcodes_table=self.top_unknown_barcodes
@@ -136,12 +191,12 @@ def validate_report_tables(report_tables: bs4.ResultSet) -> (bool, str):
 
 
 def validate_index_report_header(
-    reference_header: list, samples_table_header: dict
+    reference_header: list, sample_table_header: dict
 ) -> (bool, str):
     """Validate the index report headers"""
 
     try:
-        assert reference_header == list(samples_table_header.keys())
+        assert reference_header == list(sample_table_header.keys())
     except AssertionError as e:
         message = (
             f"The header in the cluster count sample table is not matching the\n"
