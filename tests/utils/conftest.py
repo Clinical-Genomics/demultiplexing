@@ -57,7 +57,9 @@ def fixture_indexreport_wrong_header_rt1(
 
 
 @pytest.fixture(name="indexreport_missing_lanes_rt2")
-def fixture_indexreport_missing_lanes_rt2(novaseq_indexcheck_invalid_rt2, project_dir) -> IndexReport:
+def fixture_indexreport_missing_lanes_rt2(
+    novaseq_indexcheck_invalid_rt2, project_dir
+) -> IndexReport:
     """Fixture of a corrupt IndexReport object, missing lanes in top unknown"""
     indexreport_missing_lanes_rt2 = IndexReport(
         out_dir=project_dir,
@@ -73,10 +75,14 @@ def fixture_indexreport_missing_lanes_rt2(novaseq_indexcheck_invalid_rt2, projec
 @pytest.fixture(name="indexreport_sample_table_row")
 def fixture_indexreport_sample_table_row(valid_indexreport) -> Tag:
     """Return the first row in the cluster count sample table"""
-    return valid_indexreport.report_tables[report_tables_index["cluster_count_table"]].find_all("tr")[1:][0]
+    return valid_indexreport.report_tables[
+        report_tables_index["cluster_count_table"]
+    ].find_all("tr")[1:][0]
 
 
 @pytest.fixture(name="indexreport_sample_table_header")
 def fixture_indexreport_sample_table_header(validated_indexreport) -> Tag:
     """Return the header for cluster count sample table from a valid index report"""
-    return validated_indexreport.report_tables[report_tables_index["cluster_count_table"]].tr.find_all("th")
+    return validated_indexreport.report_tables[
+        report_tables_index["cluster_count_table"]
+    ].tr.find_all("th")

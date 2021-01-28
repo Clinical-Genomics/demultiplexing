@@ -26,9 +26,8 @@ def indexreport():
     ),
 )
 @click.option(
-    "--dry-run",
-    help="Dry of the function, will not write any report",
-    is_flag=True)
+    "--dry-run", help="Dry of the function, will not write any report", is_flag=True
+)
 @click.option(
     "--flowcell-id",
     type=str,
@@ -48,7 +47,11 @@ def indexreport():
     help="Path of outdirectory for summary report",
 )
 def summary(
-    cluster_counts: int, flowcell_id: str, index_report_path: str, out_dir: str, dry_run: bool
+    cluster_counts: int,
+    flowcell_id: str,
+    index_report_path: str,
+    out_dir: str,
+    dry_run: bool,
 ):
     """Create a summary of the indexcheck report, extracting information on samples with low number of clusters
     and the topmost common unknown indexes"""

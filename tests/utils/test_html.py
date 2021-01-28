@@ -4,10 +4,11 @@ from pathlib import Path
 
 from demux.utils.indexreport import IndexReport
 
-from demux.utils.html import \
-    get_html_content, \
-    parse_html_header, \
-    parse_html_project_cluster_counts
+from demux.utils.html import (
+    get_html_content,
+    parse_html_header,
+    parse_html_project_cluster_counts,
+)
 
 
 def test_get_html_content(novaseq_valid_indexcheck_report: Path):
@@ -27,17 +28,18 @@ def test_parse_html_header(indexreport_sample_table_header: bs4.element.Tag):
         column_header = parse_html_header(html_column_header=html_column_header)
         # THEN we should get a string, and have no markers of html left
         assert type(column_header) is str
-        assert '>' or '<' not in column_header
+        assert ">" or "<" not in column_header
 
 
 def test_parse_html_project_cluster_counts(
-        indexreport_sample_table_row: bs4.element.Tag, valid_indexreport: IndexReport
+    indexreport_sample_table_row: bs4.element.Tag, valid_indexreport: IndexReport
 ):
     # GIVEN a row from a valid indexreport class
     # WHEN parsing a row from the sample cluster count table
     project, counts = parse_html_project_cluster_counts(
         header_index=valid_indexreport.sample_table_header,
-        project_row=indexreport_sample_table_row)
+        project_row=indexreport_sample_table_row,
+    )
     # THEN we should retrieve a project and cluster count
     assert type(project) is str
     assert type(counts) is int

@@ -7,7 +7,7 @@ from pathlib import Path
 from demux.utils.html import (
     get_html_content,
     parse_html_header,
-    parse_html_project_cluster_counts
+    parse_html_project_cluster_counts,
 )
 
 from demux.exc import IndexReportError
@@ -59,7 +59,7 @@ class IndexReport:
 
     @staticmethod
     def get_sample_table_header(
-            report_tables: bs4.ResultSet, report_tables_index: dict
+        report_tables: bs4.ResultSet, report_tables_index: dict
     ) -> dict:
         """Get the header from the large table with all sample clusters"""
 
@@ -77,18 +77,18 @@ class IndexReport:
 
     @staticmethod
     def get_low_cluster_counts(
-            cluster_counts: int,
-            report_tables: bs4.ResultSet,
-            report_tables_index: dict,
-            sample_table_header: dict,
+        cluster_counts: int,
+        report_tables: bs4.ResultSet,
+        report_tables_index: dict,
+        sample_table_header: dict,
     ) -> list:
         """Find samples with low cluster counts"""
 
         low_cluster_counts = []
 
         for html_project_cluster_count in report_tables[
-                                              report_tables_index["cluster_count_table"]
-                                          ].find_all("tr")[1:]:
+            report_tables_index["cluster_count_table"]
+        ].find_all("tr")[1:]:
             project, cluster_count = parse_html_project_cluster_counts(
                 project_row=html_project_cluster_count,
                 header_index=sample_table_header,
@@ -101,7 +101,7 @@ class IndexReport:
 
     @staticmethod
     def get_top_unknown_barcodes_table(
-            report_tables: bs4.ResultSet, report_tables_index: dict
+        report_tables: bs4.ResultSet, report_tables_index: dict
     ) -> bs4.element.Tag:
         """Get the table with the top unknown barcodes"""
 
