@@ -66,7 +66,7 @@ def get_low_cluster_counts(
     cluster_counts: int,
     report_tables: bs4.ResultSet,
     report_tables_index: dict,
-    sample_table_header: dict
+    sample_table_header: dict,
 ) -> list:
     """Find samples with low cluster counts"""
 
