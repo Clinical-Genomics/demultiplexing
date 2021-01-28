@@ -4,7 +4,14 @@ import re
 
 from pathlib import Path
 
-from demux.constants import reference_report_header, report_tables_index
+from demux.utils.html import (
+    get_low_cluster_counts,
+    get_html_content,
+    get_report_tables,
+    get_sample_table_header,
+    get_top_unknown_barcodes_table,
+)
+
 from demux.exc import IndexReportError
 
 LOG = logging.getLogger(__name__)
@@ -19,90 +26,40 @@ class IndexReport:
         flowcell_id: str,
         index_report_path: Path,
         out_dir: Path,
+        report_tables_index: dict,
     ):
-        self.cluster_counts = cluster_counts
         self.flowcell_id = flowcell_id
         self.index_report_path = index_report_path
         self.out_dir = out_dir
-        self.reference_report_header: list = reference_report_header
-        self.report_tables_index: dict = report_tables_index
 
         LOG.info(
-            f"Parsing file {self.index_report_path}, extracting top unkown barcodes and samples with cluster"
-            f"counts lower than {self.cluster_counts}"
+            f"Parsing file {index_report_path}, extracting top unknown barcodes and samples with cluster"
+            f"counts lower than {cluster_counts}"
         )
-        self.html_content = self._get_html_content()
-        self.low_cluster_counts = self._get_low_cluster_counts()
-        self.report_tables = self._get_report_tables()
-        self.samples_table_header = self._get_sample_table_header()
-        self.top_unknown_barcodes = self._get_top_unknown_barcodes_table()
+        self.html_content = get_html_content(index_report_path=index_report_path)
+        self.report_tables = get_report_tables(html_content=self.html_content)
+        self.samples_table_header = get_sample_table_header(
+            report_tables=self.report_tables, report_tables_index=report_tables_index
+        )
+        self.low_cluster_counts = get_low_cluster_counts(
+            report_tables=self.report_tables,
+            sample_table_header=self.samples_table_header,
+            report_tables_index=report_tables_index,
+            cluster_counts=cluster_counts,
+        )
+        self.top_unknown_barcodes = get_top_unknown_barcodes_table(
+            report_tables=self.report_tables, report_tables_index=report_tables_index
+        )
         LOG.info(f"Parsing complete!")
 
-    def _get_html_content(self) -> bs4.BeautifulSoup:
-        """Get the content of the report"""
-
-        with self.index_report_path.open() as f:
-            html_content = bs4.BeautifulSoup(f, "html.parser")
-            return html_content
-
-    def _get_report_tables(self) -> bs4.ResultSet:
-        """Get the ReportTables inside the html report"""
-
-        html_content = self._get_html_content()
-        report_tables = html_content.find_all("table", id="ReportTable")
-        return report_tables
-
-    def _get_sample_table_header(self) -> dict:
-        """Get the header from the large table with all sample clusters"""
-
-        report_tables = self._get_report_tables()
-
-        header_index = {}
-
-        html_sample_headers = report_tables[
-            self.report_tables_index["cluster_count_table"]
-        ].tr.find_all("th")
-
-        for index, html_column_header in enumerate(html_sample_headers):
-            header = purify_html_header(html_column_header)
-            header_index[header] = index
-
-        return header_index
-
-    def _get_top_unknown_barcodes_table(self) -> bs4.element.Tag:
-        """Get the table with the top unknown barcodes"""
-
-        report_tables = self._get_report_tables()
-        return report_tables[self.report_tables_index["top_unknown_barcode_table"]]
-
-    def _get_low_cluster_counts(self) -> list:
-        """Find samples with low cluster counts"""
-
-        report_tables = self._get_report_tables()
-        sample_table_header = self._get_sample_table_header()
-        low_cluster_counts = []
-
-        for html_project_cluster_count in report_tables[
-            self.report_tables_index["cluster_count_table"]
-        ].find_all("tr")[1:]:
-            project, cluster_count = purify_html_project_cluster_counts(
-                project_row=html_project_cluster_count,
-                header_index=sample_table_header,
-            )
-            if project != "indexcheck":
-                if cluster_count < self.cluster_counts:
-                    low_cluster_counts.append(html_project_cluster_count)
-
-        return low_cluster_counts
-
-    def validate(self):
+    def validate(self, reference_report_header: list):
         """Validate report structure"""
 
         LOG.info(f"Validating report")
         for valid, message in [
             validate_report_tables(report_tables=self.report_tables),
             validate_index_report_header(
-                reference_header=self.reference_report_header,
+                reference_header=reference_report_header,
                 samples_table_header=self.samples_table_header,
             ),
             validate_top_unknown_barcodes_table(
@@ -116,7 +73,7 @@ class IndexReport:
                 LOG.info(message)
         LOG.info(f"Validation passed")
 
-    def write_summary(self):
+    def write_summary(self, report_tables_index: dict):
         """Compile a summary report of the bcl2fastq report"""
 
         out_dir_path = Path(self.out_dir)
@@ -128,11 +85,7 @@ class IndexReport:
             )
             fo.write(f'<table border="1" ID="ReportTable">')
             fo.write(
-                str(
-                    self.report_tables[
-                        self.report_tables_index["cluster_count_table"]
-                    ].tr
-                )
+                str(self.report_tables[report_tables_index["cluster_count_table"]].tr)
             )
             for row in self.low_cluster_counts:
                 fo.write(str(row))
@@ -140,7 +93,7 @@ class IndexReport:
             fo.write(
                 str(
                     self.html_content.find_all("h2")[
-                        self.report_tables_index["top_unknown_barcode_table"]
+                        report_tables_index["top_unknown_barcode_table"]
                     ]
                 )
             )
@@ -148,31 +101,6 @@ class IndexReport:
         LOG.info(
             f"Wrote indexcheck report summary to {self.out_dir}/laneBarcode_summary.html"
         )
-
-
-def purify_html_header(html_column_header) -> str:
-    """Purify html header into a string without html syntax"""
-
-    column_header = re.sub("<br/>", " ", str(html_column_header))
-    header = re.sub("<.*?>", "", column_header)
-
-    return header
-
-
-def purify_html_project_cluster_counts(
-    project_row: bs4.element.Tag, header_index: dict
-) -> (str, int):
-    """Purify a html project cluster count row from html syntax"""
-
-    project = re.sub(
-        "<.*?>", "", str(project_row.find_all("td")[header_index["Project"]])
-    )
-    cluster_count = re.sub(
-        "<.*?>", "", str(project_row.find_all("td")[header_index["PF Clusters"]])
-    )
-    cluster_count = int(cluster_count.replace(",", ""))
-
-    return project, cluster_count
 
 
 def validate_top_unknown_barcodes_table(
