@@ -11,7 +11,8 @@ shopt -s nullglob
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
-EMAIL=clinical-demux@scilifelab.se
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 #############
 # FUNCTIONS #
