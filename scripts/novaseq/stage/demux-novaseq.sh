@@ -42,11 +42,13 @@ log "On node: $(hostname)"
 log "starting, will use ${TMPDIR}"
 log "Run directory: ${RUN_DIR}"
 log "Demux directory: ${DEMUX_DIR}"
+log "mkdir -p /home/proj/stage/flowcells/novaseq/$SLURM_JOB_ID"
+mkdir -p /home/proj/stage/flowcells/novaseq/"$SLURM_JOB_ID"
 
 ################
 # RUN BCL2FASTQ#
 ################
 
 log "start demultiplexing ${RUN_DIR}"
-log "singularity exec --bind /home/proj/stage/flowcells/novaseq,/home/proj/stage/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-singularity exec --bind /home/proj/stage/flowcells/novaseq,/home/proj/stage/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+log "singularity exec --bind /home/proj/stage/demultiplexed-runs,/home/proj/stage/flowcells/novaseq,/home/proj/stage/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+singularity exec --bind /home/proj/stage/demultiplexed-runs,/home/proj/stage/flowcells/novaseq,/home/proj/stage/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
