@@ -5,6 +5,7 @@ import re
 import xml.etree.cElementTree as Et
 
 from pathlib import Path
+from typing import Tuple
 
 from demux.constants.indexreport import FLOWCELL_VERSION_LANE_COUNT
 from demux.utils.html import (
@@ -189,17 +190,16 @@ def find_flowcell_version(run_parameters_path: Path) -> str:
 
 def validate_top_unknown_barcodes_table(
     top_unknown_barcodes_table: bs4.element.Tag, flowcell_version: str
-) -> (bool, str):
+) -> Tuple[bool, str]:
     """Validate the top unknown barcodes table, checking that all lanes are present"""
-    print(flowcell_version)
     try:
         assert (
-                len(
+            len(
                 re.sub("<.*?>", "", str(top_unknown_barcodes_table.tr))
                 .strip()
                 .split("Lane")
             )
-                == FLOWCELL_VERSION_LANE_COUNT[flowcell_version] + 1
+            == FLOWCELL_VERSION_LANE_COUNT[flowcell_version] + 1
         )
     except AssertionError as e:
         message = f"Top unknown barcode table is not matching the reference, please check the report"
@@ -208,7 +208,7 @@ def validate_top_unknown_barcodes_table(
     return True, message
 
 
-def validate_report_tables(report_tables: bs4.ResultSet) -> (bool, str):
+def validate_report_tables(report_tables: bs4.ResultSet) -> Tuple[bool, str]:
     """Validate the number of report tables"""
     try:
         assert len(report_tables) == 3
@@ -221,7 +221,7 @@ def validate_report_tables(report_tables: bs4.ResultSet) -> (bool, str):
 
 def validate_index_report_header(
     reference_header: list, sample_table_header: dict
-) -> (bool, str):
+) -> Tuple[bool, str]:
     """Validate the index report headers"""
 
     try:
