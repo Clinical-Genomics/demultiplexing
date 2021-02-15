@@ -36,8 +36,8 @@ class IndexReport:
         self.run_parameters = run_parameters_path
 
         LOG.info(
-            f"Parsing file {index_report_path}, extracting top unknown barcodes and samples with cluster"
-            f"counts lower than {cluster_counts}"
+            f"Parsing file index report for {self.flowcell_version} FC {self.flowcell_id}, extracting top unknown"
+            f"barcodes and samples with cluster counts lower than {cluster_counts}."
         )
         self.html_content = get_html_content(index_report_path=index_report_path)
         self.report_tables = self.get_report_tables(html_content=self.html_content)
@@ -165,8 +165,7 @@ class IndexReport:
 
 def find_flowcell_id(run_parameters_path: Path) -> str:
     """Parse the RunParameters.xml file and retrieve flowcell ID"""
-    root = Et.parse(
-        '/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/novaseq/S4_RunParameters.xml').getroot()
+    root = Et.parse(run_parameters_path).getroot()
 
     flowcell_id = root.find('ExperimentName').text
 
@@ -175,7 +174,7 @@ def find_flowcell_id(run_parameters_path: Path) -> str:
 
 def find_flowcell_version(run_parameters_path: Path) -> str:
     """Parse the RunParameters.xml file and retrieve flowcell version, e.g. S4, S1"""
-    root = Et.parse('/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/novaseq/S4_RunParameters.xml').getroot()
+    root = Et.parse(run_parameters_path).getroot()
 
     rf_info = root.iter('RfidsInfo')
 
