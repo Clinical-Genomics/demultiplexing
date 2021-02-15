@@ -1,7 +1,9 @@
-import re
 import bs4
+import re
+
 
 from pathlib import Path
+from typing import Tuple
 
 
 def parse_html_header(html_column_header: bs4.element.Tag) -> str:
@@ -15,7 +17,7 @@ def parse_html_header(html_column_header: bs4.element.Tag) -> str:
 
 def parse_html_project_cluster_counts(
     header_index: dict, project_row: bs4.element.Tag
-) -> (str, int):
+) -> Tuple[str, int]:
     """Purify a html project cluster count row from html syntax"""
 
     project = re.sub(
