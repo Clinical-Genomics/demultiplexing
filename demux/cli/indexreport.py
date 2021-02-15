@@ -44,7 +44,7 @@ def indexreport():
     "--run-parameters-path",
     type=str,
     required=True,
-    help="Path to RunParameters.xml file for the flowcell"
+    help="Path to RunParameters.xml file for the flowcell",
 )
 def summary(
     cluster_counts: int,

@@ -18,7 +18,7 @@ def fixture_valid_indexreport(
         index_report_path=novaseq_valid_indexcheck_report,
         cluster_counts=100000,
         report_tables_index=report_tables_index,
-        run_parameters_path=s4_run_parameters
+        run_parameters_path=s4_run_parameters,
     )
 
     return valid_indexreport
@@ -43,7 +43,9 @@ def fixture_validated_indexreport(parsed_indexreport: IndexReport) -> IndexRepor
 
 @pytest.fixture(name="indexreport_wrong_header_rt1")
 def fixture_indexreport_wrong_header_rt1(
-    novaseq_indexcheck_wrong_header_rt1: Path, project_dir: Path, s4_run_parameters: Path
+    novaseq_indexcheck_wrong_header_rt1: Path,
+    project_dir: Path,
+    s4_run_parameters: Path,
 ) -> IndexReport:
     """Fixture of a corrupt IndexReport object, faulty headers in sample cluster count table"""
     indexreport_wrong_header_rt1 = IndexReport(
@@ -51,7 +53,7 @@ def fixture_indexreport_wrong_header_rt1(
         index_report_path=novaseq_indexcheck_wrong_header_rt1,
         cluster_counts=100000,
         report_tables_index=report_tables_index,
-        run_parameters_path=s4_run_parameters
+        run_parameters_path=s4_run_parameters,
     )
 
     return indexreport_wrong_header_rt1
@@ -67,7 +69,7 @@ def fixture_indexreport_missing_lanes_rt2(
         index_report_path=novaseq_indexcheck_invalid_rt2,
         cluster_counts=100000,
         report_tables_index=report_tables_index,
-        run_parameters_path=s4_run_parameters
+        run_parameters_path=s4_run_parameters,
     )
 
     return indexreport_missing_lanes_rt2
@@ -87,4 +89,3 @@ def fixture_indexreport_sample_table_header(validated_indexreport: IndexReport) 
     return validated_indexreport.report_tables[
         report_tables_index["cluster_count_table"]
     ].tr.find_all("th")
-

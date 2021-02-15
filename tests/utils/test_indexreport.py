@@ -11,7 +11,10 @@ LOG = logging.getLogger(__name__)
 
 
 def test_parse_indexreport(
-    caplog, novaseq_valid_indexcheck_report: Path, project_dir: Path, s4_run_parameters: Path
+    caplog,
+    novaseq_valid_indexcheck_report: Path,
+    project_dir: Path,
+    s4_run_parameters: Path,
 ):
     """Test the function to parse a bcl2fastq indexcheck html report"""
 
@@ -23,7 +26,7 @@ def test_parse_indexreport(
         index_report_path=novaseq_valid_indexcheck_report,
         cluster_counts=100000,
         report_tables_index=report_tables_index,
-        run_parameters_path=s4_run_parameters
+        run_parameters_path=s4_run_parameters,
     )
     # THEN we should pass parsing and see
     assert "Parsing complete!" in caplog.text

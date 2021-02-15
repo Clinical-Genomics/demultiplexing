@@ -30,7 +30,9 @@ class IndexReport:
         run_parameters_path: Path,
     ):
         self.flowcell_id = find_flowcell_id(run_parameters_path=run_parameters_path)
-        self.flowcell_version = find_flowcell_version(run_parameters_path=run_parameters_path)
+        self.flowcell_version = find_flowcell_version(
+            run_parameters_path=run_parameters_path
+        )
         self.index_report_path = index_report_path
         self.out_dir = out_dir
         self.run_parameters = run_parameters_path
@@ -123,7 +125,8 @@ class IndexReport:
                 sample_table_header=self.sample_table_header,
             ),
             validate_top_unknown_barcodes_table(
-                top_unknown_barcodes_table=self.top_unknown_barcodes, flowcell_version=self.flowcell_version
+                top_unknown_barcodes_table=self.top_unknown_barcodes,
+                flowcell_version=self.flowcell_version,
             ),
         ]:
             if not valid:
@@ -167,7 +170,7 @@ def find_flowcell_id(run_parameters_path: Path) -> str:
     """Parse the RunParameters.xml file and retrieve flowcell ID"""
     root = Et.parse(run_parameters_path).getroot()
 
-    flowcell_id = root.find('ExperimentName').text
+    flowcell_id = root.find("ExperimentName").text
 
     return flowcell_id
 
@@ -176,17 +179,16 @@ def find_flowcell_version(run_parameters_path: Path) -> str:
     """Parse the RunParameters.xml file and retrieve flowcell version, e.g. S4, S1"""
     root = Et.parse(run_parameters_path).getroot()
 
-    rf_info = root.iter('RfidsInfo')
+    rf_info = root.iter("RfidsInfo")
 
     for info in rf_info:
-        flowcell_version = info.find('FlowCellMode').text
+        flowcell_version = info.find("FlowCellMode").text
 
         return flowcell_version
 
 
 def validate_top_unknown_barcodes_table(
-        top_unknown_barcodes_table: bs4.element.Tag,
-        flowcell_version: str
+    top_unknown_barcodes_table: bs4.element.Tag, flowcell_version: str
 ) -> (bool, str):
     """Validate the top unknown barcodes table, checking that all lanes are present"""
     print(flowcell_version)
