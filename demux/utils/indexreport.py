@@ -6,7 +6,7 @@ import xml.etree.cElementTree as Et
 
 from pathlib import Path
 
-from demux.constants.indexreport import flowcell_version_lane_count
+from demux.constants.indexreport import FLOWCELL_VERSION_LANE_COUNT
 from demux.utils.html import (
     get_html_content,
     parse_html_header,
@@ -194,12 +194,12 @@ def validate_top_unknown_barcodes_table(
     print(flowcell_version)
     try:
         assert (
-            len(
+                len(
                 re.sub("<.*?>", "", str(top_unknown_barcodes_table.tr))
                 .strip()
                 .split("Lane")
             )
-            == flowcell_version_lane_count[flowcell_version] + 1
+                == FLOWCELL_VERSION_LANE_COUNT[flowcell_version] + 1
         )
     except AssertionError as e:
         message = f"Top unknown barcode table is not matching the reference, please check the report"

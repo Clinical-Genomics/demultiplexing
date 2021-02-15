@@ -3,7 +3,7 @@ import logging
 
 from pathlib import Path
 
-from demux.constants import reference_report_header, report_tables_index
+from demux.constants import REFERENCE_REPORT_HEADER, REPORT_TABLES_INDEX
 from demux.utils.indexreport import IndexReport
 
 
@@ -59,12 +59,12 @@ def summary(
         cluster_counts=cluster_counts,
         index_report_path=Path(index_report_path),
         out_dir=Path(out_dir),
-        report_tables_index=report_tables_index,
+        report_tables_index=REPORT_TABLES_INDEX,
         run_parameters_path=Path(run_parameters_path),
     )
     LOG.info(f"Creating summary of laneBarcode.html for FC: {index_report.flowcell_id}")
-    index_report.validate(reference_report_header=reference_report_header)
+    index_report.validate(reference_report_header=REFERENCE_REPORT_HEADER)
     if not dry_run:
-        index_report.write_summary(report_tables_index=report_tables_index)
+        index_report.write_summary(report_tables_index=REPORT_TABLES_INDEX)
     else:
         LOG.info("This is a dry-run, will not write a summary report")

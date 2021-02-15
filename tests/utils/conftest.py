@@ -4,7 +4,7 @@ from bs4.element import Tag
 from copy import copy
 from pathlib import Path
 
-from demux.constants import report_tables_index, reference_report_header
+from demux.constants import REPORT_TABLES_INDEX, REFERENCE_REPORT_HEADER
 from demux.utils.indexreport import IndexReport
 
 
@@ -17,7 +17,7 @@ def fixture_valid_indexreport(
         out_dir=project_dir,
         index_report_path=novaseq_valid_indexcheck_report,
         cluster_counts=100000,
-        report_tables_index=report_tables_index,
+        report_tables_index=REPORT_TABLES_INDEX,
         run_parameters_path=s4_run_parameters,
     )
 
@@ -36,7 +36,7 @@ def fixture_parsed_indexreport(valid_indexreport: IndexReport) -> IndexReport:
 def fixture_validated_indexreport(parsed_indexreport: IndexReport) -> IndexReport:
     """Fixture of a parsed IndexReport object"""
     validated_indexreport = copy(parsed_indexreport)
-    validated_indexreport.validate(reference_report_header=reference_report_header)
+    validated_indexreport.validate(reference_report_header=REFERENCE_REPORT_HEADER)
 
     return validated_indexreport
 
@@ -52,7 +52,7 @@ def fixture_indexreport_wrong_header_rt1(
         out_dir=project_dir,
         index_report_path=novaseq_indexcheck_wrong_header_rt1,
         cluster_counts=100000,
-        report_tables_index=report_tables_index,
+        report_tables_index=REPORT_TABLES_INDEX,
         run_parameters_path=s4_run_parameters,
     )
 
@@ -68,7 +68,7 @@ def fixture_indexreport_missing_lanes_rt2(
         out_dir=project_dir,
         index_report_path=novaseq_indexcheck_invalid_rt2,
         cluster_counts=100000,
-        report_tables_index=report_tables_index,
+        report_tables_index=REPORT_TABLES_INDEX,
         run_parameters_path=s4_run_parameters,
     )
 
@@ -79,7 +79,7 @@ def fixture_indexreport_missing_lanes_rt2(
 def fixture_indexreport_sample_table_row(valid_indexreport: IndexReport) -> Tag:
     """Return the first row in the cluster count sample table"""
     return valid_indexreport.report_tables[
-        report_tables_index["cluster_count_table"]
+        REPORT_TABLES_INDEX["cluster_count_table"]
     ].find_all("tr")[1:][0]
 
 
@@ -87,5 +87,5 @@ def fixture_indexreport_sample_table_row(valid_indexreport: IndexReport) -> Tag:
 def fixture_indexreport_sample_table_header(validated_indexreport: IndexReport) -> Tag:
     """Return the header for cluster count sample table from a valid index report"""
     return validated_indexreport.report_tables[
-        report_tables_index["cluster_count_table"]
+        REPORT_TABLES_INDEX["cluster_count_table"]
     ].tr.find_all("th")

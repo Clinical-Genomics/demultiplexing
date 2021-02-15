@@ -3,7 +3,7 @@
 """
 
 
-reference_report_header = [
+REFERENCE_REPORT_HEADER = [
     "Lane",
     "Project",
     "Sample",
@@ -18,6 +18,6 @@ reference_report_header = [
     "Mean Quality Score",
 ]
 
-report_tables_index = {"cluster_count_table": 1, "top_unknown_barcode_table": 2}
+REPORT_TABLES_INDEX = {"cluster_count_table": 1, "top_unknown_barcode_table": 2}
 
-flowcell_version_lane_count = {"S1": 2, "S4": 4}
+FLOWCELL_VERSION_LANE_COUNT = {"S1": 2, "S4": 4}

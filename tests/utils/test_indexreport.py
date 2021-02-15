@@ -3,7 +3,7 @@ import logging
 
 from pathlib import Path
 
-from demux.constants import reference_report_header, report_tables_index
+from demux.constants import REFERENCE_REPORT_HEADER, REPORT_TABLES_INDEX
 from demux.exc import IndexReportError
 from demux.utils.indexreport import IndexReport
 
@@ -25,7 +25,7 @@ def test_parse_indexreport(
         out_dir=project_dir,
         index_report_path=novaseq_valid_indexcheck_report,
         cluster_counts=100000,
-        report_tables_index=report_tables_index,
+        report_tables_index=REPORT_TABLES_INDEX,
         run_parameters_path=s4_run_parameters,
     )
     # THEN we should pass parsing and see
@@ -38,7 +38,7 @@ def test_validate_valid_indexreport(caplog, parsed_indexreport: IndexReport):
     # GIVEN a valid parsed bcl2fastq
     caplog.set_level(logging.INFO)
     # WHEN validating said "valid" report
-    parsed_indexreport.validate(reference_report_header=reference_report_header)
+    parsed_indexreport.validate(reference_report_header=REFERENCE_REPORT_HEADER)
     # THEN validations should be passed
     assert "Validation passed" in caplog.text
 
@@ -49,7 +49,7 @@ def test_write_report(caplog, validated_indexreport: IndexReport):
     # GIVEN a validated bcl2fastq report
     caplog.set_level(logging.INFO)
     # WHEN we compile the summary report
-    validated_indexreport.write_summary(report_tables_index=report_tables_index)
+    validated_indexreport.write_summary(report_tables_index=REPORT_TABLES_INDEX)
     # THEN we should create a report and see the message
     assert "Wrote indexcheck report summary to" in caplog.text
 
@@ -62,7 +62,7 @@ def test_validate_wrong_header_rt1(caplog, indexreport_wrong_header_rt1):
     # WHEN the corrupt bcl2fastq indexcheck report is validated
     with pytest.raises(IndexReportError) as e:
         indexreport_wrong_header_rt1.validate(
-            reference_report_header=reference_report_header
+            reference_report_header=REFERENCE_REPORT_HEADER
         )
     # THEN an exception is raised and a message is reported
     assert (
@@ -79,7 +79,7 @@ def test_validate_missing_lanes_rt2(caplog, indexreport_missing_lanes_rt2):
     # WHEN the corrupt bcl2fastq indexcheck report is validated
     with pytest.raises(IndexReportError) as e:
         indexreport_missing_lanes_rt2.validate(
-            reference_report_header=reference_report_header
+            reference_report_header=REFERENCE_REPORT_HEADER
         )
     # THEN an report error should be raised and the following message prompted
     assert (

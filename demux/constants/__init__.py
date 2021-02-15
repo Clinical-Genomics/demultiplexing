@@ -1,5 +1,5 @@
 from .indexreport import (
-    reference_report_header,
-    report_tables_index,
-    flowcell_version_lane_count,
+    REFERENCE_REPORT_HEADER,
+    REPORT_TABLES_INDEX,
+    FLOWCELL_VERSION_LANE_COUNT,
 )
