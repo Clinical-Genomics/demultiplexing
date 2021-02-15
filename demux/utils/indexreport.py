@@ -2,8 +2,11 @@ import bs4
 import logging
 import re
 
+import xml.etree.cElementTree as Et
+
 from pathlib import Path
 
+from demux.constants.indexreport import flowcell_version_lane_count
 from demux.utils.html import (
     get_html_content,
     parse_html_header,
@@ -21,14 +24,16 @@ class IndexReport:
     def __init__(
         self,
         cluster_counts: int,
-        flowcell_id: str,
         index_report_path: Path,
         out_dir: Path,
         report_tables_index: dict,
+        run_parameters_path: Path,
     ):
-        self.flowcell_id = flowcell_id
+        self.flowcell_id = find_flowcell_id(run_parameters_path=run_parameters_path)
+        self.flowcell_version = find_flowcell_version(run_parameters_path=run_parameters_path)
         self.index_report_path = index_report_path
         self.out_dir = out_dir
+        self.run_parameters = run_parameters_path
 
         LOG.info(
             f"Parsing file {index_report_path}, extracting top unknown barcodes and samples with cluster"
@@ -118,7 +123,7 @@ class IndexReport:
                 sample_table_header=self.sample_table_header,
             ),
             validate_top_unknown_barcodes_table(
-                top_unknown_barcodes_table=self.top_unknown_barcodes
+                top_unknown_barcodes_table=self.top_unknown_barcodes, flowcell_version=self.flowcell_version
             ),
         ]:
             if not valid:
@@ -158,11 +163,34 @@ class IndexReport:
         )
 
 
+def find_flowcell_id(run_parameters_path: Path) -> str:
+    """Parse the RunParameters.xml file and retrieve flowcell ID"""
+    root = Et.parse(
+        '/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/novaseq/S4_RunParameters.xml').getroot()
+
+    flowcell_id = root.find('ExperimentName').text
+
+    return flowcell_id
+
+
+def find_flowcell_version(run_parameters_path: Path) -> str:
+    """Parse the RunParameters.xml file and retrieve flowcell version, e.g. S4, S1"""
+    root = Et.parse('/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/novaseq/S4_RunParameters.xml').getroot()
+
+    rf_info = root.iter('RfidsInfo')
+
+    for info in rf_info:
+        flowcell_version = info.find('FlowCellMode').text
+
+        return flowcell_version
+
+
 def validate_top_unknown_barcodes_table(
-    top_unknown_barcodes_table: bs4.element.Tag,
+        top_unknown_barcodes_table: bs4.element.Tag,
+        flowcell_version: str
 ) -> (bool, str):
     """Validate the top unknown barcodes table, checking that all lanes are present"""
-
+    print(flowcell_version)
     try:
         assert (
             len(
@@ -170,7 +198,7 @@ def validate_top_unknown_barcodes_table(
                 .strip()
                 .split("Lane")
             )
-            == 5
+            == flowcell_version_lane_count[flowcell_version] + 1
         )
     except AssertionError as e:
         message = f"Top unknown barcode table is not matching the reference, please check the report"

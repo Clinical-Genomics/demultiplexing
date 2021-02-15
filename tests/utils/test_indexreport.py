@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 
 def test_parse_indexreport(
-    novaseq_valid_indexcheck_report: Path, project_dir: Path, caplog
+    caplog, novaseq_valid_indexcheck_report: Path, project_dir: Path, s4_run_parameters: Path
 ):
     """Test the function to parse a bcl2fastq indexcheck html report"""
 
@@ -21,15 +21,15 @@ def test_parse_indexreport(
     IndexReport(
         out_dir=project_dir,
         index_report_path=novaseq_valid_indexcheck_report,
-        flowcell_id="HFKF7DSXY",
         cluster_counts=100000,
         report_tables_index=report_tables_index,
+        run_parameters_path=s4_run_parameters
     )
     # THEN we should pass parsing and see
     assert "Parsing complete!" in caplog.text
 
 
-def test_validate_valid_indexreport(parsed_indexreport: IndexReport, caplog):
+def test_validate_valid_indexreport(caplog, parsed_indexreport: IndexReport):
     """Test validation on valid indexcheck report"""
 
     # GIVEN a valid parsed bcl2fastq
@@ -40,7 +40,7 @@ def test_validate_valid_indexreport(parsed_indexreport: IndexReport, caplog):
     assert "Validation passed" in caplog.text
 
 
-def test_write_report(validated_indexreport: IndexReport, caplog):
+def test_write_report(caplog, validated_indexreport: IndexReport):
     """Test writing function of a summary"""
 
     # GIVEN a validated bcl2fastq report
@@ -51,7 +51,7 @@ def test_write_report(validated_indexreport: IndexReport, caplog):
     assert "Wrote indexcheck report summary to" in caplog.text
 
 
-def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
+def test_validate_wrong_header_rt1(caplog, indexreport_wrong_header_rt1):
     """Test validation of faulty headers in Report Table 1"""
 
     # GIVEN a corrupt bcl2fastq indexcheck report with faulty headers
@@ -68,7 +68,7 @@ def test_validate_wrong_header_rt1(indexreport_wrong_header_rt1, caplog):
     ) in caplog.text
 
 
-def test_validate_missing_lanes_rt2(indexreport_missing_lanes_rt2, caplog):
+def test_validate_missing_lanes_rt2(caplog, indexreport_missing_lanes_rt2):
     """Test the validation of missing lanes and thus structure in Report table 2"""
 
     # GIVEN a corrupt bcl2fastq indexcheck report with missing lanes

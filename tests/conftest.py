@@ -59,6 +59,18 @@ def fixture_novaseq_invalid_rt2_indexcheck_report(novaseq_dir: Path) -> Path:
     return novaseq_dir / "indexcheck_invalid_rt2.html"
 
 
+@pytest.fixture(name="s1_run_parameters")
+def fixture_s1_run_parameters(novaseq_dir: Path) -> Path:
+    """ Return the path to a S! RunParameters.xml """
+    return novaseq_dir / "S1_RunParameters.xml"
+
+
+@pytest.fixture(name="s4_run_parameters")
+def fixture_s4_run_parameters(novaseq_dir: Path) -> Path:
+    """ Return the path to a S! RunParameters.xml """
+    return novaseq_dir / "S4_RunParameters.xml"
+
+
 @pytest.fixture(name="novaseq_runs_dir")
 def fixture_runs_dir(novaseq_dir: Path) -> Path:
     """ Return the path to the novaseq runs directory """

@@ -29,12 +29,6 @@ def indexreport():
     "--dry-run", help="Dry of the function, will not write any report", is_flag=True
 )
 @click.option(
-    "--flowcell-id",
-    type=str,
-    required=True,
-    help="Flowcell id of given indexcheck report",
-)
-@click.option(
     "--index-report-path",
     type=str,
     required=True,
@@ -46,21 +40,27 @@ def indexreport():
     required=True,
     help="Path of outdirectory for summary report",
 )
+@click.option(
+    "--run-parameters-path",
+    type=str,
+    required=True,
+    help="Path to RunParameters.xml file for the flowcell"
+)
 def summary(
     cluster_counts: int,
-    flowcell_id: str,
+    dry_run: bool,
     index_report_path: str,
     out_dir: str,
-    dry_run: bool,
+    run_parameters_path: str,
 ):
     """Create a summary of the indexcheck report, extracting information on samples with low number of clusters
     and the topmost common unknown indexes"""
     index_report = IndexReport(
         cluster_counts=cluster_counts,
-        flowcell_id=flowcell_id,
         index_report_path=Path(index_report_path),
         out_dir=Path(out_dir),
         report_tables_index=report_tables_index,
+        run_parameters_path=Path(run_parameters_path),
     )
     LOG.info(f"Creating summary of laneBarcode.html for FC: {index_report.flowcell_id}")
     index_report.validate(reference_report_header=reference_report_header)
