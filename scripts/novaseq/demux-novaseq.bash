@@ -99,7 +99,9 @@ done
 
 # Create a summary of the bcl2fastq indexcheck report
 demux indexreport summary \
-  --index-report-path ${OUT_DIR}/${UNALIGNED_DIR}/Reports/html/${FC}/all/all/all/laneBarcode.html \
-  --out-dir $OUT_DIR \
-  --flowcell-id $FC \
-  --cluster-counts 1000000
+  --index-report-path "${OUT_DIR}/${UNALIGNED_DIR}/Reports/html/${FC}/all/all/all/laneBarcode.html" \
+  --out-dir "$OUT_DIR" \
+  --cluster-counts 1000000 \
+  --run-parameters-path "$IN_DIR/RunParameters.xml"
+
+
