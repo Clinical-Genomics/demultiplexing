@@ -3,8 +3,6 @@
 set -u
 
 shopt -s nullglob
-shopt -s expand_aliases
-source ~/.aliases
 
 ########
 # VARS #
@@ -74,13 +72,18 @@ for RUN_DIR in ${IN_DIR}/*; do
             date +'%Y%m%d%H%M%S' > ${RUN_DIR}/demuxstarted.txt
 
             log "bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}"
-            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} &>> ${PROJECTLOG}
+            bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} ${FC} ${PROJECTLOG} &>> ${PROJECTLOG}
 
             if [[ $? == 0 ]]; then
-                log "rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
-                rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
+                # indicate demultiplexing is finished
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
                 date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
+                # create trigger file for delivery script
+                log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/copycomplete.txt"
+                date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/copycomplete.txt
+                # remove delivery.txt (if present) to trigger delivery
+                log "date +'%Y%m%d%H%M%S' remove delivery.txt"
+                rm -f date ${DEMUXES_DIR}/${RUN}/delivery.txt
             fi
 
             # This is an easy way to avoid running multiple demuxes at the same time
