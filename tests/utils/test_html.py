@@ -42,4 +42,6 @@ def test_parse_html_project_cluster_counts(
     )
     # THEN we should retrieve a project and cluster count
     assert type(project) is str
+    assert project == "257845"
     assert type(counts) is int
+    assert counts == 4375049
