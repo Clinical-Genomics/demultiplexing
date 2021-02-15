@@ -2,8 +2,6 @@
 
 set -eu
 
-shopt -s expand_aliases
-source $HOME/.bashrc
 ulimit -n 4096
 
 ##########
@@ -12,12 +10,18 @@ ulimit -n 4096
 
 IN_DIR=${1?'please provide a run dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
+FC=${3?'fc_id needed'}
+PROJECTLOG=${4?'projectlog needed'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
+SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
 EMAIL=clinical-demux@scilifelab.se
 
-BCL2FASTQ_BIN=/usr/local/bcl2fastq2/bin/bcl2fastq
+SLURM_ACCOUNT=development
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    SLURM_ACCOUNT=production
+fi
 
 #############
 # FUNCTIONS #
@@ -35,10 +39,6 @@ log() {
 # init
 mkdir -p ${OUT_DIR}
 
-# log the version
-demux --version
-${BCL2FASTQ_BIN} --version
-
 # Here we go!
 log "Starting NovaSeq demultiplexing"
 # Send a mail that demultiplexing has started
@@ -48,10 +48,13 @@ BASEMASK=$(demux basemask create --application nova ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1
+JOB_TITLE=Demux_${RUN}
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
-# add samplesheet to unaligned folder
+log "bcl2fastq finished!"
+
+# Add samplesheet to unaligned folder
 cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
 
 # Restructure the output dir!
@@ -86,7 +89,7 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
-# Need to add stats code here :)
+# Add stats to cgstats database
 log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
 cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
 
@@ -103,5 +106,3 @@ demux indexreport summary \
   --out-dir "$OUT_DIR" \
   --cluster-counts 1000000 \
   --run-parameters-path "$IN_DIR/RunParameters.xml"
-
-
