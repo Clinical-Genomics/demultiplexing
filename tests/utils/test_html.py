@@ -2,8 +2,8 @@ import bs4
 
 from pathlib import Path
 
+from demux.constants import REFERENCE_REPORT_HEADER
 from demux.utils.indexreport import IndexReport
-
 from demux.utils.html import (
     get_html_content,
     parse_html_header,
@@ -27,6 +27,7 @@ def test_parse_html_header(indexreport_sample_table_header: bs4.element.Tag):
         # WHEN parsing this header and attempting to remove html syntax
         column_header = parse_html_header(html_column_header=html_column_header)
         # THEN we should get a string, and have no markers of html left
+        assert any(column_header in word for word in REFERENCE_REPORT_HEADER)
         assert type(column_header) is str
         assert ">" or "<" not in column_header
 
