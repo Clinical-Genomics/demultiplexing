@@ -33,8 +33,8 @@ for RUNDIR in ${INDIR}/*; do
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
-            # bash /home/proj/stage/bin/git/demultiplexing/scripts/2500/stage/demux.bash ${RUNDIR} ${DEMUXDIR}
-            # bash /home/barry.stokman/development/demultiplexing/scripts/2500/stage/demux.bash ${RUNDIR} ${DEMUXDIR}
+            # bash /home/proj/stage/bin/git/demultiplexing/scripts/2500/stage/demux-2500.bash ${RUNDIR} ${DEMUXDIR}
+            # bash /home/barry.stokman/development/demultiplexing/scripts/2500/stage/demux-2500.bash ${RUNDIR} ${DEMUXDIR}
             rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - started.txt exists

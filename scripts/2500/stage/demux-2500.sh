@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -c 18
-##SBATCH -p PARTITION # use this if you want to specify a partition to run test on, for instance `dragen` or `gpu`
+##SBATCH -p dragen # use this if you want to specify a partition to run test on, for instance `dragen` or `gpu`
 #SBATCH --qos=low
 #SBATCH --time=600
 #SBATCH --mail-type=ALL
@@ -48,5 +48,7 @@ log "Demux directory: ${DEMUX_DIR}"
 ################
 
 log "start demultiplexing ${RUN_DIR}"
-log "singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+#log "singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+#singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+log "singularity exec --bind /home/barry.stokman.development/testdata/2500,/home/barry.stokman/development/testdata/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl --ignore-missing-stats --fastq-cluster-count 0"
+singularity exec --bind /home/barry.stokman.development/testdata/2500,/home/barry.stokman/development/testdata/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl --ignore-missing-stats --fastq-cluster-count 0
