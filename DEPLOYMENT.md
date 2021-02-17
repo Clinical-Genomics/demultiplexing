@@ -9,7 +9,7 @@ When all tests done and successful and PR is approved, follow these steps:
         1. Update local branch by: `git pull origin master`
         1. Bumpversion according to specifications, eg. `bumpversion <patch/minor/major>`
         1. Push commit directly to master `git push`
-        1. Push commit directly to master `git push --tag`
+        1. Push commit directly to master `git push --tags`
 1. Deploy on the appropriate server(s):
     1. Deploy on hasta:
         1. Deploy master to stage
