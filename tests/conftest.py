@@ -1,8 +1,20 @@
 """ Conftest file for demultiplexing """
 from pathlib import Path
+from typing import Dict
+
 import pytest
+import shutil
 
 from demux.utils.runparameters import NovaseqRunParameters
+
+
+@pytest.fixture(scope="function", name="project_dir")
+def tmp_dir(tmp_path_factory) -> Path:
+    """ Yield temp dir """
+
+    my_tmpdir = Path(tmp_path_factory.mktemp("data"))
+    yield my_tmpdir
+    shutil.rmtree(str(my_tmpdir))
 
 
 @pytest.fixture(name="fixtures_dir")
@@ -29,6 +41,36 @@ def fixture_novaseq_dir(fixtures_dir: Path) -> Path:
     return fixtures_dir / "novaseq"
 
 
+@pytest.fixture(name="novaseq_valid_indexcheck_report")
+def fixture_novaseq_valid_indexcheck_report(novaseq_dir: Path) -> Path:
+    """ Return the path to valid indexcheck report """
+    return novaseq_dir / "valid_laneBarcode.html"
+
+
+@pytest.fixture(name="novaseq_indexcheck_wrong_header_rt1")
+def fixture_novaseq_invalid_rt1_indexcheck_report(novaseq_dir: Path) -> Path:
+    """ Return the path to valid indexcheck report """
+    return novaseq_dir / "wrong_header_rt1.html"
+
+
+@pytest.fixture(name="novaseq_indexcheck_invalid_rt2")
+def fixture_novaseq_invalid_rt2_indexcheck_report(novaseq_dir: Path) -> Path:
+    """ Return the path to valid indexcheck report """
+    return novaseq_dir / "indexcheck_invalid_rt2.html"
+
+
+@pytest.fixture(name="s1_run_parameters")
+def fixture_s1_run_parameters(novaseq_dir: Path) -> Path:
+    """ Return the path to a S! RunParameters.xml """
+    return novaseq_dir / "S1_RunParameters.xml"
+
+
+@pytest.fixture(name="s4_run_parameters")
+def fixture_s4_run_parameters(novaseq_dir: Path) -> Path:
+    """ Return the path to a S! RunParameters.xml """
+    return novaseq_dir / "S4_RunParameters.xml"
+
+
 @pytest.fixture(name="novaseq_runs_dir")
 def fixture_runs_dir(novaseq_dir: Path) -> Path:
     """ Return the path to the novaseq runs directory """
@@ -36,7 +78,7 @@ def fixture_runs_dir(novaseq_dir: Path) -> Path:
 
 
 @pytest.fixture(name="run_parameters_file")
-def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Path:
+def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path]:
     """ Fixture for novaseq runparameters files """
     return {
         "novaseq_oldSCV": novaseq_runs_dir

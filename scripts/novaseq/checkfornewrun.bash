@@ -56,7 +56,7 @@ for RUN_DIR in ${IN_DIR}/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
             fi
 
             # exit if samplesheet is still empty after running demux sheet fetch
