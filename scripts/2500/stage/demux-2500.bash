@@ -22,6 +22,9 @@ RUN=$(basename ${BASE})
 RUN_DIR=$(dirname ${BASE})
 PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
 
+SCRIPT_DIR=/home/proj/${CONDA_DEFAULT_ENV}/bin/git/demultiplexing/scripts/novaseq/  # use this when developing in a conda env
+#SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/        # use this when testing on stage
+
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
