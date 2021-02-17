@@ -1,5 +1,3 @@
-set -x
-
 get_basemask() {
     local RUNDIR=${1?'please provide a run dir'}
     # get the index lengths
