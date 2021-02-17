@@ -78,7 +78,7 @@ UNALDIR=Unaligned-${BASEMASK//,}
 # DEMUX !
 #log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR}"
 ## the sed command is there to remove the color codes out of the demux output and create a pretty log file
-/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
+#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
 
 JOB_TITLE=Demux_${RUN}
 log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
