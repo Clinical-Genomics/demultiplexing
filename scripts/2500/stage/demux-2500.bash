@@ -1,7 +1,7 @@
 #!/bin/bash
 #   usage: demux-2500.bash <absolute-path-to-run-dir>
 #   The output i.e. Unaligned dir will be created 
-#   under $DEMUX_DIR
+#   under $OUT_DIR
 
 set -eu -o pipefail
 
@@ -14,13 +14,13 @@ VERSION=5.4.2
 # PARAMS #
 ##########
 
-BASE=${1?'please provide a run dir'}
-DEMUX_DIR=${2?'please provide a demux dir'}
+IN_DIR=${1?'please provide a run dir'}
+OUT_DIR=${2?'please provide a demux dir'}
 EMAIL=barry.stokman@scilifelab.se
 
-RUN=$(basename ${BASE})
-RUN_DIR=$(dirname ${BASE})
-PROJECTLOG=${DEMUX_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
+RUN=$(basename ${IN_DIR})
+RUN_DIR=$(dirname ${IN_DIR})
+PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
 
 SCRIPT_DIR=/home/proj/${CONDA_DEFAULT_ENV}/bin/git/demultiplexing/scripts/novaseq/  # use this when developing in a conda env
 #SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/        # use this when testing on stage
@@ -51,13 +51,13 @@ trap failed ERR
 ###########
 
 # transform SampleSheet from Mac to Unix
-if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
-    cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
-    if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
+if [[ ! -e ${IN_DIR}/SampleSheet.ori ]]; then
+    cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/SampleSheet.ori
+    if grep -qs $'\r' ${IN_DIR}/SampleSheet.csv; then
         sed -i 's/
-/\n/g' ${BASE}/SampleSheet.csv
+/\n/g' ${IN_DIR}/SampleSheet.csv
     fi
-    sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
+    sed -i '/^$/d' ${IN_DIR}/SampleSheet.csv # remove empty lines
 fi
 
 ########
@@ -65,47 +65,47 @@ fi
 ########
 
 # init
-mkdir -p ${DEMUX_DIR}/${RUN}
+mkdir -p ${OUT_DIR}/${RUN}
 log "${PROJECTLOG} created by $0 $VERSION"
-date > ${BASE}/demuxstarted.txt
-cp ${BASE}/SampleSheet.csv ${DEMUX_DIR}/${RUN}/
-cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv
+date > ${IN_DIR}/demuxstarted.txt
+cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${RUN}/
+cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv
 
 # here we go!
 log "Setup correct, starts demuxing . . ."
 
-echo $(get_basemask ${BASE})
-BASEMASK=$(get_basemask ${BASE})
+echo $(get_basemask ${IN_DIR})
+BASEMASK=$(get_basemask ${IN_DIR})
 UNALDIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-#log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR}"
+#log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALDIR}"
 ## the sed command is there to remove the color codes out of the demux output and create a pretty log file
-#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${BASE}/Data/Intensities/BaseCalls --output-dir ${DEMUX_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
+#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
 
 JOB_TITLE=Demux_${RUN}
 log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
 RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
-cd ${DEMUX_DIR}/${RUN}/${UNALDIR}
+cd ${OUT_DIR}/${RUN}/${UNALDIR}
 #nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1  #TODO: find out wht this does
 
 # Add stats
 
-log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/"
-cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECTLOG}
+log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${OUT_DIR}/${RUN}/"
+cgstats add --machine 2500 --unaligned ${UNALDIR} ${OUT_DIR}/${RUN}/ &>> ${PROJECTLOG}
 
 # create stats files
 FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${DEMUX_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
+PROJs=$(ls ${OUT_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
 for PROJ in ${PROJs[@]}; do
     prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt"
-    cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
+    log "cgstats select --project ${prj} ${FC} &> ${OUT_DIR}/${RUN}/stats-${prj}-${FC}.txt"
+    cgstats select --project ${prj} ${FC} &> ${OUT_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
-log "rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt"
-rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
+log "rm -f ${OUT_DIR}/${RUN}/copycomplete.txt"
+rm -f ${OUT_DIR}/${RUN}/copycomplete.txt
 
-log "date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt"
-date > ${DEMUX_DIR}/${RUN}/demuxcomplete.txt
+log "date > ${OUT_DIR}/${RUN}/demuxcomplete.txt"
+date > ${OUT_DIR}/${RUN}/demuxcomplete.txt
