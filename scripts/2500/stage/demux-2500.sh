@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -c 18
-##SBATCH -p dragen # use this if you want to specify a partition to run test on, for instance `dragen` or `gpu`
+#SBATCH -p dragen # use this if you want to specify a partition to run test on, for instance `dragen` or `gpu`
 #SBATCH --qos=low
 #SBATCH --time=600
 #SBATCH --mail-type=ALL
