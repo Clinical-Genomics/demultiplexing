@@ -76,28 +76,28 @@ log "Setup correct, starts demuxing . . ."
 
 echo $(get_basemask ${IN_DIR})
 BASEMASK=$(get_basemask ${IN_DIR})
-UNALDIR=Unaligned-${BASEMASK//,}
+UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-#log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALDIR}"
+#log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}"
 ## the sed command is there to remove the color codes out of the demux output and create a pretty log file
-#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALDIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
+#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALIGNED_DIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
 
 JOB_TITLE=Demux_${RUN}
 log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
 RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
-cd ${OUT_DIR}/${RUN}/${UNALDIR}
+cd ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}
 #nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1  #TODO: find out wht this does
 
 # Add stats
 
-log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${OUT_DIR}/${RUN}/"
-cgstats add --machine 2500 --unaligned ${UNALDIR} ${OUT_DIR}/${RUN}/ &>> ${PROJECTLOG}
+log "cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/"
+cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/ &>> ${PROJECTLOG}
 
 # create stats files
 FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${OUT_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
+PROJs=$(ls ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/ | grep Proj)
 for PROJ in ${PROJs[@]}; do
     prj=$(echo ${PROJ} | sed 's/Project_//')
     log "cgstats select --project ${prj} ${FC} &> ${OUT_DIR}/${RUN}/stats-${prj}-${FC}.txt"
