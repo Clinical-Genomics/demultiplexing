@@ -10,3 +10,4 @@ from .samplesheet import (
     iseqSampleSheet,
 )
 from .novaseq_samplesheet import CreateNovaseqSamplesheet
+from .hiseq2500_samplesheet import Create2500Samplesheet
