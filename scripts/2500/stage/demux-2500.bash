@@ -76,7 +76,7 @@ log "Setup correct, starts demuxing . . ."
 
 echo $(get_basemask ${IN_DIR})
 #BASEMASK=$(get_basemask ${IN_DIR})
-BASEMASK=$(demux basemask create --application 2500 ${IN_DIR})
+BASEMASK=$(demux basemask create --application wes ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
