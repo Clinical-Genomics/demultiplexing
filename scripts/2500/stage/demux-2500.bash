@@ -84,8 +84,8 @@ UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 #/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALIGNED_DIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
 
 JOB_TITLE=Demux_${RUN}
-log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
-RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR})
 
 cd ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}
 #nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1  #TODO: find out wht this does

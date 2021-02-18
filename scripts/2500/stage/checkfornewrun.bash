@@ -5,7 +5,7 @@ shopt -s expand_aliases
 
 source ~/.bash_aliases
 
-INDIR=${1?'please provide a run dur'}
+INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
 for RUNDIR in ${INDIR}/*; do
