@@ -75,8 +75,8 @@ def create(rundir, lane, application):
 
         indexread1 = int(run_params_tree.findtext("Setup/IndexRead1"))
         indexread2 = int(run_params_tree.findtext("Setup/IndexRead2"))
-        read1 = int(run_params_tree.findtext("Read1"))
-        read2 = int(run_params_tree.findtext("Read2"))
+        read1 = int(run_params_tree.findtext("Setup/Read1"))
+        read2 = int(run_params_tree.findtext("Setup/Read2"))
 
         hiseqx2500_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
 
