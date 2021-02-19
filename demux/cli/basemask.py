@@ -67,21 +67,6 @@ def create(rundir, lane, application):
                 basemask_index2 = index2_n
             click.echo(f"Y151,{basemask_index1},{basemask_index2},Y151")
 
-    def create_2500_basemask():
-        """ Create the bcl2fastq basemask for HiSeq2500 flowcells """
-
-        run_paraters_file = "runParameters.xml"
-        run_params_tree = parse_run_parameters(run_paraters_file)
-
-        indexread1 = int(run_params_tree.findtext("Setup/IndexRead1"))
-        indexread2 = int(run_params_tree.findtext("Setup/IndexRead2"))
-        read1 = int(run_params_tree.findtext("Setup/Read1"))
-        read2 = int(run_params_tree.findtext("Setup/Read2"))
-
-        hiseqx2500_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
-
-        click.echo(f"{hiseqx2500_basemask}")
-
     def create_novaseq_basemask():
         """ create the bcl2fastq basemask for novaseq flowcells"""
 
@@ -115,8 +100,6 @@ def create(rundir, lane, application):
         """ determine the basemask """
         if application == "nova":
             create_novaseq_basemask()
-        if application == "wes":
-            create_2500_basemask()
         else:
             create_basemask(get_application_sheet(application))
 
