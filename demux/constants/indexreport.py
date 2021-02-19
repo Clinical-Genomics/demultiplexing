@@ -20,4 +20,4 @@ REFERENCE_REPORT_HEADER = [
 
 REPORT_TABLES_INDEX = {"cluster_count_table": 1, "top_unknown_barcode_table": 2}
 
-FLOWCELL_VERSION_LANE_COUNT = {"S1": 2, "S4": 4}
+FLOWCELL_VERSION_LANE_COUNT = {"S1": 2, "S2": 2, "SP": 2, "S4": 4}

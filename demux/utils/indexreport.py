@@ -213,7 +213,7 @@ def validate_report_tables(report_tables: bs4.ResultSet) -> Tuple[bool, str]:
     try:
         assert len(report_tables) == 3
     except AssertionError:
-        message = "The number of Report Tables are not the same"
+        message = "The number of Report Tables are not matching the reference, please check the report"
         return False, message
     message = "Number of report tables: Passed!"
     return True, message
