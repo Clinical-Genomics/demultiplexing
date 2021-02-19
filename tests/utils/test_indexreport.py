@@ -1,11 +1,18 @@
 import pytest
 import logging
+import bs4
 
 from pathlib import Path
 
 from demux.constants import REFERENCE_REPORT_HEADER, REPORT_TABLES_INDEX
 from demux.exc import IndexReportError
-from demux.utils.indexreport import IndexReport
+from demux.utils.indexreport import (
+    IndexReport,
+    validate_index_report_header,
+    validate_report_tables,
+    validate_top_unknown_barcodes_table,
+)
+
 
 LOG = logging.getLogger(__name__)
 
@@ -30,6 +37,60 @@ def test_parse_indexreport(
     )
     # THEN we should pass parsing and see
     assert "Parsing complete!" in caplog.text
+
+
+def test_validate_top_unknown_barcodes_table(
+    empty_top_unknown_barcodes_table: bs4.BeautifulSoup,
+):
+    """Test the validation of a empty top unknown barcodes table"""
+
+    # GIVEN a empty top unknown barcodes table
+
+    # WHEN validating said table
+    valid, message = validate_top_unknown_barcodes_table(
+        top_unknown_barcodes_table=empty_top_unknown_barcodes_table,
+        flowcell_version="S4",
+    )
+
+    # THEN we should see that it is not valid and the following message
+    assert not valid
+    assert (
+        message
+        == "Top unknown barcode table is not matching the reference, please check the report"
+    )
+
+
+def test_validate_report_tables(missing_report_tables: bs4.ResultSet):
+
+    # GIVEN missing report tables set
+
+    # WHEN validating said set
+    valid, message = validate_report_tables(report_tables=missing_report_tables)
+
+    # THEN we should see that it is not valid and the following message
+    assert not valid
+    assert (
+        message
+        == "The number of Report Tables are not matching the reference, please check the report"
+    )
+
+
+def test_validate_index_report_header(modified_report_sample_table_header: dict):
+
+    # GIVEN a modified report sample table header, missing a column
+
+    # WHEN validating said header
+    valid, message = validate_index_report_header(
+        reference_header=REFERENCE_REPORT_HEADER,
+        sample_table_header=modified_report_sample_table_header,
+    )
+
+    # THEN we should see that it is not valid and the following message
+    assert not valid
+    assert message == (
+        f"The header in the cluster count sample table is not matching the\n"
+        f"control headers. Check if they need correction"
+    )
 
 
 def test_validate_valid_indexreport(caplog, parsed_indexreport: IndexReport):

@@ -1,6 +1,6 @@
+import bs4
 import pytest
 
-from bs4.element import Tag
 from copy import copy
 from pathlib import Path
 
@@ -76,7 +76,9 @@ def fixture_indexreport_missing_lanes_rt2(
 
 
 @pytest.fixture(name="indexreport_sample_table_row")
-def fixture_indexreport_sample_table_row(valid_indexreport: IndexReport) -> Tag:
+def fixture_indexreport_sample_table_row(
+    valid_indexreport: IndexReport,
+) -> bs4.element.Tag:
     """Return the first row in the cluster count sample table"""
     return valid_indexreport.report_tables[
         REPORT_TABLES_INDEX["cluster_count_table"]
@@ -84,8 +86,34 @@ def fixture_indexreport_sample_table_row(valid_indexreport: IndexReport) -> Tag:
 
 
 @pytest.fixture(name="indexreport_sample_table_header")
-def fixture_indexreport_sample_table_header(validated_indexreport: IndexReport) -> Tag:
+def fixture_indexreport_sample_table_header(
+    validated_indexreport: IndexReport,
+) -> bs4.element.Tag:
     """Return the header for cluster count sample table from a valid index report"""
     return validated_indexreport.report_tables[
         REPORT_TABLES_INDEX["cluster_count_table"]
     ].tr.find_all("th")
+
+
+@pytest.fixture(name="empty_top_unknown_barcodes_table")
+def fixture_empty_top_unknown_barcodes_table() -> bs4:
+    """Return an empty top unknown barcodes table"""
+    empty_top_unknown_barcodes_table = bs4.BeautifulSoup(
+        "<html><body><tr></tr></body></html>", "html.parser"
+    )
+    return empty_top_unknown_barcodes_table
+
+
+@pytest.fixture(name="missing_report_tables")
+def fixture_missing_report_tables(valid_indexreport: IndexReport) -> bs4.ResultSet:
+    """Return, from a report with a missing report tables, report tables of a indexreport"""
+    missing_report_tables = valid_indexreport.report_tables[:-1]
+    return missing_report_tables
+
+
+@pytest.fixture(name="modified_report_sample_table_header")
+def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) -> dict:
+    """Return a sample table header with a missing column"""
+    modified_report = copy(valid_indexreport)
+    modified_report.sample_table_header.pop("Lane")
+    return modified_report.sample_table_header
