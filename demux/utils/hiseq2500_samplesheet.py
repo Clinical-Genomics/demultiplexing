@@ -7,9 +7,7 @@ from .samplesheet import Samplesheet
 class Create2500Samplesheet:
     """ Create a raw sample sheet for 2500 flowcells """
 
-    def __init__(
-            self, flowcell: str, index_length: int, raw_samplesheet: list
-    ):
+    def __init__(self, flowcell: str, index_length: int, raw_samplesheet: list):
         self.flowcell = flowcell
         self.index_length = index_length
         self.raw_samplesheet = raw_samplesheet
@@ -26,7 +24,11 @@ class Create2500Samplesheet:
 
     def remove_unwanted_indexes(self, raw_samplesheet: list) -> list:
         """ remove indexes with length unequal to index_length"""
-        raw_samplesheet = [line for line in raw_samplesheet if len(line["index"].replace("-", "")) == self.index_length]
+        raw_samplesheet = [
+            line
+            for line in raw_samplesheet
+            if len(line["index"].replace("-", "")) == self.index_length
+        ]
 
         return raw_samplesheet
 
