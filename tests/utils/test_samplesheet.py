@@ -1664,28 +1664,28 @@ def test_2500_samplesheet():
 
     assert (
         samplesheet.raw()
-        == """FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,SampleProject
-HB07NADXX,1,SIB911A1_sureselect4,hg19,TGACCA,959191,N,R1,NN,959191
-HB07NADXX,1,SIB911A2_sureselect5,hg19,ACAGTG,959191,N,R1,NN,959191
-HB07NADXX,1,SIB910A3_sureselect6,hg19,GCCAAT,454557,N,R1,NN,454557
-HB07NADXX,1,SIB914A2_sureselect2,hg19,CGATGT,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A11_sureselect11,hg19,GGCTAC,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A12_sureselect12,hg19,CTTGTA,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910
-HB07NADXX,2,SIB911A1_sureselect4,hg19,TGACCA,959191,N,R1,NN,959191
-HB07NADXX,2,SIB911A2_sureselect5,hg19,ACAGTG,959191,N,R1,NN,959191
-HB07NADXX,2,SIB910A3_sureselect6,hg19,GCCAAT,454557,N,R1,NN,454557
-HB07NADXX,2,SIB914A2_sureselect2,hg19,CGATGT,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A11_sureselect11,hg19,GGCTAC,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A12_sureselect12,hg19,CTTGTA,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
+        == """FCID,Lane,SampleID,SampleRef,index,index2,SampleName,Control,Recipe,Operator,Project
+HB07NADXX,1,SIB911A1_sureselect4,hg19,TGACCA,,959191,N,R1,NN,959191
+HB07NADXX,1,SIB911A2_sureselect5,hg19,ACAGTG,,959191,N,R1,NN,959191
+HB07NADXX,1,SIB910A3_sureselect6,hg19,GCCAAT,,454557,N,R1,NN,454557
+HB07NADXX,1,SIB914A2_sureselect2,hg19,CGATGT,,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A11_sureselect11,hg19,GGCTAC,,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A12_sureselect12,hg19,CTTGTA,,504910,N,R1,NN,504910
+HB07NADXX,1,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910
+HB07NADXX,2,SIB911A1_sureselect4,hg19,TGACCA,,959191,N,R1,NN,959191
+HB07NADXX,2,SIB911A2_sureselect5,hg19,ACAGTG,,959191,N,R1,NN,959191
+HB07NADXX,2,SIB910A3_sureselect6,hg19,GCCAAT,,454557,N,R1,NN,454557
+HB07NADXX,2,SIB914A2_sureselect2,hg19,CGATGT,,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A11_sureselect11,hg19,GGCTAC,,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A12_sureselect12,hg19,CTTGTA,,504910,N,R1,NN,504910
+HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910"""
     )
 
     samplesheet_lines = [line for line in samplesheet.lines()]
     assert samplesheet_lines == [
         {
             "control": "N",
-            "description": "959191",
+            "sample_name": "959191",
             "fcid": "HB07NADXX",
             "index": "TGACCA",
             "index2": "",
@@ -1698,7 +1698,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "959191",
+            "sample_name": "959191",
             "fcid": "HB07NADXX",
             "index": "ACAGTG",
             "index2": "",
@@ -1711,7 +1711,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "454557",
+            "sample_name": "454557",
             "fcid": "HB07NADXX",
             "index": "GCCAAT",
             "index2": "",
@@ -1724,7 +1724,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "CGATGT",
             "index2": "",
@@ -1737,7 +1737,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "GGCTAC",
             "index2": "",
@@ -1750,7 +1750,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "CTTGTA",
             "index2": "",
@@ -1763,7 +1763,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "GAAACC",
             "index2": "",
@@ -1776,7 +1776,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "959191",
+            "sample_name": "959191",
             "fcid": "HB07NADXX",
             "index": "TGACCA",
             "index2": "",
@@ -1789,7 +1789,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "959191",
+            "sample_name": "959191",
             "fcid": "HB07NADXX",
             "index": "ACAGTG",
             "index2": "",
@@ -1802,7 +1802,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "454557",
+            "sample_name": "454557",
             "fcid": "HB07NADXX",
             "index": "GCCAAT",
             "index2": "",
@@ -1815,7 +1815,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "CGATGT",
             "index2": "",
@@ -1828,7 +1828,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "GGCTAC",
             "index2": "",
@@ -1841,7 +1841,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "CTTGTA",
             "index2": "",
@@ -1854,7 +1854,7 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
         },
         {
             "control": "N",
-            "description": "504910",
+            "sample_name": "504910",
             "fcid": "HB07NADXX",
             "index": "GAAACC",
             "index2": "",
@@ -1871,184 +1871,184 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,504910,N,R1,NN,504910"""
     assert samplesheet_lines_r == [
         {
             "Control": "N",
-            "Description": "959191",
+            "Project": "959191",
             "FCID": "HB07NADXX",
-            "Index": "TGACCA",
-            "Index2": "",
+            "index": "TGACCA",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB911A1_sureselect4",
-            "SampleProject": "959191",
+            "SampleName": "959191",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "959191",
+            "Project": "959191",
             "FCID": "HB07NADXX",
-            "Index": "ACAGTG",
-            "Index2": "",
+            "index": "ACAGTG",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB911A2_sureselect5",
-            "SampleProject": "959191",
+            "SampleName": "959191",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "454557",
+            "Project": "454557",
             "FCID": "HB07NADXX",
-            "Index": "GCCAAT",
-            "Index2": "",
+            "index": "GCCAAT",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB910A3_sureselect6",
-            "SampleProject": "454557",
+            "SampleName": "454557",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "CGATGT",
-            "Index2": "",
+            "index": "CGATGT",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A2_sureselect2",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "GGCTAC",
-            "Index2": "",
+            "index": "GGCTAC",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A11_sureselect11",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "CTTGTA",
-            "Index2": "",
+            "index": "CTTGTA",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A12_sureselect12",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "GAAACC",
-            "Index2": "",
+            "index": "GAAACC",
+            "index2": "",
             "Lane": "1",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A15_sureselect15",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "959191",
+            "Project": "959191",
             "FCID": "HB07NADXX",
-            "Index": "TGACCA",
-            "Index2": "",
+            "index": "TGACCA",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB911A1_sureselect4",
-            "SampleProject": "959191",
+            "SampleName": "959191",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "959191",
+            "Project": "959191",
             "FCID": "HB07NADXX",
-            "Index": "ACAGTG",
-            "Index2": "",
+            "index": "ACAGTG",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB911A2_sureselect5",
-            "SampleProject": "959191",
+            "SampleName": "959191",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "454557",
+            "Project": "454557",
             "FCID": "HB07NADXX",
-            "Index": "GCCAAT",
-            "Index2": "",
+            "index": "GCCAAT",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB910A3_sureselect6",
-            "SampleProject": "454557",
+            "SampleName": "454557",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "CGATGT",
-            "Index2": "",
+            "index": "CGATGT",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A2_sureselect2",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "GGCTAC",
-            "Index2": "",
+            "index": "GGCTAC",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A11_sureselect11",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "CTTGTA",
-            "Index2": "",
+            "index": "CTTGTA",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A12_sureselect12",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
         {
             "Control": "N",
-            "Description": "504910",
+            "Project": "504910",
             "FCID": "HB07NADXX",
-            "Index": "GAAACC",
-            "Index2": "",
+            "index": "GAAACC",
+            "index2": "",
             "Lane": "2",
             "Operator": "NN",
             "Recipe": "R1",
             "SampleID": "SIB914A15_sureselect15",
-            "SampleProject": "504910",
+            "SampleName": "504910",
             "SampleRef": "hg19",
         },
     ]
