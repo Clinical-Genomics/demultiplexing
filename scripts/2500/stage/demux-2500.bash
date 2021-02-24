@@ -67,7 +67,6 @@ fi
 mkdir -p ${OUT_DIR}/${RUN}
 log "${PROJECTLOG} created by $0 $VERSION"
 date > ${IN_DIR}/demuxstarted.txt
-cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${RUN}/
 cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv
 
 # here we go!
@@ -82,10 +81,46 @@ JOB_TITLE=Demux_${RUN}
 log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR}"
 RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR})
 
+log "bcl2fastq finished!"
+
+# Add samplesheet to unaligned folder
+cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
+
 cd ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}
 
-# Add stats
+# Restructure the output dir!
+FC=${RUN##*_}
+FC=${FC:1}
+shopt -s nullglob
+for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
+    if [[ ! -d ${PROJECT_DIR} ]]; then continue; fi
 
+    PROJECT=$(basename ${PROJECT_DIR})
+    if [[ ${PROJECT} == 'Stats' ]]; then continue; fi
+    if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
+    if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
+    if [[ ${PROJECT} == 'indexcheck' ]]; then
+        mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+        continue
+    fi
+
+    for SAMPLE_DIR in ${PROJECT_DIR}/*; do
+        for FASTQ_FILE in ${SAMPLE_DIR}/*; do
+            FASTQ=$(basename ${FASTQ_FILE})
+            log "mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}_${FASTQ}"
+            mv ${FASTQ_FILE} ${SAMPLE_DIR}/${FC}_${FASTQ}
+        done
+
+        SAMPLE=$(basename ${SAMPLE_DIR})
+        log "mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}"
+        mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
+    done
+
+    log "mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
+    mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+done
+
+# Add stats
 log "cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/"
 cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/ &>> ${PROJECTLOG}
 
