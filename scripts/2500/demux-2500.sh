@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH -c 18
+#
 #SBATCH --qos=high
 #SBATCH --time=600
 #SBATCH --mail-type=FAIL
@@ -47,5 +48,5 @@ log "Demux directory: ${DEMUX_DIR}"
 ################
 
 log "start demultiplexing ${RUN_DIR}"
-log "singularity exec --bind /home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-singularity exec --bind /home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+log "singularity exec --bind /home/proj/production/flowcells/2500,/home/proj/production/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl"
+singularity exec --bind /home/proj/production/flowcells/2500,/home/proj/production/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl

@@ -6,7 +6,6 @@
 set -eu -o pipefail
 
 shopt -s expand_aliases
-source /home/barry.stokman/development/demultiplexing/scripts/2500/stage/demux.functions
 
 VERSION=5.4.2
 
@@ -22,8 +21,8 @@ RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
 
-SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/2500/stage/  # use this when developing in a conda env
-#SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/        # use this when testing on stage
+#SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/2500/stage/  # use this when developing in a conda env
+SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/stage/        # use this when testing on stage
 
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
@@ -75,21 +74,15 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo $(get_basemask ${IN_DIR})
-#BASEMASK=$(get_basemask ${IN_DIR})
 BASEMASK=$(demux basemask create --application wes --lane 1 ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
-#log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}"
-## the sed command is there to remove the color codes out of the demux output and create a pretty log file
-#/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.csv --ignore-missing-bcl --ignore-missing-stats --use-bases-mask ${BASEMASK} --fastq-cluster-count 0 --input-dir ${IN_DIR}/Data/Intensities/BaseCalls --output-dir ${OUT_DIR}/${RUN}/${UNALIGNED_DIR} 2>&1 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" >> ${PROJECTLOG}
-
 JOB_TITLE=Demux_${RUN}
 log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR}"
 RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-2500.sh ${IN_DIR} ${OUT_DIR}/${RUN} ${BASEMASK} ${UNALIGNED_DIR})
 
 cd ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}
-#nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1  #TODO: find out wht this does
 
 # Add stats
 
