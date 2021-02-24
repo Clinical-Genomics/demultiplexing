@@ -84,9 +84,7 @@ RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIP
 log "bcl2fastq finished!"
 
 # Add samplesheet to unaligned folder
-cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
-
-cd ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}
+cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/
 
 # Restructure the output dir!
 FC=${RUN##*_}
