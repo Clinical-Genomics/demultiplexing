@@ -19,7 +19,7 @@ EMAIL=barry.stokman@scilifelab.se
 
 RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
-PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").txt
+PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 
 #SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/2500/stage/  # use this when developing in a conda env
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/stage/        # use this when testing on stage
