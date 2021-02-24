@@ -73,7 +73,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 # here we go!
 log "Setup correct, starts demuxing . . ."
 
-echo $(get_basemask ${IN_DIR})
+echo "get basemask ${IN_DIR}"
 BASEMASK=$(demux basemask create --application wes --lane 1 ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
