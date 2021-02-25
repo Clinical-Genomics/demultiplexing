@@ -106,7 +106,7 @@ for PROJECT_DIR in ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/*; do
         for FASTQ_FILE in ${SAMPLE_DIR}/*; do
             FASTQ=$(basename ${FASTQ_FILE})
             SAMPLE=$(basename ${SAMPLE_DIR})
-            LANE_READ_PART=${FASTQ#*_*_*_}
+            LANE_READ_PART=${FASTQ#*_*_}
             INDEX="NNNNNNNN-NNNNNNNN"
             log "mv ${FASTQ_FILE} ${SAMPLE_DIR}/${SAMPLE}_${INDEX}_${LANE_READ_PART}"
             mv ${FASTQ_FILE} ${SAMPLE_DIR}/${SAMPLE}_${INDEX}_${LANE_READ_PART}
