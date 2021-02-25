@@ -98,7 +98,7 @@ for PROJECT_DIR in ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/*; do
     if [[ ${PROJECT} == 'Reports' ]]; then continue; fi
     if [[ ${PROJECT} =~ Project_* ]]; then continue; fi
     if [[ ${PROJECT} == 'indexcheck' ]]; then
-        mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+        mv ${PROJECT_DIR} ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/Project_${PROJECT}
         continue
     fi
 
@@ -114,8 +114,8 @@ for PROJECT_DIR in ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/*; do
         mv ${SAMPLE_DIR} ${PROJECT_DIR}/Sample_${SAMPLE}
     done
 
-    log "mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
-    mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
+    log "mv ${PROJECT_DIR} ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/Project_${PROJECT}"
+    mv ${PROJECT_DIR} ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
 # Add stats
