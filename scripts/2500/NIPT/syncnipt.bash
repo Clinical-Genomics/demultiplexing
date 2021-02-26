@@ -2,7 +2,6 @@
 # script to rsync a run to the NIPT server
 
 shopt -s nullglob
-shopt -s expand_aliases
 set -eu
 
 VERSION=5.4.2
