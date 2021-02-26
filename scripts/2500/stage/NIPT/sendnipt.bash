@@ -10,15 +10,12 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-NIPTRUNS=/home/barry.stokman/development/testdata/2500/nipt/
-NIPTOUT=/home/barry.stokman/development/testdata/2500/srv/nipt_analysis_output/
-#MAILTO=clinical-demux@scilifelab.se,nipt.karolinska@sll.se
-#MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
-#MAILTO_ERR=clinical-demux@scilifelab.se
-MAILTO=barry.stokman@scilifelab.se
-MAILTO_RERUN=barry.stokman@scilifelab.se
-MAILTO_ERR=barry.stokman@scilifelab.se
-NIPTCONF=/home/barry.stokman/development/testdata/2500/niptrc/.niptrc
+NIPTRUNS=/home/proj/stage/flowcells/2500/nipt/
+NIPTOUT=/home/proj/stage/flowcells/2500/srv/nipt_analysis_output/
+MAILTO=YOUR.NAME@scilifelab.se
+MAILTO_RERUN=YOUR.NAME@scilifelab.se
+MAILTO_ERR=YOUR.NAME@scilifelab.se
+NIPTCONF=/home/proj/stage/flowcells/2500/niptrc/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
     . $NIPTCONF
@@ -92,12 +89,12 @@ for RUN in $(ls ${NIPTRUNS}); do
         unset IFS
         DATE=${RUN_PARTS[0]}
         if [[ $DATE > 161121 ]]; then
-            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt
             # FTP the results file
             NOW=$(date +"%Y%m%d%H%M%S")
-            lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
+#            lftp sftp://$NIPTSFTP_USER:$NIPTSFTP_PASSWORD@$NIPTSFTP_HOST -e "cd SciLife_Till_StarLims; put ${TMP_OUTDIR}/${RESULTS_FILE_NAME}; bye"
         else
-            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO_RERUN} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt 
+            mail -s "Results ${SUBJECT}" -a ${TMP_OUTDIR}/${RESULTS_FILE} ${MAILTO_RERUN} < ${NIPTOUT}/${RUN}_*/REPORT.Complete.txt
         fi
 
         # clean up

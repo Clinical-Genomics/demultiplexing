@@ -10,12 +10,12 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-NIPTRUNS=/home/hiseq.clinical/NIPT/
+NIPTRUNS=/home/proj/production/flowcells/2500/nipt/
 NIPTOUT=/srv/nipt_analysis_output/
 MAILTO=clinical-demux@scilifelab.se,nipt.karolinska@sll.se
-MAILTO_RERUN=agne.lieden@ki.se,kenny.billiau@scilifelab.se
+MAILTO_RERUN=agne.lieden@ki.se,clinical-demux@scilifelab.se
 MAILTO_ERR=clinical-demux@scilifelab.se
-NIPTCONF=/home/hiseq.clinical/.niptrc
+NIPTCONF=/home/proj/production/servers/config/hasta.scilifelab.se/.niptrc
 
 if [[ -r $NIPTCONF ]]; then
     . $NIPTCONF
@@ -54,8 +54,10 @@ for RUN in $(ls ${NIPTRUNS}); do
     else
         echo [${NOW}] [${RUN}] Mailing!
 
-        INVESTIGATOR_NAME=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Investigator Name' - | cut -d, -f2)
-        EXPERIMENT_NAME=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Experiment Name' - | cut -d, -f2)
+        INVESTIGATOR_NAME=$(sed 's/
+/\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Investigator Name' - | cut -d, -f2)
+        EXPERIMENT_NAME=$(sed 's/
+/\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Experiment Name' - | cut -d, -f2)
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%$EXPERIMENT_NAME}
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%_} # remove possible ending _
 
