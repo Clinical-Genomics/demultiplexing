@@ -3,7 +3,6 @@
 
 shopt -s nullglob
 shopt -s expand_aliases
-source ~/.aliases
 set -eu
 
 VERSION=5.4.2
@@ -13,8 +12,8 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-RUNBASE=/home/hiseq.clinical/RUNS/
-NIPTBASE=/home/hiseq.clinical/NIPT/
+RUNBASE=/home/proj/production/flowcells/2500/runs/
+NIPTBASE=/home/proj/production/flowcells/2500/nipt/
 NIPTOUTPATH=/srv/nipt_runs/
 MAILTO_ERR=clinical-demux@scilifelab.se
 
@@ -43,7 +42,8 @@ for RUN in ${RUNBASE}/*; do
 
       # transform SampleSheet from Mac/Windows to Unix
       if grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv; then
-          sed -i 's//\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+          sed -i 's/
+/\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
       fi
       sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
 

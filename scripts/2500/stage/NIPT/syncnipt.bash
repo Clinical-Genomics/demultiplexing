@@ -3,7 +3,6 @@
 
 shopt -s nullglob
 shopt -s expand_aliases
-source ~/.bash_aliases
 set -eu
 
 VERSION=5.4.2
@@ -13,10 +12,10 @@ echo "Version $VERSION"
 # PARAMS #
 ##########
 
-RUNBASE=/home/barry.stokman/development/testdata/2500/runs/
-NIPTBASE=/home/barry.stokman/development/testdata/2500/nipt/
-NIPTOUTPATH=/home/barry.stokman/development/testdata/2500/srv/nipt_runs/
-MAILTO_ERR=barry.stokman@scilifelab.se
+RUNBASE=/home/proj/stage/flowcells/2500/runs/
+NIPTBASE=/home/proj/stage/flowcells/2500/nipt/
+NIPTOUTPATH=/home/proj/stage/flowcells/2500/srv/nipt_runs/
+MAILTO_ERR=YOUR.NAME@scilifelab.se
 
 #############
 # FUNCTIONS #
