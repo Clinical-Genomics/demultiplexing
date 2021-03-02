@@ -170,14 +170,6 @@ def fetch(
         click.echo("[Data]")
         click.echo(demux_samplesheet)
         return
-        # if index_length:
-        #     raw_samplesheet = [
-        #         line
-        #         for line in raw_samplesheet
-        #         if len(line["index"].replace("-", "")) == int(index_length)
-        #     ]
-        # for line in raw_samplesheet:
-        #     line["description"] = line["sample_id"]
 
     # ... fix some X specifics
     if application == "wgs":
