@@ -138,3 +138,4 @@ rm -f ${OUT_DIR}/${RUN}/copycomplete.txt
 
 log "date > ${OUT_DIR}/${RUN}/demuxcomplete.txt"
 date > ${OUT_DIR}/${RUN}/demuxcomplete.txt
+
