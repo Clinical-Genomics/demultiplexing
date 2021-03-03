@@ -2,9 +2,6 @@
 
 shopt -s nullglob
 
-
-
-
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
@@ -34,7 +31,6 @@ for RUNDIR in ${INDIR}/*; do
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
             bash /home/proj/production/bin/git/demultiplexing/scripts/2500/demuxi-2500.bash ${RUNDIR} ${DEMUXDIR}
-
             rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - started.txt exists

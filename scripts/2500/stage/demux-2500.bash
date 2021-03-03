@@ -15,13 +15,12 @@ VERSION=5.4.2
 
 IN_DIR=${1?'please provide a run dir'}
 OUT_DIR=${2?'please provide a demux dir'}
-EMAIL=barry.stokman@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 
-#SCRIPT_DIR=/home/barry.stokman/development/demultiplexing/scripts/2500/stage/  # use this when developing in a conda env
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/stage/        # use this when testing on stage
 
 SLURM_ACCOUNT=development

@@ -4,7 +4,7 @@
 #SBATCH --qos=low
 #SBATCH --time=600
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=barry.stokman@scilifelab.se
+#SBATCH --mail-user=YOUR.NAME@scilifelab.se
 
 set -eu -o pipefail
 
@@ -16,7 +16,7 @@ RUN_DIR=${1?'Run dir'}
 DEMUX_DIR=${2?'Demux dir'}
 BASEMASK=${3?'Basemask'}
 UNALIGNED_DIR=${4?'Unaligned directory'}
-EMAIL=barry.stokman@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -50,5 +50,3 @@ log "Demux directory: ${DEMUX_DIR}"
 log "start demultiplexing ${RUN_DIR}"
 log "singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl"
 singularity exec --bind /home/proj/stage/flowcells/2500,/home/proj/stage/flowcells/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl
-#log "singularity exec --bind /home/barry.stokman.development/testdata/2500,/home/barry.stokman/development/testdata/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl"
-#singularity exec --bind /home/barry.stokman.development/testdata/2500,/home/barry.stokman/development/testdata/2500/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/stage/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1 --ignore-missing-bcl
