@@ -23,7 +23,7 @@ class Create2500Samplesheet:
         return delimiter in index
 
     def remove_unwanted_indexes(self, raw_samplesheet: list) -> list:
-        """ remove indexes with length unequal to index_length"""
+        """ Remove indexes with length unequal to index_length"""
         raw_samplesheet = [
             line
             for line in raw_samplesheet

@@ -1,6 +1,5 @@
 #!/bin/bash
 #SBATCH -c 18
-#
 #SBATCH --qos=high
 #SBATCH --time=600
 #SBATCH --mail-type=FAIL
