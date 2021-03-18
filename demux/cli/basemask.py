@@ -43,8 +43,10 @@ def create(rundir, lane, application):
         """ create the bcl2fastq basemask """
         run_parameters_file = "runParameters.xml"
         run_params_tree = parse_run_parameters(run_parameters_file)
-        read1_len = int(run_params_tree.findtext("Setup/IndexRead1"))
-        read2_len = int(run_params_tree.findtext("Setup/IndexRead2"))
+        read1 = int(run_params_tree.findtext("Setup/Read1"))
+        read2 = int(run_params_tree.findtext("Setup/Read2"))
+        indexread1 = int(run_params_tree.findtext("Setup/IndexRead1"))
+        indexread2 = int(run_params_tree.findtext("Setup/IndexRead2"))
 
         lines = [line for line in sheet.lines_per_column("lane", lane)]
 
@@ -53,19 +55,19 @@ def create(rundir, lane, application):
         index2 = lines[0]["index2"] if "index2" in lines[0] else EMPTY_STRING
 
         # index1 basemask
-        index1_n = "n" * (read1_len - len(index1))
+        index1_n = "n" * (indexread1 - len(index1))
         basemask_index1 = "I" + str(len(index1)) + index1_n
 
         # index2 basemask
-        if read2_len == 0:
+        if read2 == 0:
             click.echo(f"Y151,{basemask_index1},Y151")
         else:
-            index2_n = "n" * (read2_len - len(index2))
+            index2_n = "n" * (indexread2 - len(index2))
             if len(index2) > 0:
                 basemask_index2 = "I" + str(len(index2)) + index2_n
             else:
                 basemask_index2 = index2_n
-            click.echo(f"Y151,{basemask_index1},{basemask_index2},Y151")
+            click.echo(f"Y{read1},{basemask_index1},{basemask_index2},Y{read2}")
 
     def create_novaseq_basemask():
         """ create the bcl2fastq basemask for novaseq flowcells"""
