@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "demux"
-version = "5.6.1"
+version = "5.7.0"
 description = "Application for demultiplexing sequence data"
 authors = ["henrikstranneheim <henrik.stranneheim@scilifelab.se>"]
 license = "MIT"
