@@ -77,6 +77,8 @@ def create(rundir, lane, application):
 
         indexread1 = int(run_params_tree.findtext("IndexRead1NumberOfCycles"))
         indexread2 = int(run_params_tree.findtext("IndexRead2NumberOfCycles"))
+        if not indexread2:
+            indexread2 = "n" * indexread1
         read1 = int(run_params_tree.findtext("Read1NumberOfCycles"))
         read2 = int(run_params_tree.findtext("Read2NumberOfCycles"))
 
