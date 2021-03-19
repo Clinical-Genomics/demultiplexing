@@ -77,12 +77,13 @@ def create(rundir, lane, application):
 
         indexread1 = int(run_params_tree.findtext("IndexRead1NumberOfCycles"))
         indexread2 = int(run_params_tree.findtext("IndexRead2NumberOfCycles"))
-        if not indexread2:
-            indexread2 = "n" * indexread1
         read1 = int(run_params_tree.findtext("Read1NumberOfCycles"))
         read2 = int(run_params_tree.findtext("Read2NumberOfCycles"))
 
-        novaseq_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
+        if indexread2:
+            novaseq_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
+        else:
+            novaseq_basemask = f"Y{read1},I{indexread1},Y{read2}"
 
         click.echo(f"{novaseq_basemask}")
 
