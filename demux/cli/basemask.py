@@ -59,7 +59,7 @@ def create(rundir, lane, application):
         basemask_index1 = "I" + str(len(index1)) + index1_n
 
         # index2 basemask
-        if read2 == 0:
+        if indexread2 == 0:
             click.echo(f"Y151,{basemask_index1},Y151")
         else:
             index2_n = "n" * (indexread2 - len(index2))
@@ -69,27 +69,8 @@ def create(rundir, lane, application):
                 basemask_index2 = index2_n
             click.echo(f"Y{read1},{basemask_index1},{basemask_index2},Y{read2}")
 
-    def create_novaseq_basemask():
-        """ create the bcl2fastq basemask for novaseq flowcells"""
-
-        run_parameters_file = "RunParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters_file)
-
-        indexread1 = int(run_params_tree.findtext("IndexRead1NumberOfCycles"))
-        indexread2 = int(run_params_tree.findtext("IndexRead2NumberOfCycles"))
-        read1 = int(run_params_tree.findtext("Read1NumberOfCycles"))
-        read2 = int(run_params_tree.findtext("Read2NumberOfCycles"))
-
-        if indexread2:
-            novaseq_basemask = f"Y{read1},I{indexread1},I{indexread2},Y{read2}"
-        else:
-            novaseq_basemask = f"Y{read1},I{indexread1},Y{read2}"
-
-        click.echo(f"{novaseq_basemask}")
-
     def get_application_sheet(application):
         """ parse the samplesheet in the runs directory, based on the type of application """
-        sheet = None
         samplesheet = Path(rundir).joinpath("SampleSheet.csv")
         sheet_map = {
             "nipt": NIPTSamplesheet,
@@ -103,9 +84,6 @@ def create(rundir, lane, application):
 
     def create_application_basemask(application):
         """ determine the basemask """
-        if application == "nova":
-            create_novaseq_basemask()
-        else:
-            create_basemask(get_application_sheet(application))
+        create_basemask(get_application_sheet(application))
 
     create_application_basemask(application)
