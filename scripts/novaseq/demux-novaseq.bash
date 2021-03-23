@@ -45,7 +45,7 @@ log "Starting NovaSeq demultiplexing"
 cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
 
 
-UNALIGNED_DIR=Unaligned
+UNALIGNED_DIR='Unaligned'
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
