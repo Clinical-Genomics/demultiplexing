@@ -44,8 +44,8 @@ log "Starting NovaSeq demultiplexing"
 # Send a mail that demultiplexing has started
 cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
 
-BASEMASK=$(demux basemask create --application nova ${IN_DIR})
-UNALIGNED_DIR=Unaligned-${BASEMASK//,}
+
+UNALIGNED_DIR=Unaligned
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
