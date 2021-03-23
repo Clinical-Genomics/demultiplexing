@@ -13,8 +13,7 @@ set -eu -o pipefail
 
 RUN_DIR=${1?'Run dir'}
 DEMUX_DIR=${2?'Demux dir'}
-BASEMASK=${3?'Basemask'}
-UNALIGNED_DIR=${4?'Unaligned directory'}
+UNALIGNED_DIR=${3?'Unaligned directory'}
 EMAIL=clinical-demux@scilifelab.se
 
 #############
