@@ -1,10 +1,13 @@
-""" Create a samplesheet for Novaseq flowcells """
+""" Create a samplesheet for NovaSeq flowcells """
 
 import csv
+import sys
+from typing import Any, Dict, List, Optional, Union
+
+from cglims.api import ClinicalLims
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
-
 
 SPACE = " "
 DASH = "-"
@@ -12,7 +15,7 @@ COMMA = ","
 
 
 class CreateNovaseqSamplesheet:
-    """ Create a raw sample sheet for Novaseq flowcells """
+    """Create a raw sample sheet for NovaSeq flowcells """
 
     LIMS_KEYS = [
         "fcid",
@@ -31,14 +34,25 @@ class CreateNovaseqSamplesheet:
     NEW_REAGENT_KIT_VERSION = 1.5
 
     def __init__(
-        self, flowcell, index_length, pad, raw_samplesheet, dummy_indexes_file, runs_dir
+        self,
+        flowcell: str,
+        pad: bool,
+        dummy_indexes_file: str,
+        runs_dir: str,
+        lims_config: dict,
     ):
         self.flowcell = flowcell
-        self.index_length = index_length
         self.pad = pad
-        self.raw_samplesheet = raw_samplesheet
         self.dummy_indexes_file = dummy_indexes_file
         self.runparameters = NovaseqRunParameters(self.flowcell, runs_dir)
+        self.lims_api = ClinicalLims(**lims_config)
+
+    def get_raw_samplesheet(self) -> List[Dict]:
+        raw_samplesheet = list(self.lims_api.samplesheet(self.flowcell))
+        if not raw_samplesheet:
+            sys.stderr.write(f"Samplesheet for {self.flowcell} not found in LIMS! ")
+            sys.exit()
+        return raw_samplesheet
 
     @property
     def header(self) -> list:
@@ -48,10 +62,10 @@ class CreateNovaseqSamplesheet:
     @staticmethod
     def get_dummy_samplesheet_sample(
         flowcell: str, dummy_index: str, lane: int, name: str
-    ) -> str:
+    ) -> Dict[Union[str, Any], Union[Union[str, int], Any]]:
         """ Constructs and returns a dummy sample in novaseq samplesheet format"""
 
-        dummy_samplesheet_sample = {
+        return {
             "control": "N",
             "description": "",
             "fcid": flowcell,
@@ -66,8 +80,6 @@ class CreateNovaseqSamplesheet:
             "sample_ref": "hg19",
         }
 
-        return dummy_samplesheet_sample
-
     @staticmethod
     def get_project_name(project: str, delimiter=SPACE) -> str:
         """ Only keeps the first part of the project name """
@@ -77,7 +89,7 @@ class CreateNovaseqSamplesheet:
     def get_reverse_complement_dna_seq(dna: str) -> str:
         """ Generates the reverse complement of a DNA sequence"""
         complement = {"A": "T", "C": "G", "G": "C", "T": "A"}
-        return "".join([complement[base] for base in reversed(dna)])
+        return "".join(complement[base] for base in reversed(dna))
 
     @staticmethod
     def is_dual_index(index: str, delimiter=DASH) -> bool:
@@ -92,9 +104,21 @@ class CreateNovaseqSamplesheet:
         )
 
     @staticmethod
-    def get_sample_indexes_in_lane(samplesheet: list, lane: str) -> list:
+    def get_sample_indexes_in_lane(raw_samplesheet: List[Dict], lane: str) -> list:
         """ Returns all sample indexes in a given lane """
-        return [sample["index"] for sample in samplesheet if sample["lane"] == lane]
+        return [sample["index"] for sample in raw_samplesheet if sample["lane"] == lane]
+
+    def is_fluffy_flowcell(self) -> bool:
+        """Checks if the flowcell is a NIPT flowcell"""
+        pass
+
+    def replace_project_with_lims_sample_name(
+        self, raw_samplesheet: List[Dict]
+    ) -> List[Dict]:
+        """Replaces the project in the SampleName column with the LIMS Sample Name"""
+        for sample in raw_samplesheet:
+            sample["sample_name"] = self.lims_api.sample(sample["sample_id"]).name
+        return raw_samplesheet
 
     def is_reverse_complement(self) -> bool:
         """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION)
@@ -106,7 +130,7 @@ class CreateNovaseqSamplesheet:
             and self.get_reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
         )
 
-    def add_dummy_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
+    def add_dummy_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
         """Add all dummy indexes to raw sample sheet. Dummy indexes are used to check for index
         contamination"""
         with open(f"{self.dummy_indexes_file}") as csv_file:
@@ -126,11 +150,11 @@ class CreateNovaseqSamplesheet:
                         )
                         new_dummy_samples.append(new_dummy_sample)
 
-            self.raw_samplesheet.extend(new_dummy_samples)
+            raw_samplesheet.extend(new_dummy_samples)
 
             return raw_samplesheet
 
-    def remove_unwanted_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
+    def remove_unwanted_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
         """ Filter out indexes of unwanted length and single indexes """
 
         raw_samplesheet = [
@@ -138,7 +162,7 @@ class CreateNovaseqSamplesheet:
         ]
         return raw_samplesheet
 
-    def adapt_indexes(self, raw_samplesheet) -> "CreateNovaseqSamplesheet":
+    def adapt_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
         """Adapts the indexes: pads all indexes so that all indexes have a length equal to the
         number  of index reads, and takes the reverse complement of index 2 in case of the new
         novaseq software control version (1.7) in combination with the new reagent kit
@@ -176,7 +200,7 @@ class CreateNovaseqSamplesheet:
                 else index2
             )
         if self.runparameters.index_reads == 10:
-            index1 = index1 + "AT"
+            index1 += "AT"
             index2 = (
                 self.get_reverse_complement_dna_seq("AC" + index2)
                 if is_reverse_complement
@@ -185,7 +209,7 @@ class CreateNovaseqSamplesheet:
 
         return index1, index2
 
-    def get_reagent_kit_version(self) -> int:
+    def get_reagent_kit_version(self) -> Optional[float]:
         """ Derives the reagent kit version from the run parameters """
 
         parameter_to_version = {"1": 1.0, "3": 1.5}
@@ -196,18 +220,23 @@ class CreateNovaseqSamplesheet:
         """ Construct the sample sheet """
 
         demux_samplesheet = [delimiter.join(self.header)]
-        raw_samplesheet = self.raw_samplesheet
-        raw_samplesheet = self.add_dummy_indexes(raw_samplesheet)
+        raw_samplesheet = self.get_raw_samplesheet()
+        raw_samplesheet = self.replace_project_with_lims_sample_name(raw_samplesheet)
+        breakpoint()
+        if not self.is_fluffy_samplesheet():
+            raw_samplesheet = self.add_dummy_indexes(raw_samplesheet)
         raw_samplesheet = self.remove_unwanted_indexes(raw_samplesheet)
         raw_samplesheet = self.adapt_indexes(raw_samplesheet)
         for line in raw_samplesheet:
             # fix the project content
             project = self.get_project_name(line["project"])
             line["project"] = project
-            line["sample_name"] = project
 
             demux_samplesheet.append(
                 delimiter.join([str(line[lims_key]) for lims_key in self.LIMS_KEYS])
             )
 
         return end.join(demux_samplesheet)
+
+    def is_fluffy_samplesheet(self) -> bool:
+        return self.runparameters.index_reads == 8
