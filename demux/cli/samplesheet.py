@@ -141,8 +141,6 @@ def fetch(
         """ Only keeps the first part of the project name"""
         return project.split(" ")[0]
 
-    lims_api = ClinicalLims(**context.obj["lims"])
-
     if application == "nova":
         lims_config = context.obj["lims"]
         dummy_indexes = context.obj["dummy_indexes"]
@@ -161,6 +159,7 @@ def fetch(
         click.echo(demux_samplesheet)
         return
 
+    lims_api = ClinicalLims(**context.obj["lims"])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
     if len(raw_samplesheet) == 0:
