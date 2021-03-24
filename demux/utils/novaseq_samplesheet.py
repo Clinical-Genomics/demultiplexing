@@ -1,10 +1,10 @@
 """ Create a samplesheet for NovaSeq flowcells """
-
 import csv
 import sys
 from typing import Any, Dict, List, Optional, Union
 
 from cglims.api import ClinicalLims
+from demux.constants.samplesheet import NIPT_INDEX_LENGTH
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
@@ -222,8 +222,7 @@ class CreateNovaseqSamplesheet:
         demux_samplesheet = [delimiter.join(self.header)]
         raw_samplesheet = self.get_raw_samplesheet()
         raw_samplesheet = self.replace_project_with_lims_sample_name(raw_samplesheet)
-        breakpoint()
-        if not self.is_fluffy_samplesheet():
+        if not self.is_nipt_samplesheet():
             raw_samplesheet = self.add_dummy_indexes(raw_samplesheet)
         raw_samplesheet = self.remove_unwanted_indexes(raw_samplesheet)
         raw_samplesheet = self.adapt_indexes(raw_samplesheet)
@@ -238,5 +237,5 @@ class CreateNovaseqSamplesheet:
 
         return end.join(demux_samplesheet)
 
-    def is_fluffy_samplesheet(self) -> bool:
-        return self.runparameters.index_reads == 8
+    def is_nipt_samplesheet(self) -> bool:
+        return self.runparameters.index_reads == NIPT_INDEX_LENGTH

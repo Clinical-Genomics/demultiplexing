@@ -7,13 +7,14 @@ import sys
 import click
 
 from cglims.api import ClinicalLims
+
 from ..utils import (
-    Samplesheet,
-    HiSeqXSamplesheet,
-    NIPTSamplesheet,
-    HiSeq2500Samplesheet,
-    MiseqSamplesheet,
     CreateNovaseqSamplesheet,
+    HiSeq2500Samplesheet,
+    HiSeqXSamplesheet,
+    MiseqSamplesheet,
+    NIPTSamplesheet,
+    Samplesheet,
 )
 
 LOG = logging.getLogger(__name__)
