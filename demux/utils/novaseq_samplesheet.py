@@ -108,10 +108,6 @@ class CreateNovaseqSamplesheet:
         """ Returns all sample indexes in a given lane """
         return [sample["index"] for sample in raw_samplesheet if sample["lane"] == lane]
 
-    def is_fluffy_flowcell(self) -> bool:
-        """Checks if the flowcell is a NIPT flowcell"""
-        pass
-
     def replace_project_with_lims_sample_name(
         self, raw_samplesheet: List[Dict]
     ) -> List[Dict]:
@@ -129,6 +125,10 @@ class CreateNovaseqSamplesheet:
             == self.NEW_CONTROL_SOFTWARE_VERSION
             and self.get_reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
         )
+
+    def is_nipt_samplesheet(self) -> bool:
+        """ Determines if a sample sheet if for NIPT demultiplexing, based on the index length in the run paramaters """
+        return self.runparameters.index_reads == NIPT_INDEX_LENGTH
 
     def add_dummy_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
         """Add all dummy indexes to raw sample sheet. Dummy indexes are used to check for index
@@ -236,7 +236,3 @@ class CreateNovaseqSamplesheet:
             )
 
         return end.join(demux_samplesheet)
-
-    def is_nipt_samplesheet(self) -> bool:
-        """ Determines if a sample sheet if for NIPT demultiplexing, based on the index length in the run paramaters """
-        return self.runparameters.index_reads == NIPT_INDEX_LENGTH
