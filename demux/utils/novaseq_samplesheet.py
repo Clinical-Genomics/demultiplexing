@@ -238,4 +238,5 @@ class CreateNovaseqSamplesheet:
         return end.join(demux_samplesheet)
 
     def is_nipt_samplesheet(self) -> bool:
+        """ Determines if a sample sheet if for NIPT demultiplexing, based on the index length in the run paramaters """
         return self.runparameters.index_reads == NIPT_INDEX_LENGTH
