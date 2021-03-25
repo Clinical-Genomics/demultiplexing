@@ -44,13 +44,13 @@ log "Starting NovaSeq demultiplexing"
 # Send a mail that demultiplexing has started
 cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
 
-BASEMASK=$(demux basemask create --application nova ${IN_DIR})
-UNALIGNED_DIR=Unaligned-${BASEMASK//,}
+
+UNALIGNED_DIR='Unaligned'
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
-log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
-RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${UNALIGNED_DIR})
 
 log "bcl2fastq finished!"
 
