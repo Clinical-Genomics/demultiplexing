@@ -221,7 +221,10 @@ class CreateNovaseqSamplesheet:
 
         demux_samplesheet = [delimiter.join(self.header)]
         raw_samplesheet = self.get_raw_samplesheet()
-        raw_samplesheet = self.replace_project_with_lims_sample_name(raw_samplesheet)
+        if self.is_nipt_samplesheet():
+            raw_samplesheet = self.replace_project_with_lims_sample_name(
+                raw_samplesheet
+            )
         if not self.is_nipt_samplesheet():
             raw_samplesheet = self.add_dummy_indexes(raw_samplesheet)
         raw_samplesheet = self.remove_unwanted_indexes(raw_samplesheet)
