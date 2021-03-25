@@ -9,6 +9,7 @@ import click
 from cglims.api import ClinicalLims
 
 from ..utils import (
+    Create2500Samplesheet,
     CreateNovaseqSamplesheet,
     HiSeq2500Samplesheet,
     HiSeqXSamplesheet,
@@ -180,29 +181,14 @@ def fetch(
 
     # ... fix some 2500 specifics
     if application == "wes":
-        # this is how the data is keyed when it gets back from LIMS
-        lims_keys = [
-            "fcid",
-            "lane",
-            "sample_id",
-            "sample_ref",
-            "index",
-            "description",
-            "control",
-            "recipe",
-            "operator",
-            "project",
-        ]
-        header = [HiSeq2500Samplesheet.header_map[head] for head in lims_keys]
+        demux_samplesheet = Create2500Samplesheet(
+            flowcell, index_length, raw_samplesheet
+        ).construct_samplesheet()
 
-        if index_length:
-            raw_samplesheet = [
-                line
-                for line in raw_samplesheet
-                if len(line["index"].replace("-", "")) == int(index_length)
-            ]
-        for line in raw_samplesheet:
-            line["description"] = line["sample_id"]
+        # add [section] header
+        click.echo("[Data]")
+        click.echo(demux_samplesheet)
+        return
 
     # ... fix some X specifics
     if application == "wgs":

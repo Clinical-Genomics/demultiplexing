@@ -13,8 +13,7 @@ set -eu -o pipefail
 
 RUN_DIR=${1?'Run dir'}
 DEMUX_DIR=${2?'Demux dir'}
-BASEMASK=${3?'Basemask'}
-UNALIGNED_DIR=${4?'Unaligned directory'}
+UNALIGNED_DIR=${3?'Unaligned directory'}
 EMAIL=clinical-demux@scilifelab.se
 
 #############
@@ -49,5 +48,5 @@ mkdir -p /home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID"
 ################
 
 log "start demultiplexing ${RUN_DIR}"
-log "singularity exec --bind /home/proj/production/demultiplexed-runs,/home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
-singularity exec --bind /home/proj/production/demultiplexed-runs,/home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
+log "singularity exec --bind /home/proj/production/demultiplexed-runs,/home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1"
+singularity exec --bind /home/proj/production/demultiplexed-runs,/home/proj/production/flowcells/novaseq,/home/proj/production/flowcells/novaseq/"$SLURM_JOB_ID":/run/user/$(id -u) /home/proj/production/demux-on-hasta/novaseq/container/bcl2fastq_v2-20-0.sif bcl2fastq --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${RUN_DIR} --output-dir ${DEMUX_DIR}/${UNALIGNED_DIR} --sample-sheet ${RUN_DIR}/SampleSheet.csv --barcode-mismatches 1
