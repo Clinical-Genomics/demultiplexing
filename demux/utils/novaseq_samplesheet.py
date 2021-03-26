@@ -1,17 +1,15 @@
 """ Create a samplesheet for NovaSeq flowcells """
 import csv
-import logging
 import sys
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 from cglims.api import ClinicalLims
 from demux.constants.constants import COMMA, DASH, SPACE
 from demux.constants.samplesheet import NIPT_INDEX_LENGTH
+from demux.exc import NoValidReagentKitFound
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
-
-LOG = logging.getLogger(__name__)
 
 
 class CreateNovaseqSamplesheet:
@@ -209,20 +207,17 @@ class CreateNovaseqSamplesheet:
 
         return index1, index2
 
-    def get_reagent_kit_version(self) -> Optional[float]:
+    def get_reagent_kit_version(self) -> float:
         """ Derives the reagent kit version from the run parameters """
 
         parameter_to_version = {"1": 1.0, "3": 1.5}
         reagent_kit_version = self.runparameters.reagent_kit_version
-
-        try:
-            return parameter_to_version[reagent_kit_version]
-        except KeyError:
-            LOG.error(
-                "Expected reagent kit version parameter 1 or 3, found %s instead. Exiting.",
-                reagent_kit_version,
+        if reagent_kit_version not in parameter_to_version.keys():
+            raise NoValidReagentKitFound(
+                f"Expected reagent kit version 1 or 3, found {reagent_kit_version} instead. Exiting"
             )
-            sys.exit(1)
+
+        return parameter_to_version[reagent_kit_version]
 
     def construct_samplesheet(self, end="\n", delimiter=COMMA) -> str:
         """ Construct the sample sheet """

@@ -1,5 +1,4 @@
 """ CLI points for samplesheeet action """
-
 import copy
 import logging
 import sys
@@ -7,6 +6,7 @@ import sys
 import click
 
 from cglims.api import ClinicalLims
+from demux.exc import NoValidReagentKitFound
 
 from ..utils import (
     Create2500Samplesheet,
@@ -147,18 +147,22 @@ def fetch(
         dummy_indexes = context.obj["dummy_indexes"]
         runs_dir = context.obj["runs_dir"]["novaseq"]
 
-        demux_samplesheet = CreateNovaseqSamplesheet(
-            flowcell,
-            pad,
-            dummy_indexes,
-            runs_dir,
-            lims_config,
-        ).construct_samplesheet()
+        try:
+            demux_samplesheet = CreateNovaseqSamplesheet(
+                flowcell,
+                pad,
+                dummy_indexes,
+                runs_dir,
+                lims_config,
+            ).construct_samplesheet()
 
-        # add [section] header
-        click.echo("[Data]")
-        click.echo(demux_samplesheet)
-        return
+            # add [section] header
+            click.echo("[Data]")
+            click.echo(demux_samplesheet)
+            return
+        except NoValidReagentKitFound as error:
+            LOG.error(error.message)
+            raise click.Abort()
 
     lims_api = ClinicalLims(**context.obj["lims"])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
