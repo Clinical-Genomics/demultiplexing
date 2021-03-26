@@ -4,14 +4,11 @@ import sys
 from typing import Any, Dict, List, Optional, Union
 
 from cglims.api import ClinicalLims
+from demux.constants.constants import COMMA, DASH, SPACE
 from demux.constants.samplesheet import NIPT_INDEX_LENGTH
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
-
-SPACE = " "
-DASH = "-"
-COMMA = ","
 
 
 class CreateNovaseqSamplesheet:
