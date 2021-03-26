@@ -1,5 +1,6 @@
 """ Create a samplesheet for NovaSeq flowcells """
 import csv
+import logging
 import sys
 from typing import Any, Dict, List, Optional, Union
 
@@ -9,6 +10,8 @@ from demux.constants.samplesheet import NIPT_INDEX_LENGTH
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
+
+LOG = logging.getLogger(__name__)
 
 
 class CreateNovaseqSamplesheet:
@@ -57,7 +60,7 @@ class CreateNovaseqSamplesheet:
         return list(Samplesheet.header_map.values())
 
     @staticmethod
-    def get_dummy_samplesheet_sample(
+    def get_dummy_sample_information(
         flowcell: str, dummy_index: str, lane: int, name: str
     ) -> Dict[Union[str, Any], Union[Union[str, int], Any]]:
         """ Constructs and returns a dummy sample in novaseq samplesheet format"""
@@ -142,7 +145,7 @@ class CreateNovaseqSamplesheet:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
                     ):
-                        new_dummy_sample = self.get_dummy_samplesheet_sample(
+                        new_dummy_sample = self.get_dummy_sample_information(
                             self.flowcell, dummy_index, lane, sample_name
                         )
                         new_dummy_samples.append(new_dummy_sample)
@@ -210,8 +213,16 @@ class CreateNovaseqSamplesheet:
         """ Derives the reagent kit version from the run parameters """
 
         parameter_to_version = {"1": 1.0, "3": 1.5}
+        reagent_kit_version = self.runparameters.reagent_kit_version
 
-        return parameter_to_version.get(self.runparameters.reagent_kit_version)
+        try:
+            return parameter_to_version[reagent_kit_version]
+        except KeyError:
+            LOG.error(
+                "Expected reagent kit version parameter 1 or 3, found %s instead. Exiting.",
+                reagent_kit_version,
+            )
+            sys.exit(1)
 
     def construct_samplesheet(self, end="\n", delimiter=COMMA) -> str:
         """ Construct the sample sheet """
