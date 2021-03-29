@@ -41,8 +41,7 @@ for RUN in ${RUNBASE}/*; do
 
       # transform SampleSheet from Mac/Windows to Unix
       if grep -qs $'\r' ${RUNBASE}${RUN}/SampleSheet.csv; then
-          sed -i 's/
-/\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
+          sed -i 's/^M/\n/g' ${RUNBASE}${RUN}/SampleSheet.csv
       fi
       sed -i '/^$/d' ${RUNBASE}${RUN}/SampleSheet.csv
 
