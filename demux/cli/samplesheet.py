@@ -149,11 +149,11 @@ def fetch(
 
         try:
             demux_samplesheet = CreateNovaseqSamplesheet(
-                flowcell,
-                pad,
                 dummy_indexes,
-                runs_dir,
+                flowcell,
                 lims_config,
+                pad,
+                runs_dir,
             ).construct_samplesheet()
 
             # add [section] header

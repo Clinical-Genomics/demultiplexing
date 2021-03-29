@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 from cglims.api import ClinicalLims
 from demux.constants.constants import COMMA, DASH, SPACE
-from demux.constants.samplesheet import NIPT_INDEX_LENGTH
+from demux.constants.samplesheet import NIPT_INDEX_LENGTH, PARAMETER_TO_VERSION
 from demux.exc import NoValidReagentKitFound
 
 from .runparameters import NovaseqRunParameters
@@ -33,17 +33,17 @@ class CreateNovaseqSamplesheet:
 
     def __init__(
         self,
-        flowcell: str,
-        pad: bool,
         dummy_indexes_file: str,
-        runs_dir: str,
+        flowcell: str,
         lims_config: dict,
+        pad: bool,
+        runs_dir: str,
     ):
-        self.flowcell = flowcell
-        self.pad = pad
         self.dummy_indexes_file = dummy_indexes_file
-        self.runparameters = NovaseqRunParameters(self.flowcell, runs_dir)
+        self.flowcell = flowcell
         self.lims_api = ClinicalLims(**lims_config)
+        self.pad = pad
+        self.runparameters = NovaseqRunParameters(self.flowcell, runs_dir)
 
     def get_raw_samplesheet(self) -> List[Dict]:
         raw_samplesheet = list(self.lims_api.samplesheet(self.flowcell))
@@ -57,16 +57,15 @@ class CreateNovaseqSamplesheet:
         """ Create the sample sheet header """
         return list(Samplesheet.header_map.values())
 
-    @staticmethod
     def get_dummy_sample_information(
-        flowcell: str, dummy_index: str, lane: int, name: str
+        self, dummy_index: str, lane: int, name: str
     ) -> Dict[Union[str, Any], Union[Union[str, int], Any]]:
         """ Constructs and returns a dummy sample in novaseq samplesheet format"""
 
         return {
             "control": "N",
             "description": "",
-            "fcid": flowcell,
+            "fcid": self.flowcell,
             "index": dummy_index,
             "index2": "",
             "lane": lane,
@@ -102,7 +101,7 @@ class CreateNovaseqSamplesheet:
         )
 
     @staticmethod
-    def get_sample_indexes_in_lane(raw_samplesheet: List[Dict], lane: str) -> list:
+    def get_sample_indexes_in_lane(lane: str, raw_samplesheet: List[Dict]) -> list:
         """ Returns all sample indexes in a given lane """
         return [sample["index"] for sample in raw_samplesheet if sample["lane"] == lane]
 
@@ -115,9 +114,8 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def is_reverse_complement(self) -> bool:
-        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION)
-        and the new reagent kit version (NEW_REAGENT_KIT_VERSION) the second index should be the
-        reverse complement"""
+        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION) and the new reagent
+        kit version (NEW_REAGENT_KIT_VERSION) the second index should be the reverse complement"""
         return (
             self.runparameters.control_software_version
             == self.NEW_CONTROL_SOFTWARE_VERSION
@@ -138,13 +136,15 @@ class CreateNovaseqSamplesheet:
             lanes = {sample["lane"] for sample in raw_samplesheet}
 
             for lane in lanes:
-                sample_indexes = self.get_sample_indexes_in_lane(raw_samplesheet, lane)
+                sample_indexes = self.get_sample_indexes_in_lane(lane, raw_samplesheet)
                 for sample_name, dummy_index in dummy_samples:
                     if not self.is_dummy_sample_in_samplesheet(
                         dummy_index, sample_indexes
                     ):
                         new_dummy_sample = self.get_dummy_sample_information(
-                            self.flowcell, dummy_index, lane, sample_name
+                            dummy_index,
+                            lane,
+                            sample_name,
                         )
                         new_dummy_samples.append(new_dummy_sample)
 
@@ -161,10 +161,9 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def adapt_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
-        """Adapts the indexes: pads all indexes so that all indexes have a length equal to the
-        number  of index reads, and takes the reverse complement of index 2 in case of the new
-        novaseq software control version (1.7) in combination with the new reagent kit
-        (version 1.5)"""
+        """Adapts the indexes: pads all indexes so that all indexes have a length equal to the number  of index reads,
+        and takes the reverse complement of index 2 in case of the new novaseq software control version
+        (1.7) in combination with the new reagent kit (version 1.5)"""
 
         is_reverse_complement = self.is_reverse_complement()
 
@@ -210,16 +209,15 @@ class CreateNovaseqSamplesheet:
     def get_reagent_kit_version(self) -> float:
         """ Derives the reagent kit version from the run parameters """
 
-        parameter_to_version = {"1": 1.0, "3": 1.5}
         reagent_kit_version = self.runparameters.reagent_kit_version
-        if reagent_kit_version not in parameter_to_version.keys():
+        if reagent_kit_version not in PARAMETER_TO_VERSION.keys():
             raise NoValidReagentKitFound(
-                f"Expected reagent kit version 1 or 3, found {reagent_kit_version} instead. Exiting"
+                f"Expected reagent kit version {', '.join(PARAMETER_TO_VERSION.keys())}. Found {reagent_kit_version} instead. Exiting",
             )
 
-        return parameter_to_version[reagent_kit_version]
+        return PARAMETER_TO_VERSION[reagent_kit_version]
 
-    def construct_samplesheet(self, end="\n", delimiter=COMMA) -> str:
+    def construct_samplesheet(self, delimiter=COMMA, end="\n") -> str:
         """ Construct the sample sheet """
 
         demux_samplesheet = [delimiter.join(self.header)]
