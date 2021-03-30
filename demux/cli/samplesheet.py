@@ -1,5 +1,4 @@
 """ CLI points for samplesheeet action """
-
 import copy
 import logging
 import sys
@@ -7,14 +6,16 @@ import sys
 import click
 
 from cglims.api import ClinicalLims
+from demux.exc import NoValidReagentKitFound
+
 from ..utils import (
-    Samplesheet,
-    HiSeqXSamplesheet,
-    NIPTSamplesheet,
-    HiSeq2500Samplesheet,
-    MiseqSamplesheet,
-    CreateNovaseqSamplesheet,
     Create2500Samplesheet,
+    CreateNovaseqSamplesheet,
+    HiSeq2500Samplesheet,
+    HiSeqXSamplesheet,
+    MiseqSamplesheet,
+    NIPTSamplesheet,
+    Samplesheet,
 )
 
 LOG = logging.getLogger(__name__)
@@ -141,6 +142,28 @@ def fetch(
         """ Only keeps the first part of the project name"""
         return project.split(" ")[0]
 
+    if application == "nova":
+        lims_config = context.obj["lims"]
+        dummy_indexes = context.obj["dummy_indexes"]
+        runs_dir = context.obj["runs_dir"]["novaseq"]
+
+        try:
+            demux_samplesheet = CreateNovaseqSamplesheet(
+                dummy_indexes,
+                flowcell,
+                lims_config,
+                pad,
+                runs_dir,
+            ).construct_samplesheet()
+
+            # add [section] header
+            click.echo("[Data]")
+            click.echo(demux_samplesheet)
+            return
+        except NoValidReagentKitFound as error:
+            LOG.error(error.message)
+            raise click.Abort()
+
     lims_api = ClinicalLims(**context.obj["lims"])
     raw_samplesheet = list(lims_api.samplesheet(flowcell))
 
@@ -241,114 +264,6 @@ def fetch(
                     )
 
         # add [section] header
-        click.echo("[Data]")
-
-    if application == "nova":
-        if dualindex:
-            click.echo(
-                click.style(
-                    f"No need to specify dual or single index for NovaSeq sample "
-                    f"sheets, please use --shortest, --longest, or --index-length."
-                    f"only!",
-                    fg="red",
-                )
-            )
-            context.abort()
-
-        if pad and not index_length:
-            click.echo(
-                click.style(
-                    f"Please specify an index length when using the pad option! "
-                    f"Use --longest or --index-length.",
-                    fg="red",
-                )
-            )
-            context.abort()
-
-        dummy_indexes = context.obj["dummy_indexes"]
-        runs_dir = context.obj["runs_dir"]["novaseq"]
-        demux_samplesheet = CreateNovaseqSamplesheet(
-            flowcell, index_length, pad, raw_samplesheet, dummy_indexes, runs_dir
-        ).construct_samplesheet()
-
-        # add [section] header
-        click.echo("[Data]")
-        click.echo(demux_samplesheet)
-        return
-
-    if application == "iseq":
-        if dualindex:
-            click.echo(
-                click.style(
-                    f"No need to specify dual or single index for iSeq sample "
-                    f"sheets, please use --shortest, --longest, or --index-length."
-                    f"only!",
-                    fg="red",
-                )
-            )
-            context.abort()
-
-        if pad and not index_length:
-            click.echo(
-                click.style(
-                    f"Please specify an index length when using the pad option!"
-                    f"Use --longest or --index_length.",
-                    fg="red",
-                )
-            )
-            context.abort()
-
-        lims_keys = [
-            "fcid",
-            "sample_id",
-            "sample_id",
-            "sample_id",
-            "index",
-            "index2",
-            "sample_name",
-        ]
-
-        header = [
-            "FCID",
-            "Sample_ID",
-            "Sample_Name",
-            "Description",
-            "index",
-            "index2",
-            "Sample_Project",
-        ]
-
-        if index_length:
-            if pad and int(index_length) in (16, 20):
-                raw_samplesheet = [
-                    line
-                    for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) in (16, int(index_length))
-                ]
-            else:
-                raw_samplesheet = [
-                    line
-                    for line in raw_samplesheet
-                    if len(line["index"].replace("-", "")) == int(index_length)
-                ]
-
-        for line in raw_samplesheet:
-            if "-" in line["index"]:
-                index1, index2 = line["index"].split("-")
-                if pad and len(index1) == 8:
-                    index1 += "AT"
-                    index2 = "AC" + index2
-                line["index"] = index1
-                line["index2"] = reverse_complement(index2)
-            else:
-                if pad and len(line["index"]) == 8:
-                    line["index"] += "AT"
-                line["index2"] = ""
-
-        # add [section] header
-        click.echo("[Header]")
-        click.echo("[Reads]")
-        click.echo("30")
         click.echo("[Data]")
 
     click.echo(delimiter.join(header))
