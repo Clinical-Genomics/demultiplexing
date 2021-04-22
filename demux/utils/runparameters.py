@@ -1,7 +1,7 @@
 """ Parsing of Novaseq run parameters """
 import os
 import xml.etree.cElementTree as et
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion, LooseVersion
 from pathlib import Path
 
 
@@ -47,4 +47,6 @@ class NovaseqRunParameters:
     @property
     def reagent_kit_version(self) -> LooseVersion:
         """ Returns the version of the reagent kit used """
-        return LooseVersion(self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion"))
+        return LooseVersion(
+            self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion")
+        )
