@@ -45,6 +45,6 @@ class NovaseqRunParameters:
         return int(self.parse_runparameters().findtext("IndexRead1NumberOfCycles"))
 
     @property
-    def reagent_kit_version(self) -> StrictVersion:
+    def reagent_kit_version(self) -> LooseVersion:
         """ Returns the version of the reagent kit used """
-        return StrictVersion(self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion"))
+        return LooseVersion(self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion"))

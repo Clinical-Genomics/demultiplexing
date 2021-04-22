@@ -2,7 +2,7 @@
 import csv
 import re
 import sys
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion, LooseVersion
 from typing import Any, Dict, List, Union
 
 from cglims.api import ClinicalLims
@@ -33,7 +33,7 @@ class CreateNovaseqSamplesheet:
         "project",
     ]
     CONTROL_SOFTWARE_VERSION = StrictVersion("1.7.0")
-    REAGENT_KIT_VERSION = StrictVersion("1.5")
+    REAGENT_KIT_VERSION = LooseVersion("1.5")
 
     def __init__(
         self,
