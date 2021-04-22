@@ -28,8 +28,8 @@ class CreateNovaseqSamplesheet:
         "operator",
         "project",
     ]
-    NEW_CONTROL_SOFTWARE_VERSION = "1.7.0"
-    NEW_REAGENT_KIT_VERSION = 1.5
+    CONTROL_SOFTWARE_VERSION = "1.7.0"
+    REAGENT_KIT_VERSION = 1.5
 
     def __init__(
         self,
@@ -114,12 +114,12 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def is_reverse_complement(self) -> bool:
-        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION) and the new reagent
-        kit version (NEW_REAGENT_KIT_VERSION) the second index should be the reverse complement"""
+        """If the run used the new NovaSeq control software version (CONTROL_SOFTWARE_VERSION) and the new reagent
+        kit version (REAGENT_KIT_VERSION) the second index should be the reverse complement"""
         return (
             self.runparameters.control_software_version
-            == self.NEW_CONTROL_SOFTWARE_VERSION
-            and self.get_reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
+            >= self.CONTROL_SOFTWARE_VERSION
+            and self.get_reagent_kit_version() >= self.REAGENT_KIT_VERSION
         )
 
     def is_nipt_samplesheet(self) -> bool:
