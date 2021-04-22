@@ -1,6 +1,8 @@
 """ Create a samplesheet for NovaSeq flowcells """
 import csv
+import re
 import sys
+from distutils.version import StrictVersion
 from typing import Any, Dict, List, Union
 
 from cglims.api import ClinicalLims
@@ -10,6 +12,8 @@ from demux.exc import NoValidReagentKitFound
 
 from .runparameters import NovaseqRunParameters
 from .samplesheet import Samplesheet
+
+import re
 
 
 class CreateNovaseqSamplesheet:
@@ -28,8 +32,8 @@ class CreateNovaseqSamplesheet:
         "operator",
         "project",
     ]
-    CONTROL_SOFTWARE_VERSION = "1.7.0"
-    REAGENT_KIT_VERSION = 1.5
+    CONTROL_SOFTWARE_VERSION = StrictVersion("1.7.0")
+    REAGENT_KIT_VERSION = StrictVersion("1.5")
 
     def __init__(
         self,

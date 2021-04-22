@@ -1,7 +1,8 @@
 """ Parsing of Novaseq run parameters """
 import os
-from pathlib import Path
 import xml.etree.cElementTree as et
+from distutils.version import StrictVersion
+from pathlib import Path
 
 
 class NovaseqRunParameters:
@@ -34,9 +35,9 @@ class NovaseqRunParameters:
         return et.parse(Path(self.file))
 
     @property
-    def control_software_version(self) -> str:
+    def control_software_version(self) -> StrictVersion:
         """ Returns the version of the NovaSeq Control Software used """
-        return self.parse_runparameters().findtext("ApplicationVersion")
+        return StrictVersion(self.parse_runparameters().findtext("ApplicationVersion"))
 
     @property
     def index_reads(self) -> int:
@@ -44,6 +45,6 @@ class NovaseqRunParameters:
         return int(self.parse_runparameters().findtext("IndexRead1NumberOfCycles"))
 
     @property
-    def reagent_kit_version(self) -> str:
+    def reagent_kit_version(self) -> StrictVersion:
         """ Returns the version of the reagent kit used """
-        return self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion")
+        return StrictVersion(self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion"))
