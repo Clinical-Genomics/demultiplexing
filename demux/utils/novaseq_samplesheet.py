@@ -121,8 +121,9 @@ class CreateNovaseqSamplesheet:
         """If the run used the new NovaSeq control software version (CONTROL_SOFTWARE_VERSION) and the new reagent
         kit version (REAGENT_KIT_VERSION) the second index should be the reverse complement"""
         return (
-            self.runparameters.control_software_version >= self.CONTROL_SOFTWARE_VERSION
-            and self.get_reagent_kit_version() >= self.REAGENT_KIT_VERSION
+            StrictVersion(self.runparameters.control_software_version)
+            >= self.CONTROL_SOFTWARE_VERSION
+            and LooseVersion(self.get_reagent_kit_version()) >= self.REAGENT_KIT_VERSION
         )
 
     def is_nipt_samplesheet(self) -> bool:
