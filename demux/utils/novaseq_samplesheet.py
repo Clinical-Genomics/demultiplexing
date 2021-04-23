@@ -1,11 +1,17 @@
 """ Create a samplesheet for NovaSeq flowcells """
 import csv
 import sys
+from distutils.version import StrictVersion, LooseVersion
 from typing import Any, Dict, List, Union
 
 from cglims.api import ClinicalLims
 from demux.constants.constants import COMMA, DASH, SPACE
-from demux.constants.samplesheet import NIPT_INDEX_LENGTH, PARAMETER_TO_VERSION
+from demux.constants.samplesheet import (
+    NIPT_INDEX_LENGTH,
+    PARAMETER_TO_VERSION,
+    REV_COMP_CONTROL_SOFTWARE_VERSION,
+    REV_COMP_REAGENT_KIT_VERSION,
+)
 from demux.exc import NoValidReagentKitFound
 
 from .runparameters import NovaseqRunParameters
@@ -28,8 +34,6 @@ class CreateNovaseqSamplesheet:
         "operator",
         "project",
     ]
-    NEW_CONTROL_SOFTWARE_VERSION = "1.7.0"
-    NEW_REAGENT_KIT_VERSION = 1.5
 
     def __init__(
         self,
@@ -45,12 +49,22 @@ class CreateNovaseqSamplesheet:
         self.pad = pad
         self.runparameters = NovaseqRunParameters(self.flowcell, runs_dir)
 
-    def get_raw_samplesheet(self) -> List[Dict]:
-        raw_samplesheet = list(self.lims_api.samplesheet(self.flowcell))
-        if not raw_samplesheet:
-            sys.stderr.write(f"Samplesheet for {self.flowcell} not found in LIMS! ")
-            sys.exit()
-        return raw_samplesheet
+    @property
+    def control_software_version(self) -> StrictVersion:
+        """ Returns control software version in StrictVersion format  """
+        return StrictVersion(self.runparameters.control_software_version)
+
+    @property
+    def reagent_kit_version(self) -> LooseVersion:
+        """ Derives the reagent kit version from the run parameters """
+
+        reagent_kit_version = self.runparameters.reagent_kit_version
+        if reagent_kit_version not in PARAMETER_TO_VERSION.keys():
+            raise NoValidReagentKitFound(
+                f"Expected reagent kit version {', '.join(PARAMETER_TO_VERSION.keys())}. Found {reagent_kit_version} instead. Exiting",
+            )
+
+        return LooseVersion(PARAMETER_TO_VERSION[reagent_kit_version])
 
     @property
     def header(self) -> list:
@@ -114,12 +128,13 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def is_reverse_complement(self) -> bool:
-        """If the run used the new NovaSeq control software version (NEW_CONTROL_SOFTWARE_VERSION) and the new reagent
-        kit version (NEW_REAGENT_KIT_VERSION) the second index should be the reverse complement"""
+        """
+        If the run used NovaSeq control software version REV_COMP_CONTROL_SOFTWARE_VERSION or later and reagent
+        kit version REV_COMP_REAGENT_KIT_VERSION or later, the second index should be the reverse complement
+        """
         return (
-            self.runparameters.control_software_version
-            == self.NEW_CONTROL_SOFTWARE_VERSION
-            and self.get_reagent_kit_version() == self.NEW_REAGENT_KIT_VERSION
+            self.control_software_version >= REV_COMP_CONTROL_SOFTWARE_VERSION
+            and self.reagent_kit_version >= REV_COMP_REAGENT_KIT_VERSION
         )
 
     def is_nipt_samplesheet(self) -> bool:
@@ -206,16 +221,12 @@ class CreateNovaseqSamplesheet:
 
         return index1, index2
 
-    def get_reagent_kit_version(self) -> float:
-        """ Derives the reagent kit version from the run parameters """
-
-        reagent_kit_version = self.runparameters.reagent_kit_version
-        if reagent_kit_version not in PARAMETER_TO_VERSION.keys():
-            raise NoValidReagentKitFound(
-                f"Expected reagent kit version {', '.join(PARAMETER_TO_VERSION.keys())}. Found {reagent_kit_version} instead. Exiting",
-            )
-
-        return PARAMETER_TO_VERSION[reagent_kit_version]
+    def get_raw_samplesheet(self) -> List[Dict]:
+        raw_samplesheet = list(self.lims_api.samplesheet(self.flowcell))
+        if not raw_samplesheet:
+            sys.stderr.write(f"Samplesheet for {self.flowcell} not found in LIMS! ")
+            sys.exit()
+        return raw_samplesheet
 
     def construct_samplesheet(self, delimiter=COMMA, end="\n") -> str:
         """ Construct the sample sheet """
