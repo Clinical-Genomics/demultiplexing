@@ -133,8 +133,8 @@ class CreateNovaseqSamplesheet:
         kit version REV_COMP_REAGENT_KIT_VERSION or later, the second index should be the reverse complement
         """
         return (
-            self.control_software_version >= self.REV_COMP_CONTROL_SOFTWARE_VERSION
-            and self.reagent_kit_version >= self.REV_COMP_REAGENT_KIT_VERSION
+            self.control_software_version >= REV_COMP_CONTROL_SOFTWARE_VERSION
+            and self.reagent_kit_version >= REV_COMP_REAGENT_KIT_VERSION
         )
 
     def is_nipt_samplesheet(self) -> bool:
