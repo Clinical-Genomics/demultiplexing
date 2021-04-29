@@ -594,13 +594,14 @@ class HiSeq2500Samplesheet(Samplesheet):
         "lane": "Lane",
         "sample_id": "SampleID",
         "sample_ref": "SampleRef",
-        "index": "index",
-        "index2": "index2",
+        "index": "Index",
+        "index2": "Index2",
         "sample_name": "SampleName",
         "control": "Control",
         "recipe": "Recipe",
         "operator": "Operator",
-        "project": "Project",
+        "description": "Description",
+        "project": "SampleProject",
     }
 
 
