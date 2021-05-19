@@ -60,7 +60,7 @@ def create(rundir, lane, application):
 
         # index2 basemask
         if indexread2 == 0:
-            click.echo(f"Y151,{basemask_index1},Y151")
+            click.echo(f"{read1},{basemask_index1},{read2}")
         else:
             index2_n = "n" * (indexread2 - len(index2))
             if len(index2) > 0:
