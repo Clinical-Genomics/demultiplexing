@@ -37,12 +37,11 @@ def create(rundir, lane, application):
     # runParameters.xml
     def parse_run_parameters(run_parameters_file):
         """ parse the run parameters file """
-        return xml_etree.parse(Path(rundir).joinpath(run_parameters_file))
+        return xml_etree.parse(Path(rundir).joinpath("runParameters.xml"))
 
     def create_basemask(sheet):
         """ create the bcl2fastq basemask """
-        run_parameters_file = "runParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters_file)
+        run_params_tree = parse_run_parameters()
         read1 = int(run_params_tree.findtext("Setup/Read1"))
         read2 = int(run_params_tree.findtext("Setup/Read2"))
         indexread1 = int(run_params_tree.findtext("Setup/IndexRead1"))
