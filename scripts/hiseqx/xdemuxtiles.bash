@@ -61,7 +61,7 @@ FC=$( basename "$(basename "${RUNDIR}"/)" | awk 'BEGIN {FS="/"} {split($(NF-1),a
 IS_DUAL=$(grep IndexRead2 "${RUNDIR}/runParameters.xml" | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
 
 # calculate the number of lanes
-LANE_COUNT=$(awk '$0 ~/FlowcellLayout/ {split($0,arr," "); split(arr[2],o,"="); print o[2]}' "{$RUNDIR}/RunInfo.xml" | sed 's/\"//g')
+LANE_COUNT=$(awk '$0 ~/FlowcellLayout/ {split($0,arr," "); split(arr[2],o,"="); print o[2]}' "${RUNDIR}/RunInfo.xml" | sed 's/\"//g')
 declare -a lanes=()
 for (( i=1; i<=LANE_COUNT; i++ )); do
   lanes[$i-1]=$i;
