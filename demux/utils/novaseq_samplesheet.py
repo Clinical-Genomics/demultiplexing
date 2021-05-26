@@ -19,7 +19,7 @@ from .samplesheet import Samplesheet
 
 
 class CreateNovaseqSamplesheet:
-    """Create a raw sample sheet for NovaSeq flowcells """
+    """Create a raw sample sheet for NovaSeq flowcells"""
 
     LIMS_KEYS = [
         "fcid",
@@ -51,12 +51,12 @@ class CreateNovaseqSamplesheet:
 
     @property
     def control_software_version(self) -> StrictVersion:
-        """ Returns control software version in StrictVersion format  """
+        """Returns control software version in StrictVersion format"""
         return StrictVersion(self.runparameters.control_software_version)
 
     @property
     def reagent_kit_version(self) -> LooseVersion:
-        """ Derives the reagent kit version from the run parameters """
+        """Derives the reagent kit version from the run parameters"""
 
         reagent_kit_version = self.runparameters.reagent_kit_version
         if reagent_kit_version not in PARAMETER_TO_VERSION.keys():
@@ -68,13 +68,13 @@ class CreateNovaseqSamplesheet:
 
     @property
     def header(self) -> list:
-        """ Create the sample sheet header """
+        """Create the sample sheet header"""
         return list(Samplesheet.header_map.values())
 
     def get_dummy_sample_information(
         self, dummy_index: str, lane: int, name: str
     ) -> Dict[Union[str, Any], Union[Union[str, int], Any]]:
-        """ Constructs and returns a dummy sample in novaseq samplesheet format"""
+        """Constructs and returns a dummy sample in novaseq samplesheet format"""
 
         return {
             "control": "N",
@@ -93,30 +93,30 @@ class CreateNovaseqSamplesheet:
 
     @staticmethod
     def get_project_name(project: str, delimiter=SPACE) -> str:
-        """ Only keeps the first part of the project name """
+        """Only keeps the first part of the project name"""
         return project.split(delimiter)[0]
 
     @staticmethod
     def get_reverse_complement_dna_seq(dna: str) -> str:
-        """ Generates the reverse complement of a DNA sequence"""
+        """Generates the reverse complement of a DNA sequence"""
         complement = {"A": "T", "C": "G", "G": "C", "T": "A"}
         return "".join(complement[base] for base in reversed(dna))
 
     @staticmethod
     def is_dual_index(index: str, delimiter=DASH) -> bool:
-        """ Determines if an index in the raw samplesheet is dual index or not """
+        """Determines if an index in the raw samplesheet is dual index or not"""
         return delimiter in index
 
     @staticmethod
     def is_dummy_sample_in_samplesheet(dummy_index: str, sample_indexes: list) -> bool:
-        """ Determines if a dummy sample is already present in the samplesheet """
+        """Determines if a dummy sample is already present in the samplesheet"""
         return any(
             sample_index.startswith(dummy_index) for sample_index in sample_indexes
         )
 
     @staticmethod
     def get_sample_indexes_in_lane(lane: str, raw_samplesheet: List[Dict]) -> list:
-        """ Returns all sample indexes in a given lane """
+        """Returns all sample indexes in a given lane"""
         return [sample["index"] for sample in raw_samplesheet if sample["lane"] == lane]
 
     def replace_project_with_lims_sample_name(
@@ -138,7 +138,7 @@ class CreateNovaseqSamplesheet:
         )
 
     def is_nipt_samplesheet(self) -> bool:
-        """ Determines if a sample sheet if for NIPT demultiplexing, based on the index length in the run paramaters """
+        """Determines if a sample sheet if for NIPT demultiplexing, based on the index length in the run paramaters"""
         return self.runparameters.index_reads == NIPT_INDEX_LENGTH
 
     def add_dummy_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
@@ -168,7 +168,7 @@ class CreateNovaseqSamplesheet:
             return raw_samplesheet
 
     def remove_unwanted_indexes(self, raw_samplesheet: List[Dict]) -> List[Dict]:
-        """ Filter out indexes of unwanted length and single indexes """
+        """Filter out indexes of unwanted length and single indexes"""
 
         raw_samplesheet = [
             line for line in raw_samplesheet if self.is_dual_index(line["index"])
@@ -203,7 +203,7 @@ class CreateNovaseqSamplesheet:
     def pad_and_rc_indexes(
         self, index1: str, index2: str, is_reverse_complement: bool
     ) -> tuple:
-        """ Pads and reverse complements indexes """
+        """Pads and reverse complements indexes"""
 
         if self.runparameters.index_reads == 8:
             index2 = (
@@ -229,7 +229,7 @@ class CreateNovaseqSamplesheet:
         return raw_samplesheet
 
     def construct_samplesheet(self, delimiter=COMMA, end="\n") -> str:
-        """ Construct the sample sheet """
+        """Construct the sample sheet"""
 
         demux_samplesheet = [delimiter.join(self.header)]
         raw_samplesheet = self.get_raw_samplesheet()
