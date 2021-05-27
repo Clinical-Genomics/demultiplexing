@@ -106,13 +106,13 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
     """Fixture for novaseq runparameters files"""
     return {
         "novaseq_oldSCV": novaseq_runs_dir
-                          / "RunParameters_oldSCV.xml",  # TODO: choose proper name
+        / "RunParameters_oldSCV.xml",  # TODO: choose proper name
         "novaseq_newSCV_oldkit": novaseq_runs_dir
-                                 / "RunParameters_newSCV_oldkit.xml",  # TODO: choose proper name
+        / "RunParameters_newSCV_oldkit.xml",  # TODO: choose proper name
         "novaseq_newSCV_newkit": novaseq_runs_dir
-                                 / "RunParameters_newSCV_newkit.xml",  # TODO: choose proper name
+        / "RunParameters_newSCV_newkit.xml",  # TODO: choose proper name
         "novaseq_fluffy": novaseq_runs_dir
-                          / "RunParameters_fluffy.xml",  # TODO: choose proper name
+        / "RunParameters_fluffy.xml",  # TODO: choose proper name
     }
 
 
