@@ -54,6 +54,7 @@ TMPOUT=$(mktemp -d)
 TMPOUT_DIR=${OUTDIR}/${TMPOUT}
 mkdir -p "${TMPOUT_DIR}"
 UNALIGNED_DIR=Unaligned
+UNDETERMINED_DIR="${OUTDIR}/Undetermined"
 mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 
 #########
@@ -76,6 +77,9 @@ log "/usr/local/bin/bcl2fastq -r 3 -w 3 -p 16 ${TILES_OPTS} -R '${RUNDIR}' -o '$
 ###############
 # LINK OUTPUT #
 ###############
+
+# Check if flowcell is pooled
+POOLED_FC=$(demux sheet check_pooled_lanes "${RUNDIR}/SampleSheet.csv")
 
 # first copy the lane-tile specific information
 LANE_TILE=l${LANE}t${TILES[0]}
@@ -114,18 +118,34 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
                  mv "${FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${FASTQ}"
         done
 
-        # Undetermined
-        for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
-            UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
-            # the undetermined fastq files are used on multiple places, so link them
-            log "ln '${UNDETERMINED_FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
-                 ln "${UNDETERMINED_FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
-        done
+        # Undetermined, if not pooled link to samples
+        if [[ ${POOLED_FC} == "false" ]];
+        then
+          for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
+              UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
+              # the undetermined fastq files are used on multiple places, so link them
+              log "ln '${UNDETERMINED_FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
+                   ln "${UNDETERMINED_FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
+          done
+        fi
 
         # safely rename the sample dir as they are located in a tmp folder
         log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE}'"
              mv "${SAMPLE_DIR}" "${PROJECT_DIR}/Sample_${SAMPLE}"
     done
+
+    # Undetermined, if pooled link to an Undetermined folder
+    if [[ ${POOLED_FC} == "true" ]];
+    then
+      log "Found pooled samples on lanes, creating Undetermined directory"
+      log "mkdir -p "${UNDETERMINED_DIR}""
+      mkdir -p "${UNDETERMINED_DIR}"
+      for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
+        UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
+        log "ln '${UNDETERMINED_FASTQ_FILE}' '${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
+             ln "${UNDETERMINED_FASTQ_FILE}" "${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
+      done
+    fi
 
     # hardlink the project dir as it might already be existing in the target location
     PROJECT_OUTDIR=${OUTDIR}/${UNALIGNED_DIR}/Project_${PROJECT}
