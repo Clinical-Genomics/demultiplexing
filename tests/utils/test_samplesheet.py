@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import pytest
+
+from pathlib import Path
 
 from demux.utils import (
     Samplesheet,
@@ -8,7 +11,6 @@ from demux.utils import (
     MiseqSamplesheet,
     SampleSheetValidationException,
 )
-import pytest
 
 
 def test_nipt_samplesheet():
@@ -1349,8 +1351,8 @@ def test_nipt_faulty_samplesheet():
         samplesheet.validate()
 
 
-def test_x_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_samplesheet.csv")
+def test_x_samplesheet(hiseqx_samplesheet_path: Path):
+    samplesheet = Samplesheet(hiseqx_samplesheet_path.as_posix())
 
     assert (
         samplesheet.raw()
@@ -1645,8 +1647,8 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert lines[0].dualindex == "TCCGCGAA"
 
 
-def test_x_faulty_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_faulty_samplesheet.csv")
+def test_x_faulty_samplesheet(hiseqx_faulty_samplesheet_path: Path):
+    samplesheet = Samplesheet(hiseqx_faulty_samplesheet_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
@@ -2102,6 +2104,32 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910"""
     lanes_r = [lane for lane in samplesheet.column_r("Lane")]
     assert lanes == expected_lanes
     assert lanes_r == expected_lanes
+
+
+def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
+    """Check if pooled samples are detected of a pooled samplesheet"""
+
+    # GIVEN a samplesheet with pooled lanes
+    samplesheet: Samplesheet = pooled_hiseqx_samplesheet
+
+    # WHEN checking for pooled lanes
+    results = samplesheet.check_pooled_lanes()
+
+    # THEN it should detect pooled lanes
+    assert results
+
+
+def test_check_no_pooled_lanes(hiseqx_samplesheet: Samplesheet):
+    """Check that no pooled samples are detected in a samplesheet with no pooled lanes"""
+
+    # GIVEN a samplesheet with no pooled lanes
+    samplesheet: Samplesheet = hiseqx_samplesheet
+
+    # WHEN checking for pooled lanes
+    results = samplesheet.check_pooled_lanes()
+
+    # THEN it should not detect pooled lanes
+    assert not results
 
 
 # def test_miseq_samplesheet():

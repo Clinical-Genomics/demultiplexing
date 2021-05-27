@@ -41,6 +41,30 @@ def fixture_novaseq_dir(fixtures_dir: Path) -> Path:
     return fixtures_dir / "novaseq"
 
 
+@pytest.fixture(name="hiseqx_dir")
+def fixture_hiseqx_dir(fixtures_dir: Path) -> Path:
+    """Return the path to the HiSeqX test directory"""
+    return fixtures_dir / "hiseqx"
+
+
+@pytest.fixture(name="pooled_hiseqx_samplesheet_path")
+def fixture_pooled_hiseqx_samplesheet_path(hiseqx_dir: Path) -> Path:
+    """Return the path to a pooled HiSeqX samplesheet"""
+    return hiseqx_dir / "x_pooled_samplesheet.csv"
+
+
+@pytest.fixture(name="hiseqx_samplesheet_path")
+def fixture_hiseqx_samplesheet_path(hiseqx_dir: Path) -> Path:
+    """Return the path to a HiSeqX samplesheet"""
+    return hiseqx_dir / "x_samplesheet.csv"
+
+
+@pytest.fixture(name="hiseqx_faulty_samplesheet_path")
+def fixture_hiseqx_faulty_samplesheet_path(hiseqx_dir: Path) -> Path:
+    """Return the path to a faulty HiSeqX samplesheet"""
+    return hiseqx_dir / "x_faulty_samplesheet.csv"
+
+
 @pytest.fixture(name="novaseq_valid_indexcheck_report")
 def fixture_novaseq_valid_indexcheck_report(novaseq_dir: Path) -> Path:
     """Return the path to valid indexcheck report"""
@@ -82,13 +106,13 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
     """Fixture for novaseq runparameters files"""
     return {
         "novaseq_oldSCV": novaseq_runs_dir
-        / "RunParameters_oldSCV.xml",  # TODO: choose proper name
+                          / "RunParameters_oldSCV.xml",  # TODO: choose proper name
         "novaseq_newSCV_oldkit": novaseq_runs_dir
-        / "RunParameters_newSCV_oldkit.xml",  # TODO: choose proper name
+                                 / "RunParameters_newSCV_oldkit.xml",  # TODO: choose proper name
         "novaseq_newSCV_newkit": novaseq_runs_dir
-        / "RunParameters_newSCV_newkit.xml",  # TODO: choose proper name
+                                 / "RunParameters_newSCV_newkit.xml",  # TODO: choose proper name
         "novaseq_fluffy": novaseq_runs_dir
-        / "RunParameters_fluffy.xml",  # TODO: choose proper name
+                          / "RunParameters_fluffy.xml",  # TODO: choose proper name
     }
 
 

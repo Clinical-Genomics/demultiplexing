@@ -1,9 +1,12 @@
 """ CLI points for samplesheeet action """
 import copy
+import click
+import csv
 import logging
 import sys
 
-import click
+from pathlib import Path
+from typing import List, Dict
 
 from cglims.api import ClinicalLims
 from demux.exc import NoValidReagentKitFound
@@ -52,6 +55,18 @@ def validate(samplesheet, application):
 def massage(samplesheet):
     """create a NIPT ready SampleSheet"""
     click.echo(NIPTSamplesheet(samplesheet).massage())
+
+
+@sheet.command()
+@click.argument("samplesheet", type=str)
+def check_pooled_lanes(samplesheet: str) -> None:
+    """Check if samplesheet contains pooled samples"""
+    sample_sheet = Samplesheet(samplesheet)
+
+    if sample_sheet.check_pooled_lanes():
+        click.echo("true")
+    else:
+        click.echo("false")
 
 
 @sheet.command()

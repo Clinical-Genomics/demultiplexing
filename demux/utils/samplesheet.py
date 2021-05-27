@@ -232,6 +232,14 @@ class Samplesheet(object):
 
         return False
 
+    def check_pooled_lanes(self) -> bool:
+        """Return True if samplesheet contain any pooled lanes"""
+        for lane in self.column("lane"):
+            if self.is_pooled_lane(lane):
+                return True
+            continue
+        return False
+
     def validate(self):
         """General validation of a samplesheet"""
 

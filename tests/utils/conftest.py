@@ -6,7 +6,7 @@ from pathlib import Path
 
 from demux.constants import REPORT_TABLES_INDEX, REFERENCE_REPORT_HEADER
 from demux.utils.indexreport import IndexReport
-
+from demux.utils.samplesheet import Samplesheet
 
 @pytest.fixture(name="valid_indexreport")
 def fixture_valid_indexreport(
@@ -117,3 +117,15 @@ def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) 
     modified_report = copy(valid_indexreport)
     modified_report.sample_table_header.pop("Lane")
     return modified_report.sample_table_header
+
+
+@pytest.fixture(name="pooled_hiseqx_samplesheet")
+def fixture_pooled_hiseqx_samplesheet(pooled_hiseqx_samplesheet_path: Path) -> Samplesheet:
+    """Return a pooled HiSeqX samplesheet object"""
+    return Samplesheet(pooled_hiseqx_samplesheet_path.as_posix())
+
+
+@pytest.fixture(name="hiseqx_samplesheet")
+def fixture_hiseqx_samplesheet(hiseqx_samplesheet_path: Path) -> Samplesheet:
+    """Return a pooled HiSeqX samplesheet object"""
+    return Samplesheet(hiseqx_samplesheet_path.as_posix())
