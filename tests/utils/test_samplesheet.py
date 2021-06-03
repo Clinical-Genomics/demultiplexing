@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import click
 import pytest
 
 from pathlib import Path
@@ -2109,11 +2110,13 @@ HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910"""
 def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
     """Check if pooled samples are detected of a pooled samplesheet"""
 
+    sample_name: str = "SVE2274A3_TCCGCGAT"
+
     # GIVEN a samplesheet with pooled lanes
     samplesheet: Samplesheet = pooled_hiseqx_samplesheet
 
     # WHEN checking for pooled lanes
-    results = samplesheet.check_pooled_lanes()
+    results = samplesheet.sample_in_pooled_lane(sample_name)
 
     # THEN it should detect pooled lanes
     assert results
@@ -2122,11 +2125,13 @@ def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
 def test_check_no_pooled_lanes(hiseqx_samplesheet: Samplesheet):
     """Check that no pooled samples are detected in a samplesheet with no pooled lanes"""
 
+    sample_name: str = "SVE2274A11_TCTCGCGC"
+
     # GIVEN a samplesheet with no pooled lanes
     samplesheet: Samplesheet = hiseqx_samplesheet
 
     # WHEN checking for pooled lanes
-    results = samplesheet.check_pooled_lanes()
+    results = samplesheet.sample_in_pooled_lane(sample_name)
 
     # THEN it should not detect pooled lanes
     assert not results

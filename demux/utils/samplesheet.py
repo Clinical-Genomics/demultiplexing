@@ -2,6 +2,7 @@ import re
 from copy import deepcopy
 from collections import OrderedDict
 from pathlib import Path
+from typing import Set
 
 
 class SampleSheetValidationException(Exception):
@@ -104,7 +105,6 @@ class Samplesheet(object):
         header_r = self._get_data_header_r()
         header_map_r = dict((v, k) for k, v in self.header_map.items())
         header = [header_map_r[k] for k in header_r]
-
         return header
 
     def _get_data_header_r(self):
@@ -206,7 +206,7 @@ class Samplesheet(object):
             if line[column] == content:
                 yield line
 
-    def is_pooled_lane(self, lane, column="lane"):
+    def is_pooled_lane(self, lane: int, column="lane"):
         """Return True if lane contains multiple samples"""
         lane_count = 0
         lane = str(lane)
@@ -232,12 +232,21 @@ class Samplesheet(object):
 
         return False
 
-    def check_pooled_lanes(self) -> bool:
-        """Return True if samplesheet contain any pooled lanes"""
+    def pooled_lanes(self) -> Set[int]:
+        """Return set of pooled lanes"""
+        pooled_lanes = set()
         for lane in self.column("lane"):
             if self.is_pooled_lane(lane):
-                return True
-            continue
+                pooled_lanes.add(int(lane))
+        return pooled_lanes
+
+    def sample_in_pooled_lane(self, sample: str) -> bool:
+        """Return True if sample is in pooled lane"""
+
+        for line in self.lines():
+            if sample == line["sample_id"]:
+                if self.pooled_lanes().intersection({int(line["lane"])}):
+                    return True
         return False
 
     def validate(self):

@@ -59,11 +59,15 @@ def massage(samplesheet):
 
 @sheet.command()
 @click.argument("samplesheet", type=str)
-def check_pooled_lanes(samplesheet: str) -> None:
-    """Check if samplesheet contains pooled samples"""
+@click.argument("sample", type=str)
+def sample_in_pooled_lane(samplesheet: str, sample: str) -> None:
+    """Check if a sample is in a pooled lane"""
     sample_sheet = Samplesheet(samplesheet)
 
-    if sample_sheet.check_pooled_lanes():
+    if not any([sample == seq_sample for seq_sample in sample_sheet.samples()]):
+        LOG.error(f"{sample} not in {samplesheet}")
+        raise click.Abort()
+    if sample_sheet.sample_in_pooled_lane(sample):
         click.echo("true")
     else:
         click.echo("false")
