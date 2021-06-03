@@ -1,7 +1,9 @@
 import re
-from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 from pathlib import Path
+
+from demux.constants.constants import COMMA, NEW_LINE
 
 
 class SampleSheetValidationException(Exception):
@@ -603,6 +605,30 @@ class HiSeq2500Samplesheet(Samplesheet):
         "description": "Description",
         "project": "SampleProject",
     }
+
+    def convert(self, delim=COMMA, end=NEW_LINE):
+        """Converts an old HiSeq2500 sample sheet for use on Hasta"""
+
+        def _is_dual_index(line: list) -> bool:
+            return "Index2" in line
+
+        def _insert_empty_index(line: list) -> None:
+            line.insert(5, "")
+
+        converted_samplesheet = []
+        header = self.section[self.DATA][0]
+        sample_rows = self.section[self.DATA][1:]
+        new_header = list(Samplesheet.header_map.values())
+        converted_header = delim.join(new_header)
+        converted_samplesheet.append(converted_header)
+
+        for row in sample_rows:
+            if not _is_dual_index(header):
+                _insert_empty_index(row)
+            converted_row = delim.join(row)
+            converted_samplesheet.append(converted_row)
+
+        return end.join(converted_samplesheet)
 
 
 class NIPTSamplesheet(Samplesheet):

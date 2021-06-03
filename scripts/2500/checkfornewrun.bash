@@ -28,6 +28,10 @@ for RUNDIR in ${INDIR}/*; do
                 FC=${FC:1}
                 demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
+            else
+                demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                mv ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
+                cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
             bash /home/proj/production/bin/git/demultiplexing/scripts/2500/demux-2500.bash ${RUNDIR} ${DEMUXDIR}

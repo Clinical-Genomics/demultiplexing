@@ -3,6 +3,7 @@
 SPACE = " "
 DASH = "-"
 COMMA = ","
+NEW_LINE = "\n"
 
 LIMS_KEYS = [
     "fcid",
