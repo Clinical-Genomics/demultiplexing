@@ -106,7 +106,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
 
     for SAMPLE_DIR in "${PROJECT_DIR}"/*; do
         SAMPLE_BASE=$(basename "${SAMPLE_DIR}")
-        SAMPLE_NAME=$(echo $SAMPLE_BASE | sed 's/^Sample_/g')
+        SAMPLE_NAME=$(echo $SAMPLE_BASE | sed 's/^Sample_//g')
         if [[ ${SAMPLE_BASE} =~ Sample_ ]]; then continue; fi
 
         for FASTQ_FILE in "${SAMPLE_DIR}"/*; do
