@@ -1,5 +1,5 @@
 #!/bin/bash
-#   usage: demux.bash <absolute-path-to-run-dir>
+#   usage: demux-2500.bash <absolute-path-to-run-dir>
 #   The output i.e. Unaligned dir will be created 
 #   under $DEMUX_DIR
 
@@ -47,7 +47,8 @@ trap failed ERR
 if [[ ! -e ${BASE}/SampleSheet.ori ]]; then
     cp ${BASE}/SampleSheet.csv ${BASE}/SampleSheet.ori
     if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
-        sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+        sed -i 's/
+/\n/g' ${BASE}/SampleSheet.csv
     fi
     sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
 fi

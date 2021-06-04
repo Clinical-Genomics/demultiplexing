@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "demux"
-version = "5.4.5"
+version = "5.9.2"
 description = "Application for demultiplexing sequence data"
 authors = ["henrikstranneheim <henrik.stranneheim@scilifelab.se>"]
 license = "MIT"
@@ -14,6 +14,7 @@ click = "^6.7.0"
 cglims = "^1.3.4"
 six = "^1.15.0"
 importlib-metadata = "^3.1.1"
+bs4 = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"

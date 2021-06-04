@@ -1,15 +1,14 @@
 """Demultiplexing base demux command"""
 
-import logging
-
 import click
 import coloredlogs
+import logging
 import yaml
 
-from demux import __version__
-from .samplesheet import sheet
-
 from .basemask import basemask
+from demux import __version__
+from .indexreport import indexreport
+from .samplesheet import sheet
 
 LOG = logging.getLogger(__name__)
 LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR"]
@@ -36,3 +35,4 @@ def demux(context, log_level, config):
 
 demux.add_command(sheet)
 demux.add_command(basemask)
+demux.add_command(indexreport)

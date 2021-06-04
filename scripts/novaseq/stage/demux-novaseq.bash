@@ -15,8 +15,10 @@ PROJECTLOG=${4?'projectlog needed'}
 
 RUN=$(basename ${IN_DIR})
 OUT_DIR=${DEMUXES_DIR}/${RUN}
-SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/
-EMAIL=clinical-demux@scilifelab.se
+#SCRIPT_DIR=/home/proj/${CONDA_DEFAULT_ENV}/bin/git/demultiplexing/scripts/novaseq/  # use this when developing in a conda env
+SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/novaseq/        # use this when testing on stage
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
@@ -44,13 +46,13 @@ log "Starting NovaSeq demultiplexing"
 # Send a mail that demultiplexing has started
 cat ${PROJECTLOG} | mail -s "Starting demultiplexing of novaseq flowcell ${FC} on $(hostname)" $EMAIL
 
-
-UNALIGNED_DIR='Unaligned'
+BASEMASK=$(demux basemask create --application nova ${IN_DIR})
+UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
 JOB_TITLE=Demux_${RUN}
-log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${UNALIGNED_DIR}"
-RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${UNALIGNED_DIR})
+log "sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR}"
+RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIPT_DIR}/demux-novaseq.sh ${IN_DIR} ${OUT_DIR} ${BASEMASK} ${UNALIGNED_DIR})
 
 log "bcl2fastq finished!"
 
@@ -99,10 +101,3 @@ for PROJECT_DIR in ${PROJECTS[@]}; do
     log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
     cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
 done
-
-# Create a summary of the bcl2fastq indexcheck report
-demux indexreport summary \
-  --index-report-path "$OUT_DIR/$UNALIGNED_DIR/Reports/html/$FC/all/all/all/laneBarcode.html" \
-  --out-dir "$OUT_DIR" \
-  --cluster-counts 1000000 \
-  --run-parameters-path "$IN_DIR/RunParameters.xml"

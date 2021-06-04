@@ -630,13 +630,13 @@ class HiSeq2500Samplesheet(Samplesheet):
         "lane": "Lane",
         "sample_id": "SampleID",
         "sample_ref": "SampleRef",
-        "index": "Index",
+        "index": "index",
+        "index2": "index2",
         "sample_name": "SampleName",
         "control": "Control",
         "recipe": "Recipe",
         "operator": "Operator",
-        "description": "Description",
-        "project": "SampleProject",
+        "project": "Project",
     }
 
 

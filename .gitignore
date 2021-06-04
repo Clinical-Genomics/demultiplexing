@@ -5,7 +5,7 @@ dist/
 demux.egg-info/
 
 DEVELOP/
-.idea
+.idea/
 # Distribution / packaging
 *.egg-info/
 *.egg

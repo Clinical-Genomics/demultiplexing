@@ -11,7 +11,8 @@ shopt -s nullglob
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
 SCRIPT_DIR=$(dirname $(readlink -nm $0))
-EMAIL=clinical-demux@scilifelab.se
+#EMAIL=clinical-demux@scilifelab.se
+EMAIL=YOUR.NAME@scilifelab.se
 
 #############
 # FUNCTIONS #
@@ -56,7 +57,7 @@ for RUN_DIR in ${IN_DIR}/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv
+                demux sheet fetch --application nova --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv 
             fi
 
             # exit if samplesheet is still empty after running demux sheet fetch
@@ -75,7 +76,7 @@ for RUN_DIR in ${IN_DIR}/*; do
             bash ${SCRIPT_DIR}/demux-novaseq.bash ${RUN_DIR} ${DEMUXES_DIR} ${FC} ${PROJECTLOG} &>> ${PROJECTLOG}
 
             if [[ $? == 0 ]]; then
-                # indicate demultiplexing is finished
+               # indicate demultiplexing is finished
                 log "date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt"
                 date +'%Y%m%d%H%M%S' > ${DEMUXES_DIR}/${RUN}/demuxcomplete.txt
                 # create trigger file for delivery script

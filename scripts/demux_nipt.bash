@@ -1,5 +1,5 @@
 #!/bin/bash
-#   usage: demux.bash <absolute-path-to-run-dir>
+#   usage: demux-2500.bash <absolute-path-to-run-dir>
 #   The output i.e. Unaligned dir will be created 
 #   under $UNALIGNEDBASE
 
@@ -46,7 +46,8 @@ mkdir -p ${DEMUX_DIR}/${RUN}
 
 cp ${BASE}/SampleSheet.ori ${BASE}/SampleSheet.csv
 if grep -qs $'\r' ${BASE}/SampleSheet.csv; then
-    sed -i 's//\n/g' ${BASE}/SampleSheet.csv
+    sed -i 's/
+/\n/g' ${BASE}/SampleSheet.csv
 fi
 sed -i '/^$/d' ${BASE}/SampleSheet.csv # remove empty lines
 
@@ -56,5 +57,5 @@ mv ${BASE}/SampleSheet.mas ${BASE}/SampleSheet.csv
 cp ${BASE}/SampleSheet.csv ${BASE}/Data/Intensities/BaseCalls/
 
 log "bash ${SCRIPT_DIR}/demux.bash ${BASE} ${DEMUX_DIR}"
-bash ${SCRIPT_DIR}/demux.bash ${BASE} ${DEMUX_DIR}
+bash ${SCRIPT_DIR}/demux-2500.bash ${BASE} ${DEMUX_DIR}
 
