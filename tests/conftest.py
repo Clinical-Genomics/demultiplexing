@@ -150,4 +150,3 @@ def fixture_novaseq_runparameters_api(novaseq_runs_dir):
     """ Set up novaseq runparameters api for testing """
     novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir)
     return novaseq_runparameters_api
-
