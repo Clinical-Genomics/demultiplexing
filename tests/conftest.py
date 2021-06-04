@@ -78,14 +78,56 @@ def fixture_runs_dir(novaseq_dir: Path) -> Path:
     return novaseq_dir / "runs"
 
 
-@pytest.fixture(name="hiseqx_samplesheet_multiple_index")
-def fixture_hiseqx_samplesheet_multiple_index(fixtures_dir: Path) -> HiSeqXSamplesheet:
-    """ Return a hiseqx sample sheet containing multiple indexes """
-    hiseqx_samplesheet_multiple_index = HiSeqXSamplesheet(
-        fixtures_dir / "x_samplesheet_multiple_index.csv"
-    )
+@pytest.fixture(name="hiseqx_dir")
+def fixture_hisex_dir(fixtures_dir: Path) -> Path:
+    """ Return the path to the hiseqx fixture directory """
+    return fixtures_dir / "hiseqx"
 
-    return hiseqx_samplesheet_multiple_index
+
+@pytest.fixture(name="hiseqx_samplesheet_path")
+def fixture_hiseqx_samplesheet(hiseqx_dir: Path) -> Path:
+    """ Return the path to a hiseqx samplesheet """
+    return hiseqx_dir / "x_samplesheet.csv"
+
+
+@pytest.fixture(name="x_faulty_samplesheet_path")
+def fixture_x_faulty_samplesheet(hiseqx_dir: Path) -> Path:
+    """ Return the path to a faulty hiseqx samplesheet """
+    return hiseqx_dir / "x_faulty_samplesheet.csv"
+
+
+@pytest.fixture(name="nipt_dir")
+def fixture_nipt_dir(fixtures_dir: Path) -> Path:
+    """ Return the path to nipt fixture directory """
+    return fixtures_dir / "nipt"
+
+
+@pytest.fixture(name="nipt_samplesheet_path")
+def fixture_nipt_samplesheet_path(nipt_dir: Path) -> Path:
+    """ Return path to nipt samplesheet"""
+    return nipt_dir / "nipt_samplesheet.csv"
+
+
+@pytest.fixture(name="nipt_faulty_samplesheet_path")
+def fixture_nipt_faulty_samplesheet_path(nipt_dir: Path) -> Path:
+    """ Return path to a faulty nipt samplesheet """
+    return nipt_dir / "nipt_faulty_samplesheet.csv"
+
+
+@pytest.fixture(name="dir_2500")
+def fixture_2500_dir(fixtures_dir: Path) -> Path:
+    """ Return path to the 2500 fixture directory """
+    return fixtures_dir / "2500"
+
+
+@pytest.fixture(name="samplesheet_2500_path")
+def fixture_samplesheet_2500_path(dir_2500: Path) -> Path:
+    return dir_2500 / "2500_samplesheet.csv"
+
+
+@pytest.fixture(name="faulty_samplesheet_2500_path")
+def fixture_faulty_samplesheet_2500_path(dir_2500: Path) -> Path:
+    return dir_2500 / "2500_faulty_samplesheet.csv"
 
 
 @pytest.fixture(name="run_parameters_file")
@@ -108,3 +150,4 @@ def fixture_novaseq_runparameters_api(novaseq_runs_dir):
     """ Set up novaseq runparameters api for testing """
     novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir)
     return novaseq_runparameters_api
+

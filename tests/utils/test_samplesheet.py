@@ -9,12 +9,13 @@ from demux.utils import (
     MiseqSamplesheet,
     SampleSheetValidationException,
 )
+from pathlib import Path
 import pytest
 import logging
 
 
-def test_nipt_samplesheet():
-    samplesheet = NIPTSamplesheet("tests/fixtures/nipt_samplesheet.csv")
+def test_nipt_samplesheet(nipt_samplesheet_path: Path):
+    samplesheet = NIPTSamplesheet(nipt_samplesheet_path.as_posix())
 
     assert samplesheet._get_flowcell() == "HFNC5BCXY"
     assert samplesheet._get_project_id() == "666666"
@@ -1344,15 +1345,15 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
     assert lines_r == expectes_lines_r
 
 
-def test_nipt_faulty_samplesheet():
-    samplesheet = NIPTSamplesheet("tests/fixtures/nipt_faulty_samplesheet.csv")
+def test_nipt_faulty_samplesheet(nipt_faulty_samplesheet_path: Path):
+    samplesheet = NIPTSamplesheet(nipt_faulty_samplesheet_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
 
 
-def test_x_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_samplesheet.csv")
+def test_x_samplesheet(hiseqx_samplesheet_path: Path):
+    samplesheet = Samplesheet(hiseqx_samplesheet_path.as_posix())
 
     assert (
         samplesheet.raw()
@@ -1658,25 +1659,25 @@ def test_x_validate_multiple_index(
     with pytest.raises(SampleSheetValidationException) as e:
         hiseqx_samplesheet_multiple_index.validate()
         # THEN an error should be and we should get the message
-        assert "Mulitple indexes!\nCheck SampleSheet!" in e.value
+        assert "Multiple index types in SampleSheet!" in e.value
 
 
-def test_x_faulty_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_faulty_samplesheet.csv")
-
-    with pytest.raises(SampleSheetValidationException):
-        samplesheet.validate()
-
-
-def test_2500_faulty_samplesheet():
-    samplesheet = HiSeq2500Samplesheet("tests/fixtures/2500_faulty_samplesheet.csv")
+def test_x_faulty_samplesheet(x_faulty_samplesheet_path: Path):
+    samplesheet = Samplesheet(x_faulty_samplesheet_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
 
 
-def test_2500_samplesheet():
-    samplesheet = HiSeq2500Samplesheet("tests/fixtures/2500_samplesheet.csv")
+def test_2500_faulty_samplesheet(faulty_samplesheet_2500_path: Path):
+    samplesheet = HiSeq2500Samplesheet(faulty_samplesheet_2500_path.as_posix())
+
+    with pytest.raises(SampleSheetValidationException):
+        samplesheet.validate()
+
+
+def test_2500_samplesheet(samplesheet_2500_path: Path):
+    samplesheet = HiSeq2500Samplesheet(samplesheet_2500_path.as_posix())
 
     assert (
         samplesheet.raw()

@@ -3,6 +3,7 @@ import logging
 from copy import deepcopy
 from collections import OrderedDict
 from pathlib import Path
+from typing import Tuple
 
 LOG = logging.getLogger(__name__)
 
@@ -316,23 +317,23 @@ class HiSeqXSamplesheet(Samplesheet):
     def validate(self):
         Samplesheet.validate(self)
 
-        def _validate_project_samplename():
+        def _validate_project_samplename() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["project"] != line["sample_name"]:
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Project and SampleName cannot be different!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        def _validate_index():
+        def _validate_index() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["index"] == "":
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Missing index!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        def _validate_index_types():
+        def _validate_index_types() -> Tuple[str, None]:
             """ Check if there are multiple types of indexes, meaning single, dual, or both """
 
             indexes = []
@@ -349,16 +350,13 @@ class HiSeqXSamplesheet(Samplesheet):
                         new_index_tuple = (index_1,)
 
                     # Check if index type has already been identified
-                    for index in indexes:
-                        if index == new_index_tuple:
-                            break
-                    else:
+                    if not any([new_index_tuple == index for index in indexes]):
                         indexes.append(new_index_tuple)
 
             if len(indexes) > 1:
-                msg = "Mulitple indexes, check SampleSheet!"
+                msg = "Multiple index types in SampleSheet!"
                 line_nr = None
-                return (msg, line_nr)
+                return msg, line_nr
 
         for rs in [
             _validate_index(),
@@ -757,6 +755,6 @@ class NIPTSamplesheet(Samplesheet):
 
 if __name__ == "__main__":
     sample_sheet = HiSeqXSamplesheet(
-        "/Users/karl.nyren/PycharmProjects/demultiplexing/tests/fixtures/x_samplesheet_multiple_index.csv"
+        "/tests/fixtures/hiseqx/x_samplesheet_multiple_index.csv"
     )
     sample_sheet.validate()
