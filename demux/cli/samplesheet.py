@@ -40,7 +40,7 @@ def validate(samplesheet, application):
     if application == "nipt":
         NIPTSamplesheet(samplesheet).validate()
     elif application == "wes":
-        Samplesheet(samplesheet).validate()
+        HiSeq2500Samplesheet(samplesheet).validate()
     elif application == "miseq":
         MiseqSamplesheet(samplesheet).validate()
     elif application == "wgs":

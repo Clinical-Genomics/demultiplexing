@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import pytest
+
 from demux.utils import (
-    Samplesheet,
-    NIPTSamplesheet,
     HiSeq2500Samplesheet,
     MiseqSamplesheet,
+    NIPTSamplesheet,
+    Samplesheet,
     SampleSheetValidationException,
 )
-import pytest
 
 
 def test_nipt_samplesheet():
@@ -1652,462 +1653,63 @@ def test_x_faulty_samplesheet():
         samplesheet.validate()
 
 
-def test_2500_faulty_samplesheet():
-    samplesheet = HiSeq2500Samplesheet("tests/fixtures/2500_faulty_samplesheet.csv")
+def test_2500_valid_samplesheet(hiseq2500_samplesheet_valid):
+    """Test the validation of a valid sample sheet"""
 
-    with pytest.raises(SampleSheetValidationException):
+    # GIVEN a valid sample sheet:
+    samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_valid)
+
+    # WHEN validating the samplesheet
+    result = samplesheet.validate()
+
+    # THEN the validation should return True
+    assert result
+
+
+def test_2500_invalid_samplesheet_duplicate_index(
+    hiseq2500_samplesheet_invalid_duplicate_index,
+):
+    """Test the validation of an invalid sample sheet"""
+
+    # GIVEN a valid sample sheet that has a duplicate index:
+    samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_invalid_duplicate_index)
+
+    # WHEN validating the samplesheet
+    with pytest.raises(SampleSheetValidationException) as exception:
         samplesheet.validate()
 
-
-def test_2500_samplesheet():
-    samplesheet = HiSeq2500Samplesheet("tests/fixtures/2500_samplesheet.csv")
-
-    assert (
-        samplesheet.raw()
-        == """FCID,Lane,SampleID,SampleRef,index,index2,SampleName,Control,Recipe,Operator,Project
-HB07NADXX,1,SIB911A1_sureselect4,hg19,TGACCA,,959191,N,R1,NN,959191
-HB07NADXX,1,SIB911A2_sureselect5,hg19,ACAGTG,,959191,N,R1,NN,959191
-HB07NADXX,1,SIB910A3_sureselect6,hg19,GCCAAT,,454557,N,R1,NN,454557
-HB07NADXX,1,SIB914A2_sureselect2,hg19,CGATGT,,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A11_sureselect11,hg19,GGCTAC,,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A12_sureselect12,hg19,CTTGTA,,504910,N,R1,NN,504910
-HB07NADXX,1,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910
-HB07NADXX,2,SIB911A1_sureselect4,hg19,TGACCA,,959191,N,R1,NN,959191
-HB07NADXX,2,SIB911A2_sureselect5,hg19,ACAGTG,,959191,N,R1,NN,959191
-HB07NADXX,2,SIB910A3_sureselect6,hg19,GCCAAT,,454557,N,R1,NN,454557
-HB07NADXX,2,SIB914A2_sureselect2,hg19,CGATGT,,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A11_sureselect11,hg19,GGCTAC,,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A12_sureselect12,hg19,CTTGTA,,504910,N,R1,NN,504910
-HB07NADXX,2,SIB914A15_sureselect15,hg19,GAAACC,,504910,N,R1,NN,504910"""
-    )
-
-    samplesheet_lines = [line for line in samplesheet.lines()]
-    assert samplesheet_lines == [
-        {
-            "control": "N",
-            "sample_name": "959191",
-            "fcid": "HB07NADXX",
-            "index": "TGACCA",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB911A1_sureselect4",
-            "project": "959191",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "959191",
-            "fcid": "HB07NADXX",
-            "index": "ACAGTG",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB911A2_sureselect5",
-            "project": "959191",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "454557",
-            "fcid": "HB07NADXX",
-            "index": "GCCAAT",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB910A3_sureselect6",
-            "project": "454557",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "CGATGT",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A2_sureselect2",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "GGCTAC",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A11_sureselect11",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "CTTGTA",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A12_sureselect12",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "GAAACC",
-            "index2": "",
-            "lane": "1",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A15_sureselect15",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "959191",
-            "fcid": "HB07NADXX",
-            "index": "TGACCA",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB911A1_sureselect4",
-            "project": "959191",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "959191",
-            "fcid": "HB07NADXX",
-            "index": "ACAGTG",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB911A2_sureselect5",
-            "project": "959191",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "454557",
-            "fcid": "HB07NADXX",
-            "index": "GCCAAT",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB910A3_sureselect6",
-            "project": "454557",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "CGATGT",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A2_sureselect2",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "GGCTAC",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A11_sureselect11",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "CTTGTA",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A12_sureselect12",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-        {
-            "control": "N",
-            "sample_name": "504910",
-            "fcid": "HB07NADXX",
-            "index": "GAAACC",
-            "index2": "",
-            "lane": "2",
-            "operator": "NN",
-            "recipe": "R1",
-            "sample_id": "SIB914A15_sureselect15",
-            "project": "504910",
-            "sample_ref": "hg19",
-        },
-    ]
-
-    samplesheet_lines_r = [line for line in samplesheet.lines_r()]
-    assert samplesheet_lines_r == [
-        {
-            "Control": "N",
-            "Project": "959191",
-            "FCID": "HB07NADXX",
-            "index": "TGACCA",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB911A1_sureselect4",
-            "SampleName": "959191",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "959191",
-            "FCID": "HB07NADXX",
-            "index": "ACAGTG",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB911A2_sureselect5",
-            "SampleName": "959191",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "454557",
-            "FCID": "HB07NADXX",
-            "index": "GCCAAT",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB910A3_sureselect6",
-            "SampleName": "454557",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "CGATGT",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A2_sureselect2",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "GGCTAC",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A11_sureselect11",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "CTTGTA",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A12_sureselect12",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "GAAACC",
-            "index2": "",
-            "Lane": "1",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A15_sureselect15",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "959191",
-            "FCID": "HB07NADXX",
-            "index": "TGACCA",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB911A1_sureselect4",
-            "SampleName": "959191",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "959191",
-            "FCID": "HB07NADXX",
-            "index": "ACAGTG",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB911A2_sureselect5",
-            "SampleName": "959191",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "454557",
-            "FCID": "HB07NADXX",
-            "index": "GCCAAT",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB910A3_sureselect6",
-            "SampleName": "454557",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "CGATGT",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A2_sureselect2",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "GGCTAC",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A11_sureselect11",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "CTTGTA",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A12_sureselect12",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-        {
-            "Control": "N",
-            "Project": "504910",
-            "FCID": "HB07NADXX",
-            "index": "GAAACC",
-            "index2": "",
-            "Lane": "2",
-            "Operator": "NN",
-            "Recipe": "R1",
-            "SampleID": "SIB914A15_sureselect15",
-            "SampleName": "504910",
-            "SampleRef": "hg19",
-        },
-    ]
-
-    assert samplesheet.validate() == True
-
-    expected_samples = [
-        "SIB911A1_sureselect4",
-        "SIB911A2_sureselect5",
-        "SIB910A3_sureselect6",
-        "SIB914A2_sureselect2",
-        "SIB914A11_sureselect11",
-        "SIB914A12_sureselect12",
-        "SIB914A15_sureselect15",
-        "SIB911A1_sureselect4",
-        "SIB911A2_sureselect5",
-        "SIB910A3_sureselect6",
-        "SIB914A2_sureselect2",
-        "SIB914A11_sureselect11",
-        "SIB914A12_sureselect12",
-        "SIB914A15_sureselect15",
-    ]
-    samples = [sample for sample in samplesheet.samples()]
-    samples_r = [sample for sample in samplesheet.samples_r()]
-    assert samples == expected_samples
-    assert samples_r == expected_samples
-
-    assert samplesheet.is_pooled_lane(1) == True
-    assert samplesheet.is_pooled_lane(2) == True
-
-    assert samplesheet.is_pooled_lane_r(1, column="Lane") == True
-    assert samplesheet.is_pooled_lane_r(2, column="Lane") == True
-
-    expected_lanes = [
-        "1",
-        "1",
-        "1",
-        "1",
-        "1",
-        "1",
-        "1",
-        "2",
-        "2",
-        "2",
-        "2",
-        "2",
-        "2",
-        "2",
-    ]
-    lanes = [lane for lane in samplesheet.column("lane")]
-    lanes_r = [lane for lane in samplesheet.column_r("Lane")]
-    assert lanes == expected_lanes
-    assert lanes_r == expected_lanes
+    # THEN the validation raise an exception and tell which samples have duplicate indexes
+    assert "Same index for Sample3 , Sample4 on lane 1" in str(exception.value)
 
 
-# def test_miseq_samplesheet():
-#    samplesheet = MiseqSamplesheet('tests/fixtures/161129_M03284_0041_000000000-AY7H3/SampleSheet.csv')
-#
-#    assert samplesheet._get_flowcell() == '000000000-AY7H3'
-#
-#    with open('tests/fixtures/161129_M03284_0041_000000000-AY7H3/demux_samplesheet.csv') as demux_samplesheet:
-#        assert samplesheet.to_demux() == ''.join(demux_samplesheet.readlines()).rstrip('\n')
+def test_2500_invalid_samplesheet_length(hiseq2500_samplesheet_invalid_length):
+    """Test the validation of an invalid sample sheet"""
+
+    # GIVEN a valid sample sheet that has line longer than the header
+    samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_invalid_length)
+
+    # WHEN validating the samplesheet
+    with pytest.raises(SampleSheetValidationException) as exception:
+        samplesheet.validate()
+
+    # THEN the validation raise an exception and tell which line has an incorrect length
+    assert "Line '2'" in str(exception.value)
+    assert "#fields != #fields in header" in str(exception.value)
+
+
+def test_2500_invalid_samplesheet_sample_name(
+    hiseq2500_samplesheet_invalid_sample_name,
+):
+    """Test the validation of an invalid sample sheet"""
+
+    # GIVEN a valid sample sheet that has an invalid sample name (contains a space)
+    samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_invalid_sample_name)
+
+    # WHEN validating the samplesheet
+    with pytest.raises(SampleSheetValidationException) as exception:
+        samplesheet.validate()
+
+    # THEN the validation raise an exception and tell which line has an incorrect length
+    assert "Line '10'" in str(exception.value)
+    assert "Sample 4" in str(exception.value)
+    assert " Sample contains forbidden chars" in str(exception.value)
