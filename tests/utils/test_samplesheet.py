@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from pathlib import Path
 
 import pytest
 
 from demux.utils import (
     HiSeq2500Samplesheet,
-    MiseqSamplesheet,
     NIPTSamplesheet,
     Samplesheet,
     SampleSheetValidationException,
 )
+from snapshottest import Snapshot
 
 
 def test_nipt_samplesheet():
@@ -1653,21 +1654,21 @@ def test_x_faulty_samplesheet():
         samplesheet.validate()
 
 
-def test_2500_valid_samplesheet(hiseq2500_samplesheet_valid):
+def test_2500_valid_samplesheet(hiseq2500_samplesheet_valid: Path):
     """Test the validation of a valid sample sheet"""
 
     # GIVEN a valid sample sheet:
     samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_valid)
 
     # WHEN validating the samplesheet
-    result = samplesheet.validate()
+    result: bool = samplesheet.validate()
 
     # THEN the validation should return True
     assert result
 
 
 def test_2500_invalid_samplesheet_duplicate_index(
-    hiseq2500_samplesheet_invalid_duplicate_index,
+    hiseq2500_samplesheet_invalid_duplicate_index: Path,
 ):
     """Test the validation of an invalid sample sheet"""
 
@@ -1682,7 +1683,7 @@ def test_2500_invalid_samplesheet_duplicate_index(
     assert "Same index for Sample3 , Sample4 on lane 1" in str(exception.value)
 
 
-def test_2500_invalid_samplesheet_length(hiseq2500_samplesheet_invalid_length):
+def test_2500_invalid_samplesheet_length(hiseq2500_samplesheet_invalid_length: Path):
     """Test the validation of an invalid sample sheet"""
 
     # GIVEN a valid sample sheet that has line longer than the header
@@ -1698,7 +1699,7 @@ def test_2500_invalid_samplesheet_length(hiseq2500_samplesheet_invalid_length):
 
 
 def test_2500_invalid_samplesheet_sample_name(
-    hiseq2500_samplesheet_invalid_sample_name,
+    hiseq2500_samplesheet_invalid_sample_name: Path,
 ):
     """Test the validation of an invalid sample sheet"""
 
@@ -1713,3 +1714,18 @@ def test_2500_invalid_samplesheet_sample_name(
     assert "Line '10'" in str(exception.value)
     assert "Sample 4" in str(exception.value)
     assert " Sample contains forbidden chars" in str(exception.value)
+
+
+def test_convert_2500_samplesheet(
+    hiseq2500_samplesheet_valid: Path, snapshot: Snapshot
+):
+    """Test the validation of a valid sample sheet"""
+
+    # GIVEN a valid sample sheet:
+    samplesheet = HiSeq2500Samplesheet(hiseq2500_samplesheet_valid)
+
+    # WHEN validating the samplesheet
+    result: str = samplesheet.convert()
+
+    # THEN the validation should return True
+    snapshot.assert_match(result)
