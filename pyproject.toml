@@ -20,7 +20,6 @@ bs4 = "^0.0.1"
 pytest = "^6.1.2"
 pytest-cov = "^2.10.1"
 coveralls = "^2.2.0"
-snapshottest = "^0.6.0"
 
 [tool.poetry.scripts]
 demux = "demux.__main__:main"
