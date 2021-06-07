@@ -143,8 +143,8 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
 
 
         # safely rename the sample dir as they are located in a tmp folder
-        log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE}'"
-             mv "${SAMPLE_DIR}" "${PROJECT_DIR}/Sample_${SAMPLE}"
+        log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE_BASE}'"
+             mv "${SAMPLE_DIR}" "${PROJECT_DIR}/Sample_${SAMPLE_BASE}"
     done
 
     # hardlink the project dir as it might already be existing in the target location
