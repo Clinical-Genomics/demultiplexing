@@ -18,7 +18,7 @@ class SampleSheetValidationException(Exception):
         )
 
 
-class SampleSheetParsexception(Exception):
+class SampleSheetParseException(Exception):
     pass
 
 
@@ -120,7 +120,7 @@ class Samplesheet(object):
     def parse(self, samplesheet_path, delim=","):
         """
         Parses a Samplesheet, with their fake csv format.
-        Should be instancied with the samplesheet path as an argument.
+        Should be instantiated with the samplesheet path as an argument.
         Will create a dict for each section. Header: (lines)
         """
 
@@ -142,7 +142,7 @@ class Samplesheet(object):
                 self.section[name].append(line)
 
         if self.DATA not in self.section:
-            raise SampleSheetParsexception("No data found!")
+            raise SampleSheetParseException("No data found!")
 
         header = self._get_data_header()
         self.samplesheet = [
@@ -222,7 +222,7 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
-        """ Return True if lane contains multiple samples based on the orignal header """
+        """ Return True if lane contains multiple samples based on the original header """
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -607,7 +607,7 @@ class HiSeq2500Samplesheet(Samplesheet):
         "project": "SampleProject",
     }
 
-    def convert(self, delim=COMMA, end=NEW_LINE):
+    def convert(self, delim: str = COMMA, end: str = NEW_LINE) -> str:
         """Converts an old HiSeq2500 sample sheet for use on Hasta"""
 
         def _is_dual_index(line: list) -> bool:
@@ -616,11 +616,11 @@ class HiSeq2500Samplesheet(Samplesheet):
         def _insert_empty_index(line: list) -> None:
             line.insert(5, "")
 
-        converted_samplesheet = []
-        header = self.section[self.DATA][0]
-        sample_rows = self.section[self.DATA][1:]
-        new_header = list(Samplesheet.header_map.values())
-        converted_header = delim.join(new_header)
+        converted_samplesheet: list = []
+        header: list = self.section[self.DATA][0]
+        sample_rows: list = self.section[self.DATA][1:]
+        new_header: list = list(Samplesheet.header_map.values())
+        converted_header: str = delim.join(new_header)
         converted_samplesheet.append(converted_header)
 
         for row in sample_rows:
