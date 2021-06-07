@@ -129,7 +129,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
           done
 
         # Undetermined, if pooled link to an Undetermined folder
-        elif [[ ${POOLED_FC} == "true" ]];
+        elif [[ ${POOLED_LANE} == "true" ]];
         then
           log "Found pooled samples on lanes, creating Undetermined directory"
           log "mkdir -p '${UNDETERMINED_DIR}'"
