@@ -1,9 +1,9 @@
 """ Conftest file for demultiplexing """
+import shutil
 from pathlib import Path
 from typing import Dict
 
 import pytest
-import shutil
 
 from demux.utils.runparameters import NovaseqRunParameters
 
@@ -39,6 +39,12 @@ def fixture_dummy_indexes_file(files_dir: Path) -> Path:
 def fixture_novaseq_dir(fixtures_dir: Path) -> Path:
     """ Return the path to the novaseq directory """
     return fixtures_dir / "novaseq"
+
+
+@pytest.fixture(name="hiseq2500_dir")
+def fixture_2500_dir(fixtures_dir: Path) -> Path:
+    """ Return the path to the 2500 directory """
+    return fixtures_dir / "2500"
 
 
 @pytest.fixture(name="novaseq_valid_indexcheck_report")
@@ -92,7 +98,7 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
     }
 
 
-@pytest.yield_fixture(scope="function", name="novaseq_runparameters_api")
+@pytest.fixture(scope="function", name="novaseq_runparameters_api")
 def fixture_novaseq_runparameters_api(novaseq_runs_dir):
     """ Set up novaseq runparameters api for testing """
     novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir)
