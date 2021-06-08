@@ -616,7 +616,8 @@ class HiSeq2500Samplesheet(Samplesheet):
         def _insert_empty_index(line: list) -> None:
             line.insert(5, "")
 
-        converted_samplesheet: list = []
+        converted_samplesheet: list = list()
+        converted_samplesheet.append(self.DATA)
         header: list = self.section[self.DATA][0]
         sample_rows: list = self.section[self.DATA][1:]
         new_header: list = list(Samplesheet.header_map.values())
