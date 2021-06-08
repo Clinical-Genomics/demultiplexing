@@ -1679,7 +1679,7 @@ def test_2500_invalid_samplesheet_duplicate_index(
     with pytest.raises(SampleSheetValidationException) as exception:
         samplesheet.validate()
 
-    # THEN the validation raise an exception and tell which samples have duplicate indexes
+    # THEN the validation should raise an exception and tell which samples have duplicate indexes
     assert "Same index for Sample3 , Sample4 on lane 1" in str(exception.value)
 
 
@@ -1693,7 +1693,7 @@ def test_2500_invalid_samplesheet_length(hiseq2500_samplesheet_invalid_length: P
     with pytest.raises(SampleSheetValidationException) as exception:
         samplesheet.validate()
 
-    # THEN the validation raise an exception and tell which line has an incorrect length
+    # THEN the validation should raise an exception and tell which line has an incorrect length
     assert "Line '2'" in str(exception.value)
     assert "#fields != #fields in header" in str(exception.value)
 
@@ -1710,7 +1710,7 @@ def test_2500_invalid_samplesheet_sample_name(
     with pytest.raises(SampleSheetValidationException) as exception:
         samplesheet.validate()
 
-    # THEN the validation raise an exception and tell which line has an incorrect length
+    # THEN the validation should raise an exception and tell which line has an incorrect length
     assert "Line '10'" in str(exception.value)
     assert "Sample 4" in str(exception.value)
     assert " Sample contains forbidden chars" in str(exception.value)
