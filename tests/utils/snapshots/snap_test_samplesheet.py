@@ -9,7 +9,8 @@ snapshots = Snapshot()
 
 snapshots[
     "test_convert_2500_samplesheet 1"
-] = """FCID,Lane,SampleID,SampleRef,index,index2,SampleName,Control,Recipe,Operator,Project
+] = """[Data]
+FCID,Lane,SampleID,SampleRef,index,index2,SampleName,Control,Recipe,Operator,Project
 HFLOWCELL,1,Sample1,hg19,AAACAT,,630939,N,R1,NN,630939
 HFLOWCELL,1,Sample2,hg19,ATCACG,,630939,N,R1,NN,630939
 HFLOWCELL,1,Sample3,hg19,TTAGGC,,630939,N,R1,NN,630939
