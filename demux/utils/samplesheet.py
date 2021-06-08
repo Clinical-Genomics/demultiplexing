@@ -751,10 +751,3 @@ class NIPTSamplesheet(Samplesheet):
         for line in data_lines:
             rs.append(delim.join(line))
         return end.join(rs)
-
-
-if __name__ == "__main__":
-    sample_sheet = HiSeqXSamplesheet(
-        "/tests/fixtures/hiseqx/x_samplesheet_multiple_index.csv"
-    )
-    sample_sheet.validate()
