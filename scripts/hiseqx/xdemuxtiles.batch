@@ -127,20 +127,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
               log "ln '${UNDETERMINED_FASTQ_FILE}' '${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
                    ln "${UNDETERMINED_FASTQ_FILE}" "${SAMPLE_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
           done
-
-        # Undetermined, if pooled link to an Undetermined folder
-        elif [[ ${POOLED_LANE} == "true" ]];
-        then
-          log "Found pooled samples on lanes, creating Undetermined directory"
-          log "mkdir -p '${UNDETERMINED_DIR}'"
-          mkdir -p "${UNDETERMINED_DIR}"
-          for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
-            UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
-            log "ln '${UNDETERMINED_FASTQ_FILE}' '${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
-                 ln "${UNDETERMINED_FASTQ_FILE}" "${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
-          done
         fi
-
 
         # safely rename the sample dir as they are located in a tmp folder
         log "mv '${SAMPLE_DIR}' '${PROJECT_DIR}/Sample_${SAMPLE_BASE}'"
@@ -153,6 +140,19 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
     log "cp -rl '${PROJECT_DIR}'/* '${PROJECT_OUTDIR}'"
          cp -rl "${PROJECT_DIR}"/* "${PROJECT_OUTDIR}"
 done
+
+# Undetermined, if pooled link to an Undetermined folder
+if [[ ${POOLED_LANE} == "true" ]];
+then
+  log "Found pooled samples on lanes, creating Undetermined directory"
+  log "mkdir -p '${UNDETERMINED_DIR}'"
+  mkdir -p "${UNDETERMINED_DIR}"
+  for UNDETERMINED_FASTQ_FILE in "${TMPOUT_DIR}"/Undetermined*.fastq.gz; do
+    UNDETERMINED_FASTQ=$(basename "${UNDETERMINED_FASTQ_FILE}")
+    log "ln '${UNDETERMINED_FASTQ_FILE}' '${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}'"
+         ln "${UNDETERMINED_FASTQ_FILE}" "${UNDETERMINED_DIR}/${FC}-${LANE_TILE}_${UNDETERMINED_FASTQ}"
+  done
+fi
 
 log "Done copying output"
 
