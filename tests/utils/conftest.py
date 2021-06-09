@@ -127,8 +127,6 @@ def fixture_nipt_samplesheet(nipt_samplesheet: Path) -> NIPTSamplesheet:
 
 
 @pytest.fixture(name="hiseqx_samplesheet_multiple_index")
-def fixture_hiseqx_samplesheet_multiple_index(hiseqx_dir: Path) -> HiSeqXSamplesheet:
+def fixture_hiseqx_samplesheet_multiple_index(hiseqx_samplesheet_multiple_indexes_path: Path) -> HiSeqXSamplesheet:
     """ Return a HiseqXSamplesheet object with multiple index types """
-    return HiSeqXSamplesheet(
-        (hiseqx_dir / "x_samplesheet_multiple_index.csv").as_posix()
-    )
+    return HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())

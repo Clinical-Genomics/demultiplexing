@@ -87,13 +87,19 @@ def fixture_hisex_dir(fixtures_dir: Path) -> Path:
 @pytest.fixture(name="hiseqx_samplesheet_path")
 def fixture_hiseqx_samplesheet(hiseqx_dir: Path) -> Path:
     """ Return the path to a hiseqx samplesheet """
-    return hiseqx_dir / "x_samplesheet.csv"
+    return hiseqx_dir / "hiseqx_samplesheet.csv"
 
 
-@pytest.fixture(name="hiseqx_samplesheet_wrong_header_path")
-def fixture_hiseqx_samplesheet_wrong_header_path(hiseqx_dir: Path) -> Path:
-    """ Return the path to a faulty hiseqx samplesheet """
-    return hiseqx_dir / "hiseqx_samplesheet_wrong_header.csv"
+@pytest.fixture(name="hiseqx_samplesheet_wrong_columns_path")
+def fixture_hiseqx_samplesheet_wrong_columns_path(hiseqx_dir: Path) -> Path:
+    """ Return the path to a hiseqx samplesheet with wrong columns """
+    return hiseqx_dir / "hiseqx_samplesheet_wrong_columns.csv"
+
+
+@pytest.fixture(name="hiseqx_samplesheet_multiple_indexes_path")
+def fixture_hiseqx_samplesheet_multiple_indexes_path(hiseqx_dir: Path) -> Path:
+    """ Return the path to a hiseqx samplesheet with multiple indexes types """
+    return hiseqx_dir / "hiseqx_samplesheet_multiple_index.csv"
 
 
 @pytest.fixture(name="nipt_dir")

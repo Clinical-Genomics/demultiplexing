@@ -1656,14 +1656,14 @@ def test_x_validate_multiple_index(
     # GIVEN a sample sheet with multiple types of index in it.
     caplog.set_level(logging.ERROR)
     # WHEN such sample sheet is validated
-    with pytest.raises(SampleSheetValidationException) as e:
+    with pytest.raises(SampleSheetValidationException) as exception:
         hiseqx_samplesheet_multiple_index.validate()
         # THEN an error should be and we should get the message
-        assert "Multiple index types in SampleSheet!" in e.value
+    assert "Multiple index types in SampleSheet!" in str(exception.value)
 
 
-def test_x_faulty_samplesheet(x_faulty_samplesheet_path: Path):
-    samplesheet = Samplesheet(x_faulty_samplesheet_path.as_posix())
+def test_x_faulty_samplesheet(hiseqx_samplesheet_wrong_columns_path: Path):
+    samplesheet = Samplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
