@@ -90,10 +90,10 @@ def fixture_hiseqx_samplesheet(hiseqx_dir: Path) -> Path:
     return hiseqx_dir / "x_samplesheet.csv"
 
 
-@pytest.fixture(name="x_faulty_samplesheet_path")
-def fixture_x_faulty_samplesheet(hiseqx_dir: Path) -> Path:
+@pytest.fixture(name="hiseqx_samplesheet_wrong_header_path")
+def fixture_hiseqx_samplesheet_wrong_header_path(hiseqx_dir: Path) -> Path:
     """ Return the path to a faulty hiseqx samplesheet """
-    return hiseqx_dir / "x_faulty_samplesheet.csv"
+    return hiseqx_dir / "hiseqx_samplesheet_wrong_header.csv"
 
 
 @pytest.fixture(name="nipt_dir")
