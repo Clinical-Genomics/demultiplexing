@@ -1,11 +1,11 @@
 import re
-import logging
-from copy import deepcopy
+
 from collections import OrderedDict
+from copy import deepcopy
 from pathlib import Path
 from typing import Tuple
 
-LOG = logging.getLogger(__name__)
+from demux.constants.constants import COMMA, NEW_LINE
 
 
 class SampleSheetValidationException(Exception):
@@ -20,7 +20,7 @@ class SampleSheetValidationException(Exception):
         )
 
 
-class SampleSheetParsexception(Exception):
+class SampleSheetParseException(Exception):
     pass
 
 
@@ -122,7 +122,7 @@ class Samplesheet(object):
     def parse(self, samplesheet_path, delim=","):
         """
         Parses a Samplesheet, with their fake csv format.
-        Should be instancied with the samplesheet path as an argument.
+        Should be instantiated with the samplesheet path as an argument.
         Will create a dict for each section. Header: (lines)
         """
 
@@ -144,7 +144,7 @@ class Samplesheet(object):
                 self.section[name].append(line)
 
         if self.DATA not in self.section:
-            raise SampleSheetParsexception("No data found!")
+            raise SampleSheetParseException("No data found!")
 
         header = self._get_data_header()
         self.samplesheet = [
@@ -224,7 +224,7 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
-        """ Return True if lane contains multiple samples based on the orignal header """
+        """ Return True if lane contains multiple samples based on the original header """
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -250,7 +250,7 @@ class Samplesheet(object):
                         return (msg, i + 2)
             return True
 
-        def _validate_uniq_index(samplesheet):
+        def _validate_unique_index(samplesheet):
             lanes = list(set(self.column("lane")))
             for lane in lanes:
                 if self.is_pooled_lane(lane, column="lane"):
@@ -260,12 +260,13 @@ class Samplesheet(object):
                         if index not in sample_of:
                             sample_of[index] = set()
                         sample_of[index].add(line["sample_id"])
-
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
+                            samples_list = list(samples)
+                            samples_list.sort()
                             return (
                                 "Same index for {} on lane {}".format(
-                                    " , ".join(samples), lane
+                                    " , ".join(samples_list), lane
                                 ),
                                 index,
                             )
@@ -283,7 +284,7 @@ class Samplesheet(object):
                         i + 2,
                     )
 
-        rs = _validate_uniq_index(self.samplesheet)
+        rs = _validate_unique_index(self.samplesheet)
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
@@ -358,7 +359,6 @@ class HiSeqXSamplesheet(Samplesheet):
             _validate_index_types(),
         ]:
             if type(rs) is tuple:
-                LOG.error(rs[0])
                 raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
         return True
@@ -622,14 +622,40 @@ class HiSeq2500Samplesheet(Samplesheet):
         "lane": "Lane",
         "sample_id": "SampleID",
         "sample_ref": "SampleRef",
-        "index": "index",
-        "index2": "index2",
+        "index": "Index",
+        "index2": "Index2",
         "sample_name": "SampleName",
         "control": "Control",
         "recipe": "Recipe",
         "operator": "Operator",
-        "project": "Project",
+        "description": "Description",
+        "project": "SampleProject",
     }
+
+    def convert(self, delim: str = COMMA, end: str = NEW_LINE) -> str:
+        """Converts an old HiSeq2500 sample sheet for use on Hasta"""
+
+        def _is_dual_index(line: list) -> bool:
+            return "Index2" in line
+
+        def _insert_empty_index(line: list) -> None:
+            line.insert(5, "")
+
+        converted_samplesheet: list = list()
+        converted_samplesheet.append(self.DATA)
+        header: list = self.section[self.DATA][0]
+        sample_rows: list = self.section[self.DATA][1:]
+        new_header: list = list(Samplesheet.header_map.values())
+        converted_header: str = delim.join(new_header)
+        converted_samplesheet.append(converted_header)
+
+        for row in sample_rows:
+            if not _is_dual_index(header):
+                _insert_empty_index(row)
+            converted_row = delim.join(row)
+            converted_samplesheet.append(converted_row)
+
+        return end.join(converted_samplesheet)
 
 
 class NIPTSamplesheet(Samplesheet):

@@ -1,10 +1,10 @@
-import bs4
-import pytest
-
 from copy import copy
 from pathlib import Path
 
-from demux.constants import REPORT_TABLES_INDEX, REFERENCE_REPORT_HEADER
+import bs4
+import pytest
+
+from demux.constants import REFERENCE_REPORT_HEADER, REPORT_TABLES_INDEX
 from demux.utils.indexreport import IndexReport
 from demux.utils.samplesheet import HiSeqXSamplesheet, NIPTSamplesheet
 
@@ -120,13 +120,31 @@ def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) 
     return modified_report.sample_table_header
 
 
-@pytest.fixture(name="nipt_samplesheet")
-def fixture_nipt_samplesheet(nipt_samplesheet: Path) -> NIPTSamplesheet:
-    """ Return a NIPTSamplesheet object """
-    return NIPTSamplesheet(nipt_samplesheet)
-
-
 @pytest.fixture(name="hiseqx_samplesheet_multiple_index")
 def fixture_hiseqx_samplesheet_multiple_index(hiseqx_samplesheet_multiple_indexes_path: Path) -> HiSeqXSamplesheet:
     """ Return a HiseqXSamplesheet object with multiple index types """
     return HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())
+
+
+@pytest.fixture(name="hiseq2500_samplesheet_invalid_duplicate_index")
+def fixture_invalid_2500_samplesheet_duplicate_index(hiseq2500_dir):
+    """fixture for an invalid 2500 sample sheet with a duplicate index"""
+    return hiseq2500_dir / "2500-single-index-samplesheet-invalid-duplicate-index.csv"
+
+
+@pytest.fixture(name="hiseq2500_samplesheet_invalid_length")
+def fixture_invalid_2500_samplesheet_length(hiseq2500_dir):
+    """fixture for an invalid 2500 sample sheet with a line that is longer than the header"""
+    return hiseq2500_dir / "2500-single-index-samplesheet-invalid-length.csv"
+
+
+@pytest.fixture(name="hiseq2500_samplesheet_invalid_sample_name")
+def fixture_invalid_2500_samplesheet_sample_name(hiseq2500_dir):
+    """fixture for an invalid 2500 sample sheet with a sample name with a space in it"""
+    return hiseq2500_dir / "2500-single-index-samplesheet-invalid-sample-name.csv"
+
+
+@pytest.fixture(name="hiseq2500_samplesheet_valid")
+def fixture_valid_2500_samplesheet(hiseq2500_dir):
+    """fixture for a valid 2500 sample sheet"""
+    return hiseq2500_dir / "2500-single-index-samplesheet-valid.csv"

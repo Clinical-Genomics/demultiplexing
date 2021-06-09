@@ -28,12 +28,17 @@ for RUNDIR in ${INDIR}/*; do
                 FC=${FC:1}
                 demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
+            else
+                echo converting ${RUNDIR}/SampleSheet.csv
+                demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                cp ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
+                cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
             bash /home/proj/stage/bin/git/demultiplexing/scripts/2500/stage/demux-2500.bash ${RUNDIR} ${DEMUXDIR}
             rm ${DEMUXDIR}/copycomplete.txt
         else
-            echo [${NOW}] ${RUN} is finished and demultiplexing has already started - started.txt exists
+            echo [${NOW}] ${RUN} is finished and demultiplexing has already started - demuxstarted.txt exists
         fi
     else
         echo [${NOW}] ${RUN} is not finished yet
