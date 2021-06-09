@@ -150,5 +150,7 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
 @pytest.fixture(scope="function", name="novaseq_runparameters_api")
 def fixture_novaseq_runparameters_api(novaseq_runs_dir: Path):
     """ Set up novaseq runparameters api for testing """
-    novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir.as_posix())
+    novaseq_runparameters_api = NovaseqRunParameters(
+        "HGJJKDSXY", novaseq_runs_dir.as_posix()
+    )
     return novaseq_runparameters_api

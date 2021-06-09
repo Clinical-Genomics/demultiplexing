@@ -121,7 +121,9 @@ def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) 
 
 
 @pytest.fixture(name="hiseqx_samplesheet_multiple_index")
-def fixture_hiseqx_samplesheet_multiple_index(hiseqx_samplesheet_multiple_indexes_path: Path) -> HiSeqXSamplesheet:
+def fixture_hiseqx_samplesheet_multiple_index(
+    hiseqx_samplesheet_multiple_indexes_path: Path,
+) -> HiSeqXSamplesheet:
     """ Return a HiseqXSamplesheet object with multiple index types """
     return HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())
 
