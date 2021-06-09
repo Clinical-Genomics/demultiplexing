@@ -337,22 +337,16 @@ class HiSeqXSamplesheet(Samplesheet):
             """ Check if there are multiple types of indexes, meaning single, dual, or both """
 
             indexes = []
-            for line in self.lines():
-                # If there is an index
-                if line["index"]:
-                    # Create a new tuple
-                    index_1 = len(line["index"])
-                    try:
-                        # Check if it is dual
-                        index_2 = len(line["index2"])
-                        new_index_tuple = (index_1, index_2)
-                    except KeyError:
-                        new_index_tuple = (index_1,)
-
-                    # Check if index type has already been identified
-                    if not any([new_index_tuple == index for index in indexes]):
-                        indexes.append(new_index_tuple)
-
+            try:
+                for index in zip(self.column("index"), self.column("index2")):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any([index_type == new_index_type for index_type in indexes]):
+                        indexes.append(new_index_type)
+            except KeyError:
+                for index in self.column("index"):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any([index_type == new_index_type for index_type in indexes]):
+                        indexes.append(new_index_type)
             if len(indexes) > 1:
                 msg = "Multiple index types in SampleSheet!"
                 line_nr = None
