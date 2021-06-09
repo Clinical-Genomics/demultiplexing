@@ -126,20 +126,10 @@ def fixture_nipt_faulty_samplesheet_path(nipt_dir: Path) -> Path:
     return nipt_dir / "nipt_faulty_samplesheet.csv"
 
 
-@pytest.fixture(name="dir_2500")
-def fixture_2500_dir(fixtures_dir: Path) -> Path:
+@pytest.fixture(name="hiseq2500_dir")
+def fixture_hiseq2500_dir(fixtures_dir: Path) -> Path:
     """ Return path to the 2500 fixture directory """
     return fixtures_dir / "2500"
-
-
-@pytest.fixture(name="samplesheet_2500_path")
-def fixture_samplesheet_2500_path(dir_2500: Path) -> Path:
-    return dir_2500 / "2500_samplesheet.csv"
-
-
-@pytest.fixture(name="faulty_samplesheet_2500_path")
-def fixture_faulty_samplesheet_2500_path(dir_2500: Path) -> Path:
-    return dir_2500 / "2500_faulty_samplesheet.csv"
 
 
 @pytest.fixture(name="run_parameters_file")
@@ -158,7 +148,7 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
 
 
 @pytest.fixture(scope="function", name="novaseq_runparameters_api")
-def fixture_novaseq_runparameters_api(novaseq_runs_dir):
+def fixture_novaseq_runparameters_api(novaseq_runs_dir: Path):
     """ Set up novaseq runparameters api for testing """
-    novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir)
+    novaseq_runparameters_api = NovaseqRunParameters("HGJJKDSXY", novaseq_runs_dir.as_posix())
     return novaseq_runparameters_api
