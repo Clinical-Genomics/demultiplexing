@@ -1745,6 +1745,7 @@ def test_convert_2500_samplesheet(
     # THEN the validation should return True
     snapshot.assert_match(result)
 
+
 def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
     """Check if pooled samples are detected of a pooled samplesheet"""
 

@@ -122,7 +122,9 @@ def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) 
 
 
 @pytest.fixture(name="pooled_hiseqx_samplesheet")
-def fixture_pooled_hiseqx_samplesheet(hiseqx_samplesheet_pooled_path: Path) -> Samplesheet:
+def fixture_pooled_hiseqx_samplesheet(
+    hiseqx_samplesheet_pooled_path: Path,
+) -> Samplesheet:
     """Return a pooled HiSeqX samplesheet object"""
     return Samplesheet(hiseqx_samplesheet_pooled_path.as_posix())
 
