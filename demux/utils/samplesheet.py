@@ -3,13 +3,9 @@ import re
 from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
-<<<<<<< HEAD
-from typing import Set
-=======
-from typing import Tuple
+from typing import Set, Tuple
 
 from demux.constants.constants import COMMA, NEW_LINE
->>>>>>> origin/master
 
 
 class SampleSheetValidationException(Exception):
@@ -227,11 +223,7 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
-<<<<<<< HEAD
-        """Return True if lane contains multiple samples based on the orignal header"""
-=======
         """ Return True if lane contains multiple samples based on the original header """
->>>>>>> origin/master
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -329,13 +321,8 @@ class Samplesheet(object):
 
 class HiSeqXSamplesheet(Samplesheet):
     def unparse(self, delim=","):
-<<<<<<< HEAD
         """Reconstruct the sample sheet based on the (modified) parsed values."""
-        rs = []
-=======
-        """Reconstruct the sample sheet based on the (modified) parsed values. """
 
->>>>>>> origin/master
         yield "[Data]"
         yield delim.join(self._get_data_header_r())
         for line in self.samplesheet:
