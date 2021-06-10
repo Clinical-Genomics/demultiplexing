@@ -1,4 +1,6 @@
-""" Parsing of Novaseq run parameters """
+"""
+    Parsing of Novaseq run parameters
+"""
 import os
 import xml.etree.cElementTree as et
 from pathlib import Path

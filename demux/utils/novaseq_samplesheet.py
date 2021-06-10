@@ -1,4 +1,6 @@
-""" Create a samplesheet for NovaSeq flowcells """
+"""
+    Create a samplesheet for NovaSeq flowcells
+"""
 import csv
 import sys
 from distutils.version import StrictVersion, LooseVersion

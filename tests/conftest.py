@@ -6,7 +6,6 @@ from typing import Dict
 import pytest
 
 from demux.utils.runparameters import NovaseqRunParameters
-from demux.utils.samplesheet import HiSeqXSamplesheet
 
 
 @pytest.fixture(scope="function", name="project_dir")
@@ -50,7 +49,7 @@ def fixture_hiseqx_samplesheet_pooled_path(hiseqx_dir: Path) -> Path:
 
 @pytest.fixture(name="hiseq2500_dir")
 def fixture_2500_dir(fixtures_dir: Path) -> Path:
-    """ Return the path to the 2500 directory """
+    """Return the path to the 2500 directory"""
     return fixtures_dir / "2500"
 
 
@@ -92,49 +91,49 @@ def fixture_runs_dir(novaseq_dir: Path) -> Path:
 
 @pytest.fixture(name="hiseqx_dir")
 def fixture_hisex_dir(fixtures_dir: Path) -> Path:
-    """ Return the path to the hiseqx fixture directory """
+    """Return the path to the hiseqx fixture directory"""
     return fixtures_dir / "hiseqx"
 
 
 @pytest.fixture(name="hiseqx_samplesheet_path")
 def fixture_hiseqx_samplesheet(hiseqx_dir: Path) -> Path:
-    """ Return the path to a hiseqx samplesheet """
+    """Return the path to a hiseqx samplesheet"""
     return hiseqx_dir / "hiseqx_samplesheet.csv"
 
 
 @pytest.fixture(name="hiseqx_samplesheet_wrong_columns_path")
 def fixture_hiseqx_samplesheet_wrong_columns_path(hiseqx_dir: Path) -> Path:
-    """ Return the path to a hiseqx samplesheet with wrong columns """
+    """Return the path to a hiseqx samplesheet with wrong columns"""
     return hiseqx_dir / "hiseqx_samplesheet_wrong_columns.csv"
 
 
 @pytest.fixture(name="hiseqx_samplesheet_multiple_indexes_path")
 def fixture_hiseqx_samplesheet_multiple_indexes_path(hiseqx_dir: Path) -> Path:
-    """ Return the path to a hiseqx samplesheet with multiple indexes types """
+    """Return the path to a hiseqx samplesheet with multiple indexes types"""
     return hiseqx_dir / "hiseqx_samplesheet_multiple_index.csv"
 
 
 @pytest.fixture(name="nipt_dir")
 def fixture_nipt_dir(fixtures_dir: Path) -> Path:
-    """ Return the path to nipt fixture directory """
+    """Return the path to nipt fixture directory"""
     return fixtures_dir / "nipt"
 
 
 @pytest.fixture(name="nipt_samplesheet_path")
 def fixture_nipt_samplesheet_path(nipt_dir: Path) -> Path:
-    """ Return path to nipt samplesheet"""
+    """Return path to nipt samplesheet"""
     return nipt_dir / "nipt_samplesheet.csv"
 
 
 @pytest.fixture(name="nipt_faulty_samplesheet_path")
 def fixture_nipt_faulty_samplesheet_path(nipt_dir: Path) -> Path:
-    """ Return path to a faulty nipt samplesheet """
+    """Return path to a faulty nipt samplesheet"""
     return nipt_dir / "nipt_faulty_samplesheet.csv"
 
 
 @pytest.fixture(name="hiseq2500_dir")
 def fixture_hiseq2500_dir(fixtures_dir: Path) -> Path:
-    """ Return path to the 2500 fixture directory """
+    """Return path to the 2500 fixture directory"""
     return fixtures_dir / "2500"
 
 
@@ -143,19 +142,19 @@ def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path
     """Fixture for novaseq runparameters files"""
     return {
         "novaseq_oldSCV": novaseq_runs_dir
-        / "RunParameters_oldSCV.xml",  # TODO: choose proper name
+        / "RunParameters_oldSCV.xml",
         "novaseq_newSCV_oldkit": novaseq_runs_dir
-        / "RunParameters_newSCV_oldkit.xml",  # TODO: choose proper name
+        / "RunParameters_newSCV_oldkit.xml",
         "novaseq_newSCV_newkit": novaseq_runs_dir
-        / "RunParameters_newSCV_newkit.xml",  # TODO: choose proper name
+        / "RunParameters_newSCV_newkit.xml",
         "novaseq_fluffy": novaseq_runs_dir
-        / "RunParameters_fluffy.xml",  # TODO: choose proper name
+        / "RunParameters_fluffy.xml",
     }
 
 
 @pytest.fixture(scope="function", name="novaseq_runparameters_api")
 def fixture_novaseq_runparameters_api(novaseq_runs_dir: Path):
-    """ Set up novaseq runparameters api for testing """
+    """Set up novaseq runparameters api for testing"""
     novaseq_runparameters_api = NovaseqRunParameters(
         "HGJJKDSXY", novaseq_runs_dir.as_posix()
     )

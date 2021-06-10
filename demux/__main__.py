@@ -1,8 +1,8 @@
 """
-demux.__main__
-The main entry point for the command line interface.
-Invoke as ``demux`` (if installed)
-or ``python -m demux`` (no install required).
+    demux.__main__
+    The main entry point for the command line interface.
+    Invoke as ``demux`` (if installed)
+    or ``python -m demux`` (no install required).
 """
 import sys
 

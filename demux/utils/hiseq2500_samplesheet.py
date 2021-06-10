@@ -1,4 +1,6 @@
-""" Create a samplesheet for 2500 flowcells """
+"""
+    Create a samplesheet for 2500 flowcells
+"""
 
 from ..constants.constants import DASH, COMMA, LIMS_KEYS
 from .samplesheet import Samplesheet

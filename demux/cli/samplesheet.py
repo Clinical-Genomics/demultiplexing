@@ -1,15 +1,12 @@
 """ CLI points for samplesheet action """
 import copy
 import click
-import csv
 import logging
 import sys
 
-from pathlib import Path
-from typing import List, Dict
-
 from cglims.api import ClinicalLims
 from demux.exc import NoValidReagentKitFound
+from demux.constants.constants import COMMA
 
 from ..utils import (
     Create2500Samplesheet,
@@ -23,22 +20,23 @@ from ..utils import (
 
 LOG = logging.getLogger(__name__)
 
+ARGUMENT_SAMPLE_SHEET = click.argument("samplesheet", type=str)
 
 @click.group()
-def sheet():
+def sheet() -> None:
     """Samplesheet commands"""
     pass
 
 
 @sheet.command()
-@click.argument("samplesheet")
+@ARGUMENT_SAMPLE_SHEET
 @click.option(
     "-a",
     "--application",
     type=click.Choice(["wgs", "wes", "nipt", "miseq"]),
     help="sequencing type",
 )
-def validate(samplesheet, application):
+def validate(samplesheet: str, application: str) -> None:
     """validate a samplesheet"""
     if application == "nipt":
         NIPTSamplesheet(samplesheet).validate()
@@ -51,15 +49,15 @@ def validate(samplesheet, application):
 
 
 @sheet.command()
-@click.argument("samplesheet")
-def massage(samplesheet):
+@ARGUMENT_SAMPLE_SHEET
+def massage(samplesheet: str) -> None:
     """create a NIPT ready SampleSheet"""
     click.echo(NIPTSamplesheet(samplesheet).massage())
 
 
 @sheet.command()
-@click.argument("samplesheet", type=str)
 @click.argument("sample", type=str)
+@ARGUMENT_SAMPLE_SHEET
 def sample_in_pooled_lane(samplesheet: str, sample: str) -> None:
     """Check if a sample is in a pooled lane"""
     sample_sheet = Samplesheet(samplesheet)
@@ -74,17 +72,17 @@ def sample_in_pooled_lane(samplesheet: str, sample: str) -> None:
 
 
 @sheet.command()
-@click.argument("samplesheet")
+@ARGUMENT_SAMPLE_SHEET
 @click.option(
     "-a", "--application", type=click.Choice(["miseq", "nipt"]), help="sequencing type"
 )
 @click.option("-f", "--flowcell", help="for miseq, please provide a flowcell id")
-def demux(samplesheet, application, flowcell):
+def demux(samplesheet: str, application: str, flowcell: str):
     if application == "nipt":
-        """convert NIPT samplesheet to demux'able samplesheet """
+        """convert NIPT samplesheet to demux'able samplesheet"""
         click.echo(NIPTSamplesheet(samplesheet).to_demux())
     elif application == "miseq":
-        """convert MiSeq samplesheet to demux'able samplesheet """
+        """convert MiSeq samplesheet to demux'able samplesheet"""
         click.echo(MiseqSamplesheet(samplesheet, flowcell).to_demux())
     else:
         LOG.error("No application provided!")
@@ -99,6 +97,10 @@ def demux(samplesheet, application, flowcell):
     type=click.Choice(["wgs", "wes", "nova", "iseq"]),
     help="application type",
 )
+@click.option(
+    "-d", "--delimiter", default=COMMA, show_default=True, help="column delimiter"
+)
+@click.option("-e", "--end", default="\n", show_default=True, help="line delimiter")
 @click.option(
     "-i",
     "--dualindex",
@@ -117,35 +119,30 @@ def demux(samplesheet, application, flowcell):
     "-L", "--longest", is_flag=True, help="2500 and NovaSeq: only return longest index"
 )
 @click.option(
-    "-S",
-    "--shortest",
-    is_flag=True,
-    help="2500 and NovaSeq: only return shortest index",
-)
-@click.option(
-    "-d", "--delimiter", default=",", show_default=True, help="column delimiter"
-)
-@click.option("-e", "--end", default="\n", show_default=True, help="line delimiter")
-@click.option(
     "-p",
     "--pad",
     is_flag=True,
     default=False,
     help="add 2 bases to indices with length 8",
 )
+@click.option(
+    "-S",
+    "--shortest",
+    is_flag=True,
+    help="2500 and NovaSeq: only return shortest index",
+)
 @click.pass_context
 def fetch(
     context,
-    flowcell,
-    application,
-    dualindex,
-    index_length,
-    longest,
-    shortest,
-    pad,
-    delimiter=",",
-    end="\n",
-):
+    application: str,
+    delimiter: str,
+    dualindex: bool,
+    flowcell: str,
+    index_length: str,
+    longest: bool,
+    pad: bool,
+    shortest: bool,
+) -> None:
     """
     Fetch a samplesheet from LIMS.
     If a flowcell has dual indices of length 10+10 bp (dual 10) and/or 8+8 bp (dual 8), use
@@ -153,12 +150,12 @@ def fetch(
     This will ensure that all indices in the sample sheet are of the same length, namely 10.
     """
 
-    def reverse_complement(dna):
+    def reverse_complement(dna: str) -> str:
         complement = {"A": "T", "C": "G", "G": "C", "T": "A"}
         return "".join([complement[base] for base in dna[::-1]])
 
-    def get_project(project):
-        """ Only keeps the first part of the project name"""
+    def get_project(project: str) -> str:
+        """Only keeps the first part of the project name"""
         return project.split(" ")[0]
 
     if application == "nova":
@@ -297,7 +294,7 @@ def fetch(
 
 
 @sheet.command()
-@click.argument("samplesheet")
-def convert(samplesheet):
+@ARGUMENT_SAMPLE_SHEET
+def convert(samplesheet: str):
     """CLI command to convert an old HiSeq2500 sample sheet for use on Hasta"""
     click.echo(HiSeq2500Samplesheet(samplesheet).convert())

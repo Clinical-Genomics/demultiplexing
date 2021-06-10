@@ -1,4 +1,6 @@
-"""Constants for sample sheet creation"""
+"""
+    Constants for sample sheet creation
+"""
 from distutils.version import LooseVersion, StrictVersion
 
 NIPT_INDEX_LENGTH = 8
