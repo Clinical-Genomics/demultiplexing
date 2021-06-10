@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pathlib import Path
-
 import pytest
 
+from pathlib import Path
+from snapshottest import Snapshot
+
 from demux.utils import (
+    HiSeqXSamplesheet,
     HiSeq2500Samplesheet,
     NIPTSamplesheet,
     Samplesheet,
     SampleSheetValidationException,
 )
-from snapshottest import Snapshot
 
 
-def test_nipt_samplesheet():
-    samplesheet = NIPTSamplesheet("tests/fixtures/nipt_samplesheet.csv")
+def test_nipt_samplesheet(nipt_samplesheet_path: Path):
+    samplesheet = NIPTSamplesheet(nipt_samplesheet_path.as_posix())
 
     assert samplesheet._get_flowcell() == "HFNC5BCXY"
     assert samplesheet._get_project_id() == "666666"
@@ -1344,15 +1345,15 @@ HFNC5BCXY,2,PCS-1724772-01,hg19,ACTGAT,Control,666666,R1,NN,666666"""
     assert lines_r == expectes_lines_r
 
 
-def test_nipt_faulty_samplesheet():
-    samplesheet = NIPTSamplesheet("tests/fixtures/nipt_faulty_samplesheet.csv")
+def test_nipt_faulty_samplesheet(nipt_faulty_samplesheet_path: Path):
+    samplesheet = NIPTSamplesheet(nipt_faulty_samplesheet_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
         samplesheet.validate()
 
 
-def test_x_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_samplesheet.csv")
+def test_x_samplesheet(hiseqx_samplesheet_path: Path):
+    samplesheet = Samplesheet(hiseqx_samplesheet_path.as_posix())
 
     assert (
         samplesheet.raw()
@@ -1647,11 +1648,25 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert lines[0].dualindex == "TCCGCGAA"
 
 
-def test_x_faulty_samplesheet():
-    samplesheet = Samplesheet("tests/fixtures/x_faulty_samplesheet.csv")
+def test_x_validate_multiple_index(
+    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet, caplog
+):
+    """ Test validation function to detect multiple index in sample sheet """
+
+    # GIVEN a sample sheet with multiple types of index in it.
+    sample_sheet = hiseqx_samplesheet_multiple_index
+    # WHEN such sample sheet is validated
+    with pytest.raises(SampleSheetValidationException) as exception:
+        sample_sheet.validate()
+        # THEN an error should be and we should get the message
+    assert "Multiple index types in SampleSheet!" in str(exception.value)
+
+
+def test_hiseqx_samplesheet_wrong_columns(hiseqx_samplesheet_wrong_columns_path: Path):
+    sample_sheet = Samplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
 
     with pytest.raises(SampleSheetValidationException):
-        samplesheet.validate()
+        sample_sheet.validate()
 
 
 def test_2500_valid_samplesheet(hiseq2500_samplesheet_valid: Path):

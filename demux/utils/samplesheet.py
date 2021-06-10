@@ -1,7 +1,9 @@
 import re
+
 from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
+from typing import Tuple
 
 from demux.constants.constants import COMMA, NEW_LINE
 
@@ -96,7 +98,7 @@ class Samplesheet(object):
 
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
-        self.original_sheet = []  # all lines of hte samplesheet
+        self.original_sheet = []  # all lines of the samplesheet
         self.section_markers = (
             dict()
         )  # [Name]: line; does this section have a named section
@@ -304,7 +306,7 @@ class Samplesheet(object):
 class HiSeqXSamplesheet(Samplesheet):
     def unparse(self, delim=","):
         """Reconstruct the sample sheet based on the (modified) parsed values. """
-        rs = []
+
         yield "[Data]"
         yield delim.join(self._get_data_header_r())
         for line in self.samplesheet:
@@ -316,23 +318,50 @@ class HiSeqXSamplesheet(Samplesheet):
     def validate(self):
         Samplesheet.validate(self)
 
-        def _validate_project_samplename():
+        def _validate_project_samplename() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["project"] != line["sample_name"]:
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Project and SampleName cannot be different!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        def _validate_index():
+        def _validate_index() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["index"] == "":
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Missing index!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        for rs in [_validate_index(), _validate_project_samplename()]:
+        def _validate_index_types() -> Tuple[str, None]:
+            """ Check if there are multiple types of indexes, meaning single, dual, or both """
+
+            indexes = []
+            try:
+                for index in zip(self.column("index"), self.column("index2")):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any(
+                        [index_type == new_index_type for index_type in indexes]
+                    ):
+                        indexes.append(new_index_type)
+            except KeyError:
+                for index in self.column("index"):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any(
+                        [index_type == new_index_type for index_type in indexes]
+                    ):
+                        indexes.append(new_index_type)
+            if len(indexes) > 1:
+                msg = "Multiple index types in SampleSheet!"
+                line_nr = None
+                return msg, line_nr
+
+        for rs in [
+            _validate_index(),
+            _validate_project_samplename(),
+            _validate_index_types(),
+        ]:
             if type(rs) is tuple:
                 raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
