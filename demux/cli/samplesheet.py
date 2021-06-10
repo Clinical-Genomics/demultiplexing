@@ -22,6 +22,7 @@ LOG = logging.getLogger(__name__)
 
 ARGUMENT_SAMPLE_SHEET = click.argument("samplesheet", type=str)
 
+
 @click.group()
 def sheet() -> None:
     """Samplesheet commands"""

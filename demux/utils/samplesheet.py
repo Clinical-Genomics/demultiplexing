@@ -223,7 +223,7 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
-        """ Return True if lane contains multiple samples based on the original header """
+        """Return True if lane contains multiple samples based on the original header"""
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -351,7 +351,7 @@ class HiSeqXSamplesheet(Samplesheet):
                     return msg, line_nr
 
         def _validate_index_types() -> Tuple[str, None]:
-            """ Check if there are multiple types of indexes, meaning single, dual, or both """
+            """Check if there are multiple types of indexes, meaning single, dual, or both"""
 
             indexes = []
             try:

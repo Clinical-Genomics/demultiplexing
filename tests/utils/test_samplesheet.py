@@ -1648,10 +1648,10 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
     assert lines[0].dualindex == "TCCGCGAA"
 
 
-def test_x_validate_multiple_index(
+def test_hiseqx_samplesheet_multiple_index(
     hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet, caplog
 ):
-    """ Test validation function to detect multiple index in sample sheet """
+    """Test validation function to detect multiple index in sample sheet"""
 
     # GIVEN a sample sheet with multiple types of index in it.
     sample_sheet = hiseqx_samplesheet_multiple_index
@@ -1663,9 +1663,13 @@ def test_x_validate_multiple_index(
 
 
 def test_hiseqx_samplesheet_wrong_columns(hiseqx_samplesheet_wrong_columns_path: Path):
-    sample_sheet = Samplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
+    """Test validation of correct columns in a hiseqx sample sheet"""
 
+    # GIVEN a hiseqx sample sheet with incorrect headers
+    sample_sheet = Samplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
+    # WHEN said samplesheet is validated
     with pytest.raises(SampleSheetValidationException):
+        # THEN appropriate exception should be raised
         sample_sheet.validate()
 
 

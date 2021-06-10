@@ -141,14 +141,10 @@ def fixture_hiseq2500_dir(fixtures_dir: Path) -> Path:
 def fixture_novaseq_runparameters_file(novaseq_runs_dir: Path) -> Dict[str, Path]:
     """Fixture for novaseq runparameters files"""
     return {
-        "novaseq_oldSCV": novaseq_runs_dir
-        / "RunParameters_oldSCV.xml",
-        "novaseq_newSCV_oldkit": novaseq_runs_dir
-        / "RunParameters_newSCV_oldkit.xml",
-        "novaseq_newSCV_newkit": novaseq_runs_dir
-        / "RunParameters_newSCV_newkit.xml",
-        "novaseq_fluffy": novaseq_runs_dir
-        / "RunParameters_fluffy.xml",
+        "novaseq_oldSCV": novaseq_runs_dir / "RunParameters_oldSCV.xml",
+        "novaseq_newSCV_oldkit": novaseq_runs_dir / "RunParameters_newSCV_oldkit.xml",
+        "novaseq_newSCV_newkit": novaseq_runs_dir / "RunParameters_newSCV_newkit.xml",
+        "novaseq_fluffy": novaseq_runs_dir / "RunParameters_fluffy.xml",
     }
 
 
