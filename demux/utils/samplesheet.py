@@ -1,8 +1,15 @@
 import re
-from copy import deepcopy
+
 from collections import OrderedDict
+from copy import deepcopy
 from pathlib import Path
+<<<<<<< HEAD
 from typing import Set
+=======
+from typing import Tuple
+
+from demux.constants.constants import COMMA, NEW_LINE
+>>>>>>> origin/master
 
 
 class SampleSheetValidationException(Exception):
@@ -17,7 +24,7 @@ class SampleSheetValidationException(Exception):
         )
 
 
-class SampleSheetParsexception(Exception):
+class SampleSheetParseException(Exception):
     pass
 
 
@@ -95,7 +102,7 @@ class Samplesheet(object):
 
     def __init__(self, samplesheet_path):
         self.samplesheet_path = samplesheet_path
-        self.original_sheet = []  # all lines of hte samplesheet
+        self.original_sheet = []  # all lines of the samplesheet
         self.section_markers = (
             dict()
         )  # [Name]: line; does this section have a named section
@@ -118,7 +125,7 @@ class Samplesheet(object):
     def parse(self, samplesheet_path, delim=","):
         """
         Parses a Samplesheet, with their fake csv format.
-        Should be instancied with the samplesheet path as an argument.
+        Should be instantiated with the samplesheet path as an argument.
         Will create a dict for each section. Header: (lines)
         """
 
@@ -140,7 +147,7 @@ class Samplesheet(object):
                 self.section[name].append(line)
 
         if self.DATA not in self.section:
-            raise SampleSheetParsexception("No data found!")
+            raise SampleSheetParseException("No data found!")
 
         header = self._get_data_header()
         self.samplesheet = [
@@ -220,7 +227,11 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
+<<<<<<< HEAD
         """Return True if lane contains multiple samples based on the orignal header"""
+=======
+        """ Return True if lane contains multiple samples based on the original header """
+>>>>>>> origin/master
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -263,7 +274,7 @@ class Samplesheet(object):
                         return (msg, i + 2)
             return True
 
-        def _validate_uniq_index(samplesheet):
+        def _validate_unique_index(samplesheet):
             lanes = list(set(self.column("lane")))
             for lane in lanes:
                 if self.is_pooled_lane(lane, column="lane"):
@@ -273,12 +284,13 @@ class Samplesheet(object):
                         if index not in sample_of:
                             sample_of[index] = set()
                         sample_of[index].add(line["sample_id"])
-
                     for index, samples in sample_of.items():
                         if len(samples) > 1:
+                            samples_list = list(samples)
+                            samples_list.sort()
                             return (
                                 "Same index for {} on lane {}".format(
-                                    " , ".join(samples), lane
+                                    " , ".join(samples_list), lane
                                 ),
                                 index,
                             )
@@ -296,7 +308,7 @@ class Samplesheet(object):
                         i + 2,
                     )
 
-        rs = _validate_uniq_index(self.samplesheet)
+        rs = _validate_unique_index(self.samplesheet)
         if type(rs) is tuple:
             raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
@@ -317,8 +329,13 @@ class Samplesheet(object):
 
 class HiSeqXSamplesheet(Samplesheet):
     def unparse(self, delim=","):
+<<<<<<< HEAD
         """Reconstruct the sample sheet based on the (modified) parsed values."""
         rs = []
+=======
+        """Reconstruct the sample sheet based on the (modified) parsed values. """
+
+>>>>>>> origin/master
         yield "[Data]"
         yield delim.join(self._get_data_header_r())
         for line in self.samplesheet:
@@ -330,23 +347,50 @@ class HiSeqXSamplesheet(Samplesheet):
     def validate(self):
         Samplesheet.validate(self)
 
-        def _validate_project_samplename():
+        def _validate_project_samplename() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["project"] != line["sample_name"]:
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Project and SampleName cannot be different!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        def _validate_index():
+        def _validate_index() -> Tuple[str, int]:
             for i, line in enumerate(self.lines()):
                 if line["index"] == "":
                     # add i + 2 as it makes it easier to spot the 'wrong' line
                     line_nr = i + 2
                     msg = "Missing index!"
-                    return (msg, line_nr)
+                    return msg, line_nr
 
-        for rs in [_validate_index(), _validate_project_samplename()]:
+        def _validate_index_types() -> Tuple[str, None]:
+            """ Check if there are multiple types of indexes, meaning single, dual, or both """
+
+            indexes = []
+            try:
+                for index in zip(self.column("index"), self.column("index2")):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any(
+                        [index_type == new_index_type for index_type in indexes]
+                    ):
+                        indexes.append(new_index_type)
+            except KeyError:
+                for index in self.column("index"):
+                    new_index_type = (len(index[0]), len(index[1]))
+                    if not any(
+                        [index_type == new_index_type for index_type in indexes]
+                    ):
+                        indexes.append(new_index_type)
+            if len(indexes) > 1:
+                msg = "Multiple index types in SampleSheet!"
+                line_nr = None
+                return msg, line_nr
+
+        for rs in [
+            _validate_index(),
+            _validate_project_samplename(),
+            _validate_index_types(),
+        ]:
             if type(rs) is tuple:
                 raise SampleSheetValidationException(self.DATA, rs[1], rs[0])
 
@@ -611,14 +655,40 @@ class HiSeq2500Samplesheet(Samplesheet):
         "lane": "Lane",
         "sample_id": "SampleID",
         "sample_ref": "SampleRef",
-        "index": "index",
-        "index2": "index2",
+        "index": "Index",
+        "index2": "Index2",
         "sample_name": "SampleName",
         "control": "Control",
         "recipe": "Recipe",
         "operator": "Operator",
-        "project": "Project",
+        "description": "Description",
+        "project": "SampleProject",
     }
+
+    def convert(self, delim: str = COMMA, end: str = NEW_LINE) -> str:
+        """Converts an old HiSeq2500 sample sheet for use on Hasta"""
+
+        def _is_dual_index(line: list) -> bool:
+            return "Index2" in line
+
+        def _insert_empty_index(line: list) -> None:
+            line.insert(5, "")
+
+        converted_samplesheet: list = list()
+        converted_samplesheet.append(self.DATA)
+        header: list = self.section[self.DATA][0]
+        sample_rows: list = self.section[self.DATA][1:]
+        new_header: list = list(Samplesheet.header_map.values())
+        converted_header: str = delim.join(new_header)
+        converted_samplesheet.append(converted_header)
+
+        for row in sample_rows:
+            if not _is_dual_index(header):
+                _insert_empty_index(row)
+            converted_row = delim.join(row)
+            converted_samplesheet.append(converted_row)
+
+        return end.join(converted_samplesheet)
 
 
 class NIPTSamplesheet(Samplesheet):

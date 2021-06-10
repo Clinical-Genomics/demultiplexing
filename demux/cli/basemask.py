@@ -6,12 +6,7 @@ from pathlib import Path
 
 import click
 
-from ..utils import (
-    HiSeq2500Samplesheet,
-    HiSeqXSamplesheet,
-    MiseqSamplesheet,
-    NIPTSamplesheet,
-)
+from ..utils import HiSeqXSamplesheet, MiseqSamplesheet, NIPTSamplesheet, Samplesheet
 
 EMPTY_STRING = ""
 LOG = logging.getLogger(__name__)
@@ -73,7 +68,7 @@ def create(rundir, lane, application):
         samplesheet = Path(rundir).joinpath("SampleSheet.csv")
         sheet_map = {
             "nipt": NIPTSamplesheet,
-            "wes": HiSeq2500Samplesheet,
+            "wes": Samplesheet,
             "miseq": MiseqSamplesheet,
             "wgs": HiSeqXSamplesheet,
         }

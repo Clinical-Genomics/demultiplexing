@@ -1,4 +1,4 @@
-""" CLI points for samplesheeet action """
+""" CLI points for samplesheet action """
 import copy
 import click
 import csv
@@ -294,3 +294,10 @@ def fetch(
 
         # print it!
         click.echo(delimiter.join([str(line[lims_key]) for lims_key in lims_keys]))
+
+
+@sheet.command()
+@click.argument("samplesheet")
+def convert(samplesheet):
+    """CLI command to convert an old HiSeq2500 sample sheet for use on Hasta"""
+    click.echo(HiSeq2500Samplesheet(samplesheet).convert())
