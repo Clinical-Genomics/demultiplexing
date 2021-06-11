@@ -6,7 +6,6 @@ import pytest
 
 from demux.constants import REFERENCE_REPORT_HEADER, REPORT_TABLES_INDEX
 from demux.utils.indexreport import IndexReport
-from demux.utils.samplesheet import HiSeqXSamplesheet, NIPTSamplesheet
 
 
 @pytest.fixture(name="valid_indexreport")
@@ -118,14 +117,6 @@ def fixture_modified_report_sample_table_header(valid_indexreport: IndexReport) 
     modified_report = copy(valid_indexreport)
     modified_report.sample_table_header.pop("Lane")
     return modified_report.sample_table_header
-
-
-@pytest.fixture(name="hiseqx_samplesheet_multiple_index")
-def fixture_hiseqx_samplesheet_multiple_index(
-    hiseqx_samplesheet_multiple_indexes_path: Path,
-) -> HiSeqXSamplesheet:
-    """ Return a HiseqXSamplesheet object with multiple index types """
-    return HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())
 
 
 @pytest.fixture(name="hiseq2500_samplesheet_invalid_duplicate_index")

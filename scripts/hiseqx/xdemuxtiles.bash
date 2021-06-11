@@ -60,6 +60,13 @@ FC=$( basename "$(basename "${RUNDIR}"/)" | awk 'BEGIN {FS="/"} {split($(NF-1),a
 # is this a dual-index FC?
 IS_DUAL=$(grep IndexRead2 "${RUNDIR}/runParameters.xml" | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
 
+# calculate the number of lanes
+LANE_COUNT=$(awk '$0 ~/FlowcellLayout/ {split($0,arr," "); split(arr[2],o,"="); print o[2]}' "${RUNDIR}/RunInfo.xml" | sed 's/\"//g')
+declare -a lanes=()
+for (( i=1; i<=LANE_COUNT; i++ )); do
+  lanes[$i-1]=$i;
+done
+
 # get the samplesheet
 if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     DUALINDEX_PARAM=
@@ -80,7 +87,6 @@ log "Using sample sheet:"
 log_file "${RUNDIR}/SampleSheet.csv"
 
 log "Starting overall process"
-lanes=(1 2 3 4 5 6 7 8)
 tiles=('11 12' '21 22')
 DEMUX_JOBIDS=()
 i=0

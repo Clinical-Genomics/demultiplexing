@@ -1,11 +1,13 @@
-""" Parsing of Novaseq run parameters """
+"""
+    Parsing of Novaseq run parameters
+"""
 import os
 import xml.etree.cElementTree as et
 from pathlib import Path
 
 
 class NovaseqRunParameters:
-    """ Finds and parses the RunParameters.xml file for a NovaSeq flowcell """
+    """Finds and parses the RunParameters.xml file for a NovaSeq flowcell"""
 
     RUNPARAMETERS_FILE = "RunParameters.xml"
 
@@ -15,7 +17,7 @@ class NovaseqRunParameters:
         self.file = self.find_runparameters_file()
 
     def find_runparameters_file(self) -> str:
-        """ Find the runparameters file of a based on the flowcell name """
+        """Find the runparameters file of a based on the flowcell name"""
 
         runparameters_file = None
         for directory in os.scandir(self.runs_dir):
@@ -30,20 +32,20 @@ class NovaseqRunParameters:
         return runparameters_file
 
     def parse_runparameters(self) -> "et":
-        """ Parse the runparameters file """
+        """Parse the runparameters file"""
         return et.parse(Path(self.file))
 
     @property
     def control_software_version(self) -> str:
-        """ Returns the version of the NovaSeq Control Software used """
+        """Returns the version of the NovaSeq Control Software used"""
         return self.parse_runparameters().findtext("ApplicationVersion")
 
     @property
     def index_reads(self) -> int:
-        """ Returns the number of index reads using number of cycles for read one """
+        """Returns the number of index reads using number of cycles for read one"""
         return int(self.parse_runparameters().findtext("IndexRead1NumberOfCycles"))
 
     @property
     def reagent_kit_version(self) -> str:
-        """ Returns the version of the reagent kit used """
+        """Returns the version of the reagent kit used"""
         return self.parse_runparameters().findtext("RfidsInfo/SbsConsumableVersion")

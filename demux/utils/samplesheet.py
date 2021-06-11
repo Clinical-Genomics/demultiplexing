@@ -3,7 +3,7 @@ import re
 from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
-from typing import Tuple
+from typing import Set, Tuple
 
 from demux.constants.constants import COMMA, NEW_LINE
 
@@ -105,10 +105,13 @@ class Samplesheet(object):
         self.parse(samplesheet_path)
 
     def _get_data_header(self):
-        header_r = self._get_data_header_r()
-        header_map_r = dict((v, k) for k, v in self.header_map.items())
-        header = [header_map_r[k] for k in header_r]
-
+        try:
+            header_r = self._get_data_header_r()
+            header_map_r = dict((v, k) for k, v in self.header_map.items())
+            header = [header_map_r[k] for k in header_r]
+        except KeyError as e:
+            msg = f"Incorrect column found - {e}"
+            raise SampleSheetValidationException(section="header", msg=msg, line_nr=0)
         return header
 
     def _get_data_header_r(self):
@@ -157,42 +160,42 @@ class Samplesheet(object):
         ]
 
     def lines(self):
-        """ Yields all lines of the [Data] section. """
+        """Yields all lines of the [Data] section."""
         for line in self.samplesheet:
             yield line
 
     def lines_r(self):
-        """ Yields all lines of the [Data] section based on the original header """
+        """Yields all lines of the [Data] section based on the original header"""
         for line in self.samplesheet_r:
             yield line
 
     def raw(self, delim=",", end="\n"):
-        """Reconstructs the sample sheet. """
+        """Reconstructs the sample sheet."""
         rs = []
         for line in self.original_sheet:
             rs.append(delim.join(line))
         return end.join(rs)
 
     def samples(self, column="sample_id"):
-        """ Return all samples in the samplesheet """
+        """Return all samples in the samplesheet"""
         return self.column(column)
 
     def samples_r(self, column="SampleID"):
-        """ Return all samples in the samplesheet based on the original header"""
+        """Return all samples in the samplesheet based on the original header"""
         return self.column_r(column)
 
     def column(self, column):
-        """ Return all values from a column in the samplesheet """
+        """Return all values from a column in the samplesheet"""
         for line in self.samplesheet:
             yield line[column]
 
     def column_r(self, column):
-        """ Return all values from a column in the samplesheet based on the original header"""
+        """Return all values from a column in the samplesheet based on the original header"""
         for line in self.samplesheet_r:
             yield line[column]
 
     def cell(self, line, column):
-        """ return the contents of a column in a line """
+        """return the contents of a column in a line"""
 
         return line[self._get_header_key(column)]
 
@@ -210,8 +213,8 @@ class Samplesheet(object):
             if line[column] == content:
                 yield line
 
-    def is_pooled_lane(self, lane, column="lane"):
-        """ Return True if lane contains multiple samples """
+    def is_pooled_lane(self, lane: int, column="lane"):
+        """Return True if lane contains multiple samples"""
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet:
@@ -224,7 +227,7 @@ class Samplesheet(object):
         return False
 
     def is_pooled_lane_r(self, lane, column="lane"):
-        """ Return True if lane contains multiple samples based on the original header """
+        """Return True if lane contains multiple samples based on the original header"""
         lane_count = 0
         lane = str(lane)
         for line in self.samplesheet_r:
@@ -236,8 +239,25 @@ class Samplesheet(object):
 
         return False
 
+    def pooled_lanes(self) -> Set[int]:
+        """Return set of pooled lanes"""
+        pooled_lanes = set()
+        for lane in self.column("lane"):
+            if self.is_pooled_lane(lane):
+                pooled_lanes.add(int(lane))
+        return pooled_lanes
+
+    def sample_in_pooled_lane(self, sample: str) -> bool:
+        """Return True if sample is in pooled lane"""
+
+        for line in self.lines():
+            if sample == line["sample_id"]:
+                if self.pooled_lanes().intersection({int(line["lane"])}):
+                    return True
+        return False
+
     def validate(self):
-        """ General validation of a samplesheet """
+        """General validation of a samplesheet"""
 
         def _validate_length(section):
             if len(section) > 2:
@@ -305,7 +325,7 @@ class Samplesheet(object):
 
 class HiSeqXSamplesheet(Samplesheet):
     def unparse(self, delim=","):
-        """Reconstruct the sample sheet based on the (modified) parsed values. """
+        """Reconstruct the sample sheet based on the (modified) parsed values."""
 
         yield "[Data]"
         yield delim.join(self._get_data_header_r())
@@ -335,7 +355,7 @@ class HiSeqXSamplesheet(Samplesheet):
                     return msg, line_nr
 
         def _validate_index_types() -> Tuple[str, None]:
-            """ Check if there are multiple types of indexes, meaning single, dual, or both """
+            """Check if there are multiple types of indexes, meaning single, dual, or both"""
 
             indexes = []
             try:
@@ -491,7 +511,7 @@ class MiseqSamplesheet(Samplesheet):
         return self.flowcell
 
     def to_demux(self, delim=",", end="\n"):
-        """ Convert miseq to hiseq style samplesheet for demultiplexing. """
+        """Convert miseq to hiseq style samplesheet for demultiplexing."""
 
         checked_indexes = {}  # the indexes in the SampleSheet
 

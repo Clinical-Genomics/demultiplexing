@@ -30,14 +30,13 @@ def create(rundir, lane, application):
     """Create a basemask based on SampleSheet.csv and runParameters"""
 
     # runParameters.xml
-    def parse_run_parameters(run_parameters_file):
-        """ parse the run parameters file """
-        return xml_etree.parse(Path(rundir).joinpath(run_parameters_file))
+    def parse_run_parameters():
+        """parse the run parameters file"""
+        return xml_etree.parse(Path(rundir).joinpath("runParameters.xml"))
 
     def create_basemask(sheet):
-        """ create the bcl2fastq basemask """
-        run_parameters_file = "runParameters.xml"
-        run_params_tree = parse_run_parameters(run_parameters_file)
+        """create the bcl2fastq basemask"""
+        run_params_tree = parse_run_parameters()
         read1 = int(run_params_tree.findtext("Setup/Read1"))
         read2 = int(run_params_tree.findtext("Setup/Read2"))
         indexread1 = int(run_params_tree.findtext("Setup/IndexRead1"))
@@ -65,7 +64,7 @@ def create(rundir, lane, application):
             click.echo(f"Y{read1},{basemask_index1},{basemask_index2},Y{read2}")
 
     def get_application_sheet(application):
-        """ parse the samplesheet in the runs directory, based on the type of application """
+        """parse the samplesheet in the runs directory, based on the type of application"""
         samplesheet = Path(rundir).joinpath("SampleSheet.csv")
         sheet_map = {
             "nipt": NIPTSamplesheet,
@@ -78,7 +77,7 @@ def create(rundir, lane, application):
         return sheet
 
     def create_application_basemask(application):
-        """ determine the basemask """
+        """determine the basemask"""
         create_basemask(get_application_sheet(application))
 
     create_application_basemask(application)

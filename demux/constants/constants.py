@@ -1,4 +1,6 @@
-""" Constants for demultiplexing """
+"""
+    Constants for demultiplexing
+"""
 
 SPACE = " "
 DASH = "-"

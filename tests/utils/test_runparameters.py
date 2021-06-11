@@ -3,7 +3,7 @@ import pytest
 
 
 def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
-    """ Tests find runparameters_file method """
+    """Tests find runparameters_file method"""
 
     # GIVEN a flowcell id
     flowcell_id = novaseq_runparameters_api.flowcell
@@ -19,7 +19,7 @@ def test_find_runparameters_file(novaseq_runparameters_api, novaseq_runs_dir):
 
 
 def test_find_runparameters_file_not_found(novaseq_runparameters_api):
-    """ tests find runparameters_file method """
+    """tests find runparameters_file method"""
 
     # GIVEN a flowcell id
     novaseq_runparameters_api.flowcell = "NO_FLOWCELL"
@@ -38,7 +38,7 @@ def test_find_runparameters_file_not_found(novaseq_runparameters_api):
 def test_control_software_version_old_scv(
     novaseq_runparameters_api, run_parameters_file
 ):
-    """ tests find runparameters_file method """
+    """tests find runparameters_file method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
@@ -54,7 +54,7 @@ def test_control_software_version_old_scv(
 def test_control_software_version_new_scv(
     novaseq_runparameters_api, run_parameters_file
 ):
-    """ tests control software version method """
+    """tests control software version method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
@@ -70,7 +70,7 @@ def test_control_software_version_new_scv(
 def test_control_software_version_index_reads_fluffy(
     novaseq_runparameters_api, run_parameters_file
 ):
-    """ tests control software version method """
+    """tests control software version method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
@@ -84,7 +84,7 @@ def test_control_software_version_index_reads_fluffy(
 
 
 def test_index_reads(novaseq_runparameters_api, run_parameters_file):
-    """ tests index reads method """
+    """tests index reads method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
@@ -98,7 +98,7 @@ def test_index_reads(novaseq_runparameters_api, run_parameters_file):
 
 
 def test_reagent_kit_new(novaseq_runparameters_api, run_parameters_file):
-    """ tests reagent kit method """
+    """tests reagent kit method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
@@ -113,7 +113,7 @@ def test_reagent_kit_new(novaseq_runparameters_api, run_parameters_file):
 
 
 def test_reagent_kit_old(novaseq_runparameters_api, run_parameters_file):
-    """ tests reagent kit method """
+    """tests reagent kit method"""
 
     # GIVEN an instance of the runparameters API
     api = novaseq_runparameters_api
