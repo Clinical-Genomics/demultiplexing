@@ -1649,12 +1649,14 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
 
 
 def test_hiseqx_samplesheet_multiple_index(
-    hiseqx_samplesheet_multiple_indexes_path: Path
+    hiseqx_samplesheet_multiple_indexes_path: Path,
 ):
     """Test validation function to detect multiple index in sample sheet"""
 
     # GIVEN a sample sheet with multiple types of index in it.
-    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())
+    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet = HiSeqXSamplesheet(
+        hiseqx_samplesheet_multiple_indexes_path.as_posix()
+    )
 
     # WHEN such sample sheet is validated
     with pytest.raises(SampleSheetValidationException) as exception:
@@ -1758,10 +1760,12 @@ def test_check_pooled_lanes(hiseqx_samplesheet_pooled_path: Path):
     sample_name: str = "SVE2274A3_TCCGCGAT"
 
     # GIVEN a samplesheet with pooled lanes
-    samplesheet: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_pooled_path.as_posix())
+    hiseqx_samplesheet_pooled: HiSeqXSamplesheet = HiSeqXSamplesheet(
+        hiseqx_samplesheet_pooled_path.as_posix()
+    )
 
     # WHEN checking for pooled lanes
-    results = samplesheet.sample_in_pooled_lane(sample_name)
+    results = hiseqx_samplesheet_pooled.sample_in_pooled_lane(sample_name)
 
     # THEN it should detect pooled lanes
     assert results
@@ -1773,7 +1777,9 @@ def test_check_no_pooled_lanes(hiseqx_samplesheet_path: Path):
     sample_name: str = "SVE2274A11_TCTCGCGC"
 
     # GIVEN a samplesheet with no pooled lanes
-    hiseqx_samplesheet: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_path.as_posix())
+    hiseqx_samplesheet: HiSeqXSamplesheet = HiSeqXSamplesheet(
+        hiseqx_samplesheet_path.as_posix()
+    )
 
     # WHEN checking for pooled lanes
     results = hiseqx_samplesheet.sample_in_pooled_lane(sample_name)
