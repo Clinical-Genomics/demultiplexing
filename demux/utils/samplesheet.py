@@ -105,9 +105,13 @@ class Samplesheet(object):
         self.parse(samplesheet_path)
 
     def _get_data_header(self):
-        header_r = self._get_data_header_r()
-        header_map_r = dict((v, k) for k, v in self.header_map.items())
-        header = [header_map_r[k] for k in header_r]
+        try:
+            header_r = self._get_data_header_r()
+            header_map_r = dict((v, k) for k, v in self.header_map.items())
+            header = [header_map_r[k] for k in header_r]
+        except KeyError as e:
+            msg = f"Incorrect column found - {e}"
+            raise SampleSheetValidationException(section="header", msg=msg, line_nr=0)
         return header
 
     def _get_data_header_r(self):

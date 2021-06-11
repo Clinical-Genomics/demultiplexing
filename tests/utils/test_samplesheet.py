@@ -1649,28 +1649,30 @@ HC7H2ALXX,8,SVE2274A11_TCTCGCGC,hg19,TCTCGCGC,659262,N,R1,NN,659262"""
 
 
 def test_hiseqx_samplesheet_multiple_index(
-    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet, caplog
+    hiseqx_samplesheet_multiple_indexes_path: Path
 ):
     """Test validation function to detect multiple index in sample sheet"""
 
     # GIVEN a sample sheet with multiple types of index in it.
-    sample_sheet = hiseqx_samplesheet_multiple_index
+    hiseqx_samplesheet_multiple_index: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_multiple_indexes_path.as_posix())
+
     # WHEN such sample sheet is validated
     with pytest.raises(SampleSheetValidationException) as exception:
-        sample_sheet.validate()
+        hiseqx_samplesheet_multiple_index.validate()
         # THEN an error should be and we should get the message
     assert "Multiple index types in SampleSheet!" in str(exception.value)
 
 
 def test_hiseqx_samplesheet_wrong_columns(hiseqx_samplesheet_wrong_columns_path: Path):
-    """Test validation of correct columns in a hiseqx sample sheet"""
+    """Test check for correct columns in hiseqx sample sheet"""
 
     # GIVEN a hiseqx sample sheet with incorrect headers
-    sample_sheet = Samplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
-    # WHEN said samplesheet is validated
-    with pytest.raises(SampleSheetValidationException):
-        # THEN appropriate exception should be raised
-        sample_sheet.validate()
+    # WHEN said samplesheet is created
+    with pytest.raises(SampleSheetValidationException) as exception:
+        HiSeqXSamplesheet(hiseqx_samplesheet_wrong_columns_path.as_posix())
+
+    # THEN appropriate exception should be raised
+    assert "Incorrect column found - " in str(exception.value)
 
 
 def test_2500_valid_samplesheet(hiseq2500_samplesheet_valid: Path):
@@ -1750,13 +1752,13 @@ def test_convert_2500_samplesheet(
     snapshot.assert_match(result)
 
 
-def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
+def test_check_pooled_lanes(hiseqx_samplesheet_pooled_path: Path):
     """Check if pooled samples are detected of a pooled samplesheet"""
 
     sample_name: str = "SVE2274A3_TCCGCGAT"
 
     # GIVEN a samplesheet with pooled lanes
-    samplesheet: Samplesheet = pooled_hiseqx_samplesheet
+    samplesheet: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_pooled_path.as_posix())
 
     # WHEN checking for pooled lanes
     results = samplesheet.sample_in_pooled_lane(sample_name)
@@ -1765,16 +1767,16 @@ def test_check_pooled_lanes(pooled_hiseqx_samplesheet: Samplesheet):
     assert results
 
 
-def test_check_no_pooled_lanes(hiseqx_samplesheet: Samplesheet):
+def test_check_no_pooled_lanes(hiseqx_samplesheet_path: Path):
     """Check that no pooled samples are detected in a samplesheet with no pooled lanes"""
 
     sample_name: str = "SVE2274A11_TCTCGCGC"
 
     # GIVEN a samplesheet with no pooled lanes
-    samplesheet: Samplesheet = hiseqx_samplesheet
+    hiseqx_samplesheet: HiSeqXSamplesheet = HiSeqXSamplesheet(hiseqx_samplesheet_path.as_posix())
 
     # WHEN checking for pooled lanes
-    results = samplesheet.sample_in_pooled_lane(sample_name)
+    results = hiseqx_samplesheet.sample_in_pooled_lane(sample_name)
 
     # THEN it should not detect pooled lanes
     assert not results

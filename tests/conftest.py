@@ -96,9 +96,15 @@ def fixture_hisex_dir(fixtures_dir: Path) -> Path:
 
 
 @pytest.fixture(name="hiseqx_samplesheet_path")
-def fixture_hiseqx_samplesheet(hiseqx_dir: Path) -> Path:
+def fixture_hiseqx_samplesheet_path(hiseqx_dir: Path) -> Path:
     """Return the path to a hiseqx samplesheet"""
     return hiseqx_dir / "hiseqx_samplesheet.csv"
+
+
+@pytest.fixture(name="hiseqx_samplesheet_pooled_path")
+def fixture_hiseqx_samplesheet_pooled_path(hiseqx_dir: Path) -> Path:
+    """Return the path to a hiseqx samplesheet"""
+    return hiseqx_dir / "hiseqx_samplesheet_pooled.csv"
 
 
 @pytest.fixture(name="hiseqx_samplesheet_wrong_columns_path")
