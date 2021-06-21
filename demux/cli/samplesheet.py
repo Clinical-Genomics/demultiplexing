@@ -101,7 +101,6 @@ def demux(samplesheet: str, application: str, flowcell: str):
 @click.option(
     "-d", "--delimiter", default=COMMA, show_default=True, help="column delimiter"
 )
-@click.option("-e", "--end", default="\n", show_default=True, help="line delimiter")
 @click.option(
     "-i",
     "--dualindex",
