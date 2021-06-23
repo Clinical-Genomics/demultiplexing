@@ -117,7 +117,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
         done
 
         # Get info if lane is pooled
-        POOLED_LANE=$(demux sheet sample_in_pooled_lane "${RUNDIR}/SampleSheet.csv" "${SAMPLE_NAME}")
+        POOLED_LANE=$(demux sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
         # Undetermined, if not pooled link to samples
         if [[ ${POOLED_LANE} == "false" ]];
         then

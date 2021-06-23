@@ -59,7 +59,7 @@ def massage(samplesheet: str) -> None:
 @sheet.command()
 @click.argument("sample", type=str)
 @ARGUMENT_SAMPLE_SHEET
-def sample_in_pooled_lane(samplesheet: str, sample: str) -> None:
+def sample_in_pooled_lane(sample: str, samplesheet: str) -> None:
     """Check if a sample is in a pooled lane"""
     sample_sheet = Samplesheet(samplesheet)
 
