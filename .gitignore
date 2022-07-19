@@ -6,6 +6,9 @@ demux.egg-info/
 
 DEVELOP/
 .idea/
+.vscode
+.venv
+
 # Distribution / packaging
 *.egg-info/
 *.egg
