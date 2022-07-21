@@ -15,6 +15,7 @@ VERSION=5.4.2
 
 IN_DIR=${1?'please provide a run dir'}
 OUT_DIR=${2?'please provide a demux dir'}
+LANE=${3:-1}
 EMAIL=YOUR.NAME@scilifelab.se
 
 RUN=$(basename ${IN_DIR})
@@ -72,7 +73,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$(demux basemask create --application wes --lane 1 ${IN_DIR})
+BASEMASK=$(demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !
