@@ -19,6 +19,7 @@ OUTDIR=${2?'Demux dir'}
 LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
+CONDA_BINARY_PATH='/home/proj/production/bin/miniconda3/envs/P_demux'
 
 #############
 # FUNCTIONS #
@@ -61,7 +62,7 @@ mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 # DEMUX #
 #########
 
-BASEMASK=$(demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
+BASEMASK=$(conda run --name "${CONDA_BINARY_PATH}" demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
 
 TILES_OPTS=''
 if (( ${#TILES[@]} )); then
@@ -117,7 +118,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
         done
 
         # Get info if lane is pooled
-        POOLED_LANE=$(demux sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
+        POOLED_LANE=$(conda run --name "${CONDA_BINARY_PATH}" demux sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
         # Undetermined, if not pooled link to samples
         if [[ ${POOLED_LANE} == "false" ]];
         then

@@ -22,6 +22,7 @@ RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 
+CONDA_BINARY_PATH='/home/proj/production/bin/miniconda3/envs/P_demux'
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
 SLURM_ACCOUNT=development
@@ -73,7 +74,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$(demux basemask create --application wes --lane ${LANE} ${IN_DIR})
+BASEMASK=$(conda run --name "${CONDA_BINARY_PATH}" demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !

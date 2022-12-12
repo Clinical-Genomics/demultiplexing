@@ -7,9 +7,11 @@ set -eu -o pipefail
 # PARAMS #
 ##########
 
-VERSION=5.4.3
+VERSION=5.5.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
+
+CONDA_BINARY_PATH='/home/proj/production/bin/miniconda3/envs/P_demux'
 
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
@@ -55,7 +57,7 @@ mkdir -p "${LOGDIR}"
 log "demuxtiles.bash VERSION ${VERSION}"
 
 # get the flowcell name
-FC=$( basename "$(basename "${RUNDIR}"/)" | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
+FC=$(basename "$(basename "${RUNDIR}"/)" | awk 'BEGIN {FS="/"} {split($(NF-1),arr,"_");print substr(arr[4],2,length(arr[4]))}')
 
 # is this a dual-index FC?
 IS_DUAL=$(grep IndexRead2 "${RUNDIR}/runParameters.xml" | sed 's/<\/IndexRead2>\r//' | sed 's/    <IndexRead2>//')
@@ -73,12 +75,12 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    demux sheet fetch -a wgs ${DUALINDEX_PARAM} "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "conda run --name "${CONDA_BINARY_PATH}" demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    conda run --name "${CONDA_BINARY_PATH}" demux sheet fetch -a wgs ${DUALINDEX_PARAM} "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+conda run --name "${CONDA_BINARY_PATH}" demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv" 
