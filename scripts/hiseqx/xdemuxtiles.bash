@@ -11,7 +11,8 @@ VERSION=5.5.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
-CONDA_BINARY_PATH='/home/proj/production/bin/miniconda3/envs/P_demux'
+CONDA_EXE="/home/proj/production/bin/miniconda3/bin/conda"
+DEMUX_ENV_NAME="P_demux"
 
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
@@ -75,12 +76,12 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "conda run --name "${CONDA_BINARY_PATH}" demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    conda run --name "${CONDA_BINARY_PATH}" demux sheet fetch -a wgs ${DUALINDEX_PARAM} "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet fetch -a wgs ${DUALINDEX_PARAM} "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-conda run --name "${CONDA_BINARY_PATH}" demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv" 

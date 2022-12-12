@@ -1,7 +1,8 @@
 #!/bin/bash
 
 shopt -s nullglob
-CONDA_BINARY_PATH='/home/proj/production/bin/miniconda3/envs/P_demux'
+CONDA_EXE="/home/proj/production/bin/miniconda3/bin/conda"
+DEMUX_ENV_NAME="P_demux"
 
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
@@ -19,7 +20,7 @@ for RUNDIR in ${INDIR}/*; do
                 if grep -qs ',ctmr,' ${RUNDIR}/SampleSheet.csv; then
                     echo [${NOW}] ${RUN} is CTMR - transmogrifying SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ctmr
-                    conda run --name "${CONDA_BINARY_PATH}" demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
+                    ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
@@ -27,11 +28,11 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
+                ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             else
                 echo converting ${RUNDIR}/SampleSheet.csv
-                conda run --name "${CONDA_BINARY_PATH}" demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
                 cp ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
