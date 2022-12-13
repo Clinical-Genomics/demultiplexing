@@ -11,17 +11,18 @@ VERSION=5.5.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
-CONDA_EXE="/home/proj/${ENVIRONMENT}/bin/miniconda3/bin/conda"
-DEMUX_ENV_NAME="P_demux"
-
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
 SLURM_ACCOUNT=development
+DEMUX_ENV_NAME="S_demux"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
+    DEMUX_ENV_NAME="P_demux"
 fi
+
+CONDA_EXE="/home/proj/${ENVIRONMENT}/bin/miniconda3/bin/conda"
 
 #############
 # FUNCTIONS #
