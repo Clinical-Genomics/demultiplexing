@@ -16,13 +16,16 @@ LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
 SLURM_ACCOUNT=development
-DEMUX_ENV_NAME="S_demux"
+
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_EXE="${CONDA_BASE}/bin/conda"
+DEMUX_ENV_NAME="${CONDA_BASE}/envs/S_demux"
+
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
-    DEMUX_ENV_NAME="P_demux"
+    DEMUX_ENV_NAME="${CONDA_BASE}/envs/P_demux"
 fi
 
-CONDA_EXE="/home/proj/${ENVIRONMENT}/bin/miniconda3/bin/conda"
 
 #############
 # FUNCTIONS #
@@ -82,8 +85,6 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 fi
 
 # validate!
-echo ${CONDA_EXE}
-echo ${DEMUX_ENV_NAME}
 ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
