@@ -11,7 +11,7 @@ VERSION=5.5.0
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
-CONDA_EXE="/home/proj/production/bin/miniconda3/bin/conda"
+CONDA_EXE="/home/proj/${ENVIRONMENT}/bin/miniconda3/bin/conda"
 DEMUX_ENV_NAME="P_demux"
 
 EMAIL=clinical-demux@scilifelab.se
@@ -81,6 +81,8 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 fi
 
 # validate!
+echo ${CONDA_EXE}
+echo ${DEMUX_ENV_NAME}
 ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
