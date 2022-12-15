@@ -27,7 +27,7 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     CONDA_ENV="P_demux"
 fi
 
-CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+
 
 #############
 # FUNCTIONS #
@@ -69,7 +69,7 @@ for RUN_DIR in "${IN_DIR}"/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "${CONDA_RUN_COMMAND}/ sheet fetch --application iseq --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                "${CONDA_RUN_COMMAND}/demux" sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"

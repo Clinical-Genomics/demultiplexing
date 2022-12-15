@@ -18,7 +18,7 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     CONDA_ENV="P_demux"
 fi
 
-CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+
 
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
@@ -33,7 +33,7 @@ for RUNDIR in ${INDIR}/*; do
                 if grep -qs ',ctmr,' ${RUNDIR}/SampleSheet.csv; then
                     echo [${NOW}] ${RUN} is CTMR - transmogrifying SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ctmr
-                    "${CONDA_RUN_COMMAND}/demux" sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
+                    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
@@ -41,11 +41,11 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                "${CONDA_RUN_COMMAND}/demux" sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             else
                 echo converting ${RUNDIR}/SampleSheet.csv
-                "${CONDA_RUN_COMMAND}/demux" sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
                 cp ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi

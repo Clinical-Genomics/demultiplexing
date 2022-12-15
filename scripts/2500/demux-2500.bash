@@ -31,7 +31,7 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     CONDA_ENV="P_demux"
 fi
 
-CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+
 
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
@@ -84,7 +84,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$("${CONDA_RUN_COMMAND}/demux" basemask create --application wes --lane ${LANE} ${IN_DIR})
+BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !

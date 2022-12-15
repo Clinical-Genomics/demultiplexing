@@ -20,9 +20,10 @@ LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
 
+### SETUP CONDA VARIABLES ###
+
 CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"
 
 if [[ ${ENVIRONMENT} == 'production' ]]; then
@@ -30,7 +31,8 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     CONDA_ENV="P_demux"
 fi
 
-CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+CONDA_ENV_BIN_BASE="${CONDA_BASE}/envs/${CONDA_ENV}/bin/"
+
 
 #############
 # FUNCTIONS #
@@ -73,7 +75,7 @@ mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 # DEMUX #
 #########
 
-BASEMASK=$("${CONDA_RUN_COMMAND}/demux" basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
+BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
 
 TILES_OPTS=''
 if (( ${#TILES[@]} )); then
@@ -129,7 +131,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
         done
 
         # Get info if lane is pooled
-        POOLED_LANE=$("${CONDA_RUN_COMMAND}/demux" sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
+        POOLED_LANE=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
         # Undetermined, if not pooled link to samples
         if [[ ${POOLED_LANE} == "false" ]];
         then
