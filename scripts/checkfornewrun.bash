@@ -7,6 +7,18 @@ source ~/.aliases
 INDIR=${1?'please provide a run dur'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_EXE="${CONDA_BASE}/bin/conda"
+CONDA_ENV_BASE="${CONDA_BASE}/envs"
+CONDA_ENV="S_demux"
+
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    SLURM_ACCOUNT=production
+    CONDA_ENV="P_demux"
+fi
+
+CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
     NOW=$(date +"%Y%m%d%H%M%S")
@@ -20,7 +32,7 @@ for RUNDIR in ${INDIR}/*; do
                 if grep -qs ',ctmr,' ${RUNDIR}/SampleSheet.csv; then
                     echo [${NOW}] ${RUN} is CTMR - transmogrifying SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ctmr
-                    demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
+                    "${CONDA_RUN_COMMAND}/demux" sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
@@ -28,7 +40,7 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
+                "${CONDA_RUN_COMMAND}/demux" sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
