@@ -19,13 +19,15 @@ SLURM_ACCOUNT=development
 
 CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
-DEMUX_ENV_NAME="${CONDA_BASE}/envs/S_demux"
+CONDA_ENV_BASE="${CONDA_BASE}/envs"
+CONDA_ENV="S_demux"
 
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
-    DEMUX_ENV_NAME="${CONDA_BASE}/envs/P_demux"
+    CONDA_ENV="P_demux"
 fi
 
+CONDA_RUN_COMMAND="${CONDA_EXE} run --name $CONDA_ENV ${CONDA_ENV_BASE}"
 
 #############
 # FUNCTIONS #
@@ -80,12 +82,12 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    ${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet fetch -a wgs ${DUALINDEX_PARAM} "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "${CONDA_RUN_COMMAND}/demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    "${CONDA_RUN_COMMAND}/demux" sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-${CONDA_EXE} run --name $DEMUX_ENV_NAME demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+"${CONDA_RUN_COMMAND}/demux" sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv" 
