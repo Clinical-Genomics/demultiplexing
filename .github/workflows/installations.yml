@@ -29,7 +29,6 @@ jobs:
                   pip --version
               env:
                   PYTHON_VERSION: ${{matrix.python-version}}
-                  OLD_VERSION: 3.6
 
             - name: Production Dependencies
               run: |
