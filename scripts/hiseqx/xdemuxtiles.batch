@@ -20,7 +20,7 @@ LANE=${3?'Lane (1-8)'}
 TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"

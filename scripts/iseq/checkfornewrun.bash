@@ -18,7 +18,7 @@ EMAIL=clinical-demux@scilifelab.se
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"

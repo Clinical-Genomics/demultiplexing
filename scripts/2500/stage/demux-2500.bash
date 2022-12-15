@@ -24,7 +24,7 @@ PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/stage/        # use this when testing on stage
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"

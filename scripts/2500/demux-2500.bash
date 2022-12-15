@@ -22,7 +22,7 @@ RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3/"
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"
