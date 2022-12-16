@@ -68,7 +68,7 @@ for RUN_DIR in "${IN_DIR}"/*; do
             date +'%Y%m%d%H%M%S' > "${RUN_DIR}/demuxstarted.txt"
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
-                log "${CONDA_RUN_COMMAND}/ sheet fetch --application iseq --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
+                log "${CONDA_EXE} run --name ${CONDA_ENV} ${CONDA_ENV_BIN_BASE}/demux sheet fetch --application iseq --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
                 $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
             fi
 
