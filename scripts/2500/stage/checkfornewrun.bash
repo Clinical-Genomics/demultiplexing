@@ -5,6 +5,21 @@ shopt -s nullglob
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
+
+INDIR=${1?'please provide a run dir'}
+DEMUXDIR=${2?'please provide a demux dir'}
+
+CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
+CONDA_EXE="${CONDA_BASE}/bin/conda"
+CONDA_ENV_BASE="${CONDA_BASE}/envs"
+CONDA_ENV="S_demux"
+
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    CONDA_ENV="P_demux"
+fi
+
+
+
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
     NOW=$(date +"%Y%m%d%H%M%S")
@@ -18,7 +33,7 @@ for RUNDIR in ${INDIR}/*; do
                 if grep -qs ',ctmr,' ${RUNDIR}/SampleSheet.csv; then
                     echo [${NOW}] ${RUN} is CTMR - transmogrifying SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ctmr
-                    demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
+                    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
@@ -26,11 +41,11 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             else
                 echo converting ${RUNDIR}/SampleSheet.csv
-                demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
                 cp ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
