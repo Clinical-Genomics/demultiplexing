@@ -8,7 +8,7 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=clinical-demux@scilifelab.se
 
-set -eu -o pipefail
+set -e -o pipefail
 
 ##########
 # PARAMS #
@@ -17,7 +17,8 @@ set -eu -o pipefail
 RUNDIR=${1?'Run dir'}
 OUTDIR=${2?'Demux dir'}
 LANE=${3?'Lane (1-8)'}
-TILES=(${@:4}) # remaining args are the tile identifiers: 11 12 21 22
+ENVIRONMENT=${4?'Environment'}
+TILES=(${@:5}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
 
 ### SETUP CONDA VARIABLES ###
