@@ -52,7 +52,7 @@ log_file() {
 
 failed() {
     PROJECTLOG=$(ls -tr1 "${OUTDIR}/projectlog.*.log" | tail -1)
-    mail -s "ERROR starting demux of $(basename "$RUNDIR")" ${EMAIL} < "${PROJECTLOG}" 
+    mail -s "ERROR starting demux of $(basename "$RUNDIR")" ${EMAIL} < "${PROJECTLOG}"
 }
 trap failed ERR
 
@@ -92,7 +92,7 @@ fi
 $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
-mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv" 
+mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv"
 
 log "Using sample sheet:"
 log_file "${RUNDIR}/SampleSheet.csv"
@@ -107,8 +107,8 @@ for lane in "${lanes[@]}"; do
 
     tile_qs=( ${tile} )
     JOB_TITLE="Xdem-l${lane}t${tile_qs[0]}-${FC}"
-    log "sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/xdemuxtiles.batch' '${RUNDIR}' '${OUTDIR}/' '${lane}' '${tile}'"
-    RS=$(sbatch -A ${SLURM_ACCOUNT} -J "$JOB_TITLE" -o "$LOGDIR/${JOB_TITLE}-%j.log" -e "${LOGDIR}/${JOB_TITLE}-%j.err" "${SCRIPTDIR}/xdemuxtiles.batch" "${RUNDIR}" "${OUTDIR}/" "${lane}" "${tile}")
+    log "sbatch -A ${SLURM_ACCOUNT} -J '$JOB_TITLE' -o '$LOGDIR/${JOB_TITLE}-%j.log' -e '${LOGDIR}/${JOB_TITLE}-%j.err' '${SCRIPTDIR}/xdemuxtiles.batch' '${RUNDIR}' '${OUTDIR}/' '${lane}' '${ENVIRONMENT}' '${tile}'"
+    RS=$(sbatch -A ${SLURM_ACCOUNT} -J "$JOB_TITLE" -o "$LOGDIR/${JOB_TITLE}-%j.log" -e "${LOGDIR}/${JOB_TITLE}-%j.err" "${SCRIPTDIR}/xdemuxtiles.batch" "${RUNDIR}" "${OUTDIR}/" "${lane}" "${ENVIRONMENT}" "${tile}")
     DEMUX_JOBIDS[$((i++))]=${RS##* }
 
     log "$RS"
