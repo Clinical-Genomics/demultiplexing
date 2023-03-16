@@ -21,24 +21,17 @@ EMAIL=clinical-demux@scilifelab.se
 RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
-
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-
-if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
-fi
-
-
-
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
 SLURM_ACCOUNT=development
+usestage
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
+    down
+    useprod
 fi
+
+
 
 #############
 # FUNCTIONS #
@@ -84,7 +77,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux basemask create --application wes --lane ${LANE} ${IN_DIR})
+BASEMASK=$(demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !

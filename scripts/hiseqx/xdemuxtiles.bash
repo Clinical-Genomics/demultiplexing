@@ -16,7 +16,6 @@ LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
 SLURM_ACCOUNT=development
-
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
 fi
