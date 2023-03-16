@@ -17,18 +17,9 @@ SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
 SLURM_ACCOUNT=development
 
-### SETUP CONDA VARIABLES ###
-
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV="S_demux"
-
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
-    CONDA_ENV="P_demux"
 fi
-
-CONDA_ENV_BIN_BASE="${CONDA_BASE}/envs/${CONDA_ENV}/bin/"
 
 
 #############
@@ -84,12 +75,12 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "${CONDA_EXE} run --name ${CONDA_ENV} ${CONDA_ENV_BIN_BASE}/demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    demux sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv"
