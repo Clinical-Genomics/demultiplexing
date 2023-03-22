@@ -1,7 +1,7 @@
 #!/bin/bash
 # demux Xrun in parts
 
-set -eu -o pipefail
+set -e -o pipefail
 
 ##########
 # PARAMS #
