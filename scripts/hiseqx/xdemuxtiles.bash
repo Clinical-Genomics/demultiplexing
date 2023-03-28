@@ -19,7 +19,6 @@ CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
 CONDA_ENV="S_demux"
-
 SLURM_ACCOUNT=development
 
 HOSTNAME=$(hostname)
@@ -88,6 +87,7 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
 fi
 
 # validate!
+log "$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet validate --application wgs "${RUNDIR}/SampleSheet.csv""
 $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
