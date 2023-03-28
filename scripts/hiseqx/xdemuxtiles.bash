@@ -29,6 +29,8 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     SLURM_ACCOUNT=production
 fi
 
+CONDA_ENV_BIN_BASE="${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
+
 #############
 # FUNCTIONS #
 #############

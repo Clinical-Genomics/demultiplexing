@@ -17,8 +17,7 @@ if [[ ${ENVIRONMENT} == 'production' ]]; then
     DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux.yaml"
 fi
 
-
-
+CONDA_ENV_BIN_BASE="${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
 
 for RUNDIR in ${INDIR}/*; do
     RUN=$(basename ${RUNDIR})
