@@ -21,10 +21,14 @@ DEMUXDIR=${2?'please provide a demux dir'}
 CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
 CONDA_EXE="${CONDA_BASE}/bin/conda"
 CONDA_ENV_BASE="${CONDA_BASE}/envs"
+CONDA_ENV_BIN_BASE="${CONDA_ENV}/bin"
 CONDA_ENV="S_demux"
 
+HOSTNAME=$(hostname)
+DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux-stage.yaml"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
     CONDA_ENV="P_demux"
+    DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux.yaml"
 fi
 
 
@@ -69,7 +73,7 @@ for RUN_DIR in "${IN_DIR}"/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "${CONDA_EXE} run --name ${CONDA_ENV} ${CONDA_ENV_BIN_BASE}/demux sheet fetch --application iseq --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
+                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"
