@@ -289,9 +289,12 @@ def fetch(
         project = get_project(line["project"])
         line["project"] = project
         line["sample_name"] = project
-        final_samplesheet.append(delimiter.join([str(line[lims_key]) for lims_key in lims_keys]))
+        final_samplesheet.append(
+            delimiter.join([str(line[lims_key]) for lims_key in lims_keys])
+        )
 
     print("\n".join(final_samplesheet), end="")
+
 
 @sheet.command()
 @ARGUMENT_SAMPLE_SHEET

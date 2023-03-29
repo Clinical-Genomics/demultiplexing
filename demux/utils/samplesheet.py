@@ -136,7 +136,7 @@ class Samplesheet(object):
                 line = line.strip()
                 line = line.split(delim)
                 if len(line) == 0:
-                    continue # skip empty lines
+                    continue  # skip empty lines
                 self.original_sheet.append(line)
                 if line[0].startswith("["):
                     name = line[0]
@@ -391,7 +391,6 @@ class HiSeqXSamplesheet(Samplesheet):
 
 
 class iseqSampleSheet(Samplesheet):
-
     header_map = {
         "fcid": "FCID",
         "sample_id": "Sample_ID",
@@ -404,7 +403,6 @@ class iseqSampleSheet(Samplesheet):
 
 
 class MiseqSamplesheet(Samplesheet):
-
     header_map = {
         "lane": "Lane",
         "sample_id": "Sample_ID",
@@ -524,7 +522,6 @@ class MiseqSamplesheet(Samplesheet):
             checked_indexes[index] = 1
 
         def get_undetermined_indexes():
-
             # combine the D indexes
             for di7_index, di7_name in self.di7.items():
                 for di5_index, di5_name in self.di5.items():
@@ -642,7 +639,6 @@ class MiseqSamplesheet(Samplesheet):
 
 
 class HiSeq2500Samplesheet(Samplesheet):
-
     header_map = {
         "fcid": "FCID",
         "lane": "Lane",
@@ -685,7 +681,6 @@ class HiSeq2500Samplesheet(Samplesheet):
 
 
 class NIPTSamplesheet(Samplesheet):
-
     header_map = {
         "lane": "Lane",
         "sample_id": "Sample_ID",

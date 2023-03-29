@@ -61,7 +61,6 @@ def test_validate_top_unknown_barcodes_table(
 
 
 def test_validate_report_tables(missing_report_tables: bs4.ResultSet):
-
     # GIVEN missing report tables set
 
     # WHEN validating said set
@@ -76,7 +75,6 @@ def test_validate_report_tables(missing_report_tables: bs4.ResultSet):
 
 
 def test_validate_index_report_header(modified_report_sample_table_header: dict):
-
     # GIVEN a modified report sample table header, missing a column
 
     # WHEN validating said header
