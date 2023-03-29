@@ -136,7 +136,7 @@ class Samplesheet(object):
                 line = line.strip()
                 line = line.split(delim)
                 if len(line) == 0:
-                    continue  # skip empty lines
+                    continue # skip empty lines
                 self.original_sheet.append(line)
                 if line[0].startswith("["):
                     name = line[0]
