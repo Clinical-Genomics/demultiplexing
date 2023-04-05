@@ -136,12 +136,14 @@ class Samplesheet(object):
                 line = line.strip()
                 line = line.split(delim)
                 if len(line) == 0:
-                    continue # skip empty lines
+                    # skip empty lines
+                    continue
                 self.original_sheet.append(line)
                 if line[0].startswith("["):
                     name = line[0]
                     self.section_markers[name] = line
-                    continue  # skip the actual section header
+                    # skip the actual section header
+                    continue
 
                 if name not in self.section:
                     self.section[name] = []
