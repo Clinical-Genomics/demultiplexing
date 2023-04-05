@@ -15,21 +15,13 @@ EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-SLURM_ACCOUNT=development
-
-HOSTNAME=$(hostname)
-DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux-stage.yaml"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
-    DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux.yaml"
+    useprod
     SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
-CONDA_ENV_BIN_BASE="${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
 
 #############
 # FUNCTIONS #
@@ -84,13 +76,13 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    demux sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-log "$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet validate --application wgs "${RUNDIR}/SampleSheet.csv""
-$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+log "demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv""
+demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv"

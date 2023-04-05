@@ -16,24 +16,19 @@ set -e -o pipefail
 
 RUNDIR=${1?'Run dir'}
 OUTDIR=${2?'Demux dir'}
+
 LANE=${3?'Lane (1-8)'}
 ENVIRONMENT=${4?'Environment'}
 TILES=(${@:5}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-
-HOSTNAME=$(hostname)
-DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux-stage.yaml"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
-    DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux.yaml"
+    useprod
+    SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
-CONDA_ENV_BIN_BASE="${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
 
 #############
 # FUNCTIONS #
@@ -76,7 +71,7 @@ mkdir -p "${OUTDIR}/${UNALIGNED_DIR}"
 # DEMUX #
 #########
 
-BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
+BASEMASK=$(demux basemask create --lane "${LANE}" --application wgs "${RUNDIR}")
 
 TILES_OPTS=''
 if (( ${#TILES[@]} )); then
@@ -132,7 +127,7 @@ for PROJECT_DIR in "${TMPOUT_DIR}"/*; do
         done
 
         # Get info if lane is pooled
-        POOLED_LANE=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
+        POOLED_LANE=$(demux sheet sample_in_pooled_lane "${SAMPLE_NAME}" "${RUNDIR}/SampleSheet.csv")
         # Undetermined, if not pooled link to samples
         if [[ ${POOLED_LANE} == "false" ]];
         then
