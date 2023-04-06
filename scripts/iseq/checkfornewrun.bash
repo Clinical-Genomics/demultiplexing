@@ -3,8 +3,8 @@
 set -u
 
 shopt -s nullglob
+source "${HOME}/.bashrc"
 shopt -s expand_aliases
-source "${HOME}/.aliases"
 
 ########
 # VARS #

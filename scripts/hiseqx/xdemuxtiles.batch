@@ -9,6 +9,7 @@
 #SBATCH --mail-user=clinical-demux@scilifelab.se
 
 set -e -o pipefail
+source "${HOME}/.bashrc"
 shopt -s expand_aliases
 
 ##########

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 shopt -s nullglob
+source "${HOME}/.bashrc"
+shopt -s expand_aliases
 
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}

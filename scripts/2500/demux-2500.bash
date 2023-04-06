@@ -4,7 +4,7 @@
 #   under $OUT_DIR
 
 set -eu -o pipefail
-
+source "${HOME}/.bashrc"
 shopt -s expand_aliases
 
 VERSION=5.11.1
