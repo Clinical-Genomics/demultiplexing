@@ -23,22 +23,13 @@ RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-
-SLURM_ACCOUNT=development
-
-HOSTNAME=$(hostname)
-DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux-stage.yaml"
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
+    useprod
     SLURM_ACCOUNT=production
-    DEMUX_CONFIG="/home/proj/${ENVIRONMENT}/servers/config/${HOSTNAME}/demux.yaml"
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
-CONDA_ENV_BIN_BASE="${CONDA_ENV_BASE}/${CONDA_ENV}/bin"
 
 #############
 # FUNCTIONS #
@@ -84,7 +75,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux -c "${DEMUX_CONFIG}" basemask create --application wes --lane ${LANE} ${IN_DIR})
+BASEMASK=$(demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !

@@ -2,6 +2,7 @@
 # demux Xrun in parts
 
 set -eu -o pipefail
+shopt -s expand_aliases
 
 ##########
 # PARAMS #
