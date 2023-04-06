@@ -3,7 +3,7 @@
 set -eu
 shopt -s nullglob
 
-VERSION=3.4.3
+VERSION=5.11.1
 
 ########
 # VARS #

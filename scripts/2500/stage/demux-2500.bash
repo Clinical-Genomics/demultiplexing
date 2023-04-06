@@ -7,7 +7,7 @@ set -eu -o pipefail
 
 shopt -s expand_aliases
 
-VERSION=5.4.2
+VERSION=5.11.1
 
 ##########
 # PARAMS #

@@ -8,7 +8,7 @@ shopt -s expand_aliases
 # PARAMS #
 ##########
 
-VERSION=5.5.0
+VERSION=5.11.1
 RUNDIR=${1?'full path to run dir'}
 OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
