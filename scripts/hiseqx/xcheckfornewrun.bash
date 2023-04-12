@@ -11,7 +11,8 @@ shopt -s expand_aliases
 SCRIPT_DIR="$(dirname "$(readlink -nm "$0")")"
 RUNS_DIR=${1?please provide a runs dir} #/home/proj/${ENVIRONMENT-stage}/flowcells/hiseqx/
 DEMUXES_DIR=${2?please provide a demuxes dir} #/home/proj/${ENVIRONMENT-stage}/demultiplexed-runs/
-EMAIL=${3-clinical-demux@scilifelab.se}
+ENVIRONMENT=${3?please provide the environment}
+EMAIL=${4-clinical-demux@scilifelab.se}
 
 #############
 # FUNCTIONS #
@@ -53,7 +54,7 @@ for RUN in "${RUNS_DIR}"/*; do
 
             mkdir -p ${DEMUXES_DIR}/${RUN}/
             PROJECTLOG=${DEMUXES_DIR}/${RUN}/projectlog.$(date +'%Y%m%d%H%M%S').log
-            ${SCRIPT_DIR}/xdemuxtiles.bash ${RUNS_DIR}/${RUN} &>> ${PROJECTLOG}
+            ${SCRIPT_DIR}/xdemuxtiles.bash ${RUNS_DIR}/${RUN} "${ENVIRONMENT}" &>> ${PROJECTLOG}
             rm -f ${DEMUXES_DIR}/${RUN}/copycomplete.txt
             rm -f ${DEMUXES_DIR}/${RUN}/delivery.txt
         else

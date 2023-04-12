@@ -11,7 +11,8 @@ shopt -s expand_aliases
 
 VERSION=5.11.1
 RUNDIR=${1?'full path to run dir'}
-OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
+ENVIRONMENT=${2?'environment'}
+OUTDIR=${3-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"

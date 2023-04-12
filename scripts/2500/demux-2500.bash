@@ -15,7 +15,8 @@ VERSION=5.11.1
 
 IN_DIR=${1?'please provide a run dir'}
 OUT_DIR=${2?'please provide a demux dir'}
-LANE=${3:-1}
+ENVIRONMENT=${3?'please provide an environment'}
+LANE=${4:-1}
 EMAIL=clinical-demux@scilifelab.se
 
 RUN=$(basename ${IN_DIR})

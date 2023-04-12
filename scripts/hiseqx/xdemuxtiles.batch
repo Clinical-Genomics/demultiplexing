@@ -18,17 +18,16 @@ shopt -s expand_aliases
 
 RUNDIR=${1?'Run dir'}
 OUTDIR=${2?'Demux dir'}
-
 LANE=${3?'Lane (1-8)'}
 ENVIRONMENT=${4?'Environment'}
 TILES=(${@:5}) # remaining args are the tile identifiers: 11 12 21 22
 EMAIL=clinical-demux@scilifelab.se
 
-# if [[ ${ENVIRONMENT} == 'production' ]]; then
-#     useprod
-# elif [[ ${ENVIRONMENT} == 'stage' ]]; then
-#     usestage
-# fi
+if [[ ${ENVIRONMENT} == 'production' ]]; then
+    useprod
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage 
+fi
 
 #############
 # FUNCTIONS #

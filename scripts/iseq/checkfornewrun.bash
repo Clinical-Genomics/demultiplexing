@@ -12,6 +12,7 @@ shopt -s expand_aliases
 
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
+ENVIRONMENT=${3?'please provide the environment'}
 SCRIPT_DIR=$(dirname "$(readlink -nm "$0")")
 EMAIL=clinical-demux@scilifelab.se
 
