@@ -15,21 +15,22 @@ VERSION=5.11.1
 
 IN_DIR=${1?'please provide a run dir'}
 OUT_DIR=${2?'please provide a demux dir'}
-LANE=${3:-1}
-EMAIL=YOUR.NAME@scilifelab.se
+ENVIRONMENT=${3?'please provide an environment'}
+LANE=${4:-1}
+EMAIL=clinical-demux@scilifelab.se
 
 RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
-SLURM_ACCOUNT=development
-usestage
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    SLURM_ACCOUNT=production
-    down
     useprod
-fi
+    SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
+fi  
 
 
 
