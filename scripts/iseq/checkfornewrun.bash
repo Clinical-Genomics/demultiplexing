@@ -3,8 +3,8 @@
 set -u
 
 shopt -s nullglob
+source "${HOME}/.bashrc"
 shopt -s expand_aliases
-source "${HOME}/.aliases"
 
 ########
 # VARS #
@@ -12,22 +12,20 @@ source "${HOME}/.aliases"
 
 IN_DIR=${1?'please provide the runs dir'}
 DEMUXES_DIR=${2?'please provide the demuxes dir'}
+ENVIRONMENT=${3?'please provide the environment'}
 SCRIPT_DIR=$(dirname "$(readlink -nm "$0")")
 EMAIL=clinical-demux@scilifelab.se
 
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
 
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
+    useprod
+    SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
-
 
 #############
 # FUNCTIONS #
@@ -69,7 +67,7 @@ for RUN_DIR in "${IN_DIR}"/*; do
 
             if [[ ! -e ${RUN_DIR}/SampleSheet.csv ]]; then
                 log "${CONDA_EXE} run --name ${CONDA_ENV} ${CONDA_ENV_BIN_BASE}/demux sheet fetch --application iseq --pad --longest ${FC} > ${RUN_DIR}/SampleSheet.csv"
-                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
+                demux sheet fetch --application iseq --pad --longest "${FC}" > "${RUN_DIR}/SampleSheet.csv"
             fi
 
             log "mkdir -p ${DEMUXES_DIR}/${RUN}/"

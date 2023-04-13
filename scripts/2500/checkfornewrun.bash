@@ -1,19 +1,20 @@
 #!/bin/bash
 
 shopt -s nullglob
+source "${HOME}/.bashrc"
+shopt -s expand_aliases
 
 INDIR=${1?'please provide a run dir'}
 DEMUXDIR=${2?'please provide a demux dir'}
-
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
+ENVIRONMENT=${3?'please provide the environment'}
 
 if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
+    useprod
+    SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
 
 
 for RUNDIR in ${INDIR}/*; do
@@ -29,7 +30,7 @@ for RUNDIR in ${INDIR}/*; do
                 if grep -qs ',ctmr,' ${RUNDIR}/SampleSheet.csv; then
                     echo [${NOW}] ${RUN} is CTMR - transmogrifying SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/SampleSheet.ctmr
-                    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
+                    demux sheet demux -a miseq ${RUNDIR}/SampleSheet.ctmr > ${RUNDIR}/SampleSheet.csv
                     cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
                 fi
             fi
@@ -37,16 +38,16 @@ for RUNDIR in ${INDIR}/*; do
                 echo [${NOW}] ${RUN} fetching samplesheet.csv
                 FC=${RUN##*_}
                 FC=${FC:1}
-                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
+                demux sheet fetch --application wes --shortest ${FC} > ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             else
                 echo converting ${RUNDIR}/SampleSheet.csv
-                $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
+                demux sheet convert ${RUNDIR}/SampleSheet.csv > ${RUNDIR}/SampleSheet.conv
                 cp ${RUNDIR}/SampleSheet.conv ${RUNDIR}/SampleSheet.csv
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
-            bash /home/proj/production/bin/git/demultiplexing/scripts/2500/demux-2500.bash ${RUNDIR} ${DEMUXDIR}
+            bash "/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/demux-2500.bash" ${RUNDIR} ${DEMUXDIR}
             rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - demuxstarted.txt exists

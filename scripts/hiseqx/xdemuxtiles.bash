@@ -2,34 +2,29 @@
 # demux Xrun in parts
 
 set -eu -o pipefail
+source "${HOME}/.bashrc"
+shopt -s expand_aliases
 
 ##########
 # PARAMS #
 ##########
 
-VERSION=5.5.0
+VERSION=5.11.1
 RUNDIR=${1?'full path to run dir'}
-OUTDIR=${2-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
+ENVIRONMENT=${2?'environment'}
+OUTDIR=${3-"/home/proj/${ENVIRONMENT}/demultiplexed-runs/$(basename "${RUNDIR}")/"}
 
 EMAIL=clinical-demux@scilifelab.se
 LOGDIR="${OUTDIR}/LOG"
 SCRIPTDIR="$(dirname "$(readlink -nm "$0")")"
 
-SLURM_ACCOUNT=development
-
-### SETUP CONDA VARIABLES ###
-
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV="S_demux"
-
 if [[ ${ENVIRONMENT} == 'production' ]]; then
+    useprod
     SLURM_ACCOUNT=production
-    CONDA_ENV="P_demux"
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
-
-CONDA_ENV_BIN_BASE="${CONDA_BASE}/envs/${CONDA_ENV}/bin/"
-
 
 #############
 # FUNCTIONS #
@@ -84,12 +79,13 @@ if [[ ! -e ${RUNDIR}/SampleSheet.csv ]]; then
     if [[ ${IS_DUAL} == '8' ]]; then
         DUALINDEX_PARAM='--dualindex'
     fi
-    log "${CONDA_EXE} run --name ${CONDA_ENV} ${CONDA_ENV_BIN_BASE}/demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
-    $CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
+    log "demux sheet fetch -a wgs ${DUALINDEX_PARAM} ${FC} > ${RUNDIR}/SampleSheet.csv"
+    demux sheet fetch -a wgs $DUALINDEX_PARAM "${FC}" > "${RUNDIR}/SampleSheet.csv"
 fi
 
 # validate!
-$CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
+log "demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv""
+demux sheet validate --application wgs "${RUNDIR}/SampleSheet.csv"
 
 # notify we are ready to start!
 mail -s "DEMUX of $FC started" ${EMAIL} < "${RUNDIR}/SampleSheet.csv"

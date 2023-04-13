@@ -14,7 +14,7 @@
 
 set -e
 
-VERSION=3.41.0
+VERSION=5.11.1
 RUNDIR=${1?'Please provide demux dir'}
 
 LOGDIR=${RUNDIR}/LOG/

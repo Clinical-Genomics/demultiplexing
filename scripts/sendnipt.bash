@@ -3,7 +3,7 @@
 
 set -ue
 
-VERSION=5.4.2
+VERSION=5.11.1
 echo "Version $VERSION"
 
 ##########
@@ -54,8 +54,10 @@ for RUN in $(ls ${NIPTRUNS}); do
     else
         echo [${NOW}] [${RUN}] Mailing!
 
-        INVESTIGATOR_NAME=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Investigator Name' - | cut -d, -f2)
-        EXPERIMENT_NAME=$(sed 's//\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Experiment Name' - | cut -d, -f2)
+        INVESTIGATOR_NAME=$(sed 's/
+/\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Investigator Name' - | cut -d, -f2)
+        EXPERIMENT_NAME=$(sed 's/
+/\n/g' ${NIPTRUNS}/${RUN}/SampleSheet.csv  | grep 'Experiment Name' - | cut -d, -f2)
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%$EXPERIMENT_NAME}
         INVESTIGATOR_NAME=${INVESTIGATOR_NAME%_} # remove possible ending _
 

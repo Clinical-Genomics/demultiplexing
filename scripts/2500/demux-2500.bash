@@ -4,10 +4,10 @@
 #   under $OUT_DIR
 
 set -eu -o pipefail
-
+source "${HOME}/.bashrc"
 shopt -s expand_aliases
 
-VERSION=5.4.2
+VERSION=5.11.1
 
 ##########
 # PARAMS #
@@ -15,29 +15,21 @@ VERSION=5.4.2
 
 IN_DIR=${1?'please provide a run dir'}
 OUT_DIR=${2?'please provide a demux dir'}
-LANE=${3:-1}
+ENVIRONMENT=${3?'please provide an environment'}
+LANE=${4:-1}
 EMAIL=clinical-demux@scilifelab.se
 
 RUN=$(basename ${IN_DIR})
 RUN_DIR=$(dirname ${IN_DIR})
 PROJECTLOG=${OUT_DIR}/${RUN}/projectlog.$(date +"%Y%m%d%H%M%S").log
-
-CONDA_BASE="/home/proj/${ENVIRONMENT}/bin/miniconda3"
-CONDA_EXE="${CONDA_BASE}/bin/conda"
-CONDA_ENV_BASE="${CONDA_BASE}/envs"
-CONDA_ENV="S_demux"
-
-if [[ ${ENVIRONMENT} == 'production' ]]; then
-    CONDA_ENV="P_demux"
-fi
-
-
-
 SCRIPT_DIR=/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/
 
-SLURM_ACCOUNT=development
 if [[ ${ENVIRONMENT} == 'production' ]]; then
+    useprod
     SLURM_ACCOUNT=production
+elif [[ ${ENVIRONMENT} == 'stage' ]]; then
+    usestage
+    SLURM_ACCOUNT=development
 fi
 
 #############
@@ -84,7 +76,7 @@ cp ${IN_DIR}/SampleSheet.csv ${IN_DIR}/Data/Intensities/BaseCalls/SampleSheet.cs
 log "Setup correct, starts demuxing . . ."
 
 echo "get basemask ${IN_DIR}"
-BASEMASK=$($CONDA_EXE run --name $CONDA_ENV $CONDA_ENV_BIN_BASE/demux basemask create --application wes --lane ${LANE} ${IN_DIR})
+BASEMASK=$(demux basemask create --application wes --lane ${LANE} ${IN_DIR})
 UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 
 # DEMUX !

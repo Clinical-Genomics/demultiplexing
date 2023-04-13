@@ -283,14 +283,17 @@ def fetch(
         click.echo("[Data]")
 
     click.echo(delimiter.join(header))
+    final_samplesheet = []
     for line in raw_samplesheet:
         # fix the project content
         project = get_project(line["project"])
         line["project"] = project
         line["sample_name"] = project
+        final_samplesheet.append(
+            delimiter.join([str(line[lims_key]) for lims_key in lims_keys])
+        )
 
-        # print it!
-        click.echo(delimiter.join([str(line[lims_key]) for lims_key in lims_keys]))
+    print("\n".join(final_samplesheet), end="")
 
 
 @sheet.command()
