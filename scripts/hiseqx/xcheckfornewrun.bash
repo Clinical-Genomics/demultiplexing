@@ -42,7 +42,7 @@ for RUN in "${RUNS_DIR}"/*; do
         if [ ! -f ${RUNS_DIR}/${RUN}/demuxstarted.txt ]; then
 
             # process FCs serially
-            FCS=$(squeue --format=%j | grep Xdem | grep -v ${FC} | cut -d- -f 3 | sort | uniq)
+            FCS=( $(squeue --format=%j | grep Xdem | grep -v ${FC} | cut -d- -f 3 | sort | uniq) )
             if [[ ${#FCS[@]} -gt 0 ]]; then
                 RUNNING_FCS=$(join , "${FCS[@]}")
                 log "${RUN} ${RUNNING_FCS} are demuxing - Postpone demux!"
