@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -eu
 source "${HOME}/.bashrc"
 shopt -s expand_aliases
 
