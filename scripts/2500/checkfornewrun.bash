@@ -47,7 +47,7 @@ for RUNDIR in ${INDIR}/*; do
                 cp ${RUNDIR}/SampleSheet.csv ${RUNDIR}/Data/Intensities/BaseCalls/
             fi
             echo [${NOW}] ${RUN} starting demultiplexing
-            bash "/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/demux-2500.bash" ${RUNDIR} ${DEMUXDIR}
+            bash "/home/proj/${ENVIRONMENT}/bin/git/demultiplexing/scripts/2500/demux-2500.bash" ${RUNDIR} ${DEMUXDIR} ${ENVIRONMENT}
             rm ${DEMUXDIR}/copycomplete.txt
         else
             echo [${NOW}] ${RUN} is finished and demultiplexing has already started - demuxstarted.txt exists
