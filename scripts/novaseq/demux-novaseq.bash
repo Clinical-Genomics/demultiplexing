@@ -54,9 +54,6 @@ RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIP
 
 log "bcl2fastq finished!"
 
-# Add samplesheet to unaligned folder
-cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${UNALIGNED_DIR}/
-
 # Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
@@ -89,16 +86,6 @@ for PROJECT_DIR in ${OUT_DIR}/${UNALIGNED_DIR}/*; do
     mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}
 done
 
-# Add stats to cgstats database
-log "cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
-cgstats add --machine novaseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}
-
-PROJECTS=$(ls ${OUT_DIR}/${UNALIGNED_DIR}/ | grep Project_)
-for PROJECT_DIR in ${PROJECTS[@]}; do
-    PROJECT=${PROJECT_DIR##*_}
-    log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
-    cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt
-done
 
 # Create a summary of the bcl2fastq indexcheck report
 demux indexreport summary \

@@ -79,20 +79,6 @@ log "/usr/local/bin/configureBclToFastq.pl --force --sample-sheet ${BASE}/Data/I
 cd ${DEMUX_DIR}/${RUN}/${UNALDIR}
 nohup make -j 8 > nohup.$(date +"%Y%m%d%H%M%S").out 2>&1
 
-# Add stats
-
-log "cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/"
-cgstats add --machine 2500 --unaligned ${UNALDIR} ${DEMUX_DIR}/${RUN}/ &>> ${PROJECTLOG}
-
-# create stats files
-FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${DEMUX_DIR}/${RUN}/${UNALDIR}/ | grep Proj)
-for PROJ in ${PROJs[@]}; do
-    prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt"
-    cgstats select --project ${prj} ${FC} &> ${DEMUX_DIR}/${RUN}/stats-${prj}-${FC}.txt
-done
-
 log "rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt"
 rm -f ${DEMUX_DIR}/${RUN}/copycomplete.txt
 

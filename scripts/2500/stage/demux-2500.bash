@@ -88,9 +88,6 @@ RES=$(sbatch --wait -A ${SLURM_ACCOUNT} -J ${JOB_TITLE} -o ${PROJECTLOG} ${SCRIP
 
 log "bcl2fastq finished!"
 
-# Add samplesheet to unaligned folder
-cp ${IN_DIR}/SampleSheet.csv ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/
-
 # Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
@@ -124,19 +121,6 @@ for PROJECT_DIR in ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/*; do
 
     log "mv ${PROJECT_DIR} ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/Project_${PROJECT}"
     mv ${PROJECT_DIR} ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/Project_${PROJECT}
-done
-
-# Add stats
-log "cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/"
-cgstats add --machine 2500 --unaligned ${UNALIGNED_DIR} ${OUT_DIR}/${RUN}/ &>> ${PROJECTLOG}
-
-# create stats files
-FC=$(echo ${RUN} | awk 'BEGIN {FS="/"} {split($(NF),arr,"_");print substr(arr[4],2,length(arr[4]))}')
-PROJs=$(ls ${OUT_DIR}/${RUN}/${UNALIGNED_DIR}/ | grep Proj)
-for PROJ in ${PROJs[@]}; do
-    prj=$(echo ${PROJ} | sed 's/Project_//')
-    log "cgstats select --project ${prj} ${FC} &> ${OUT_DIR}/${RUN}/stats-${prj}-${FC}.txt"
-    cgstats select --project ${prj} ${FC} &> ${OUT_DIR}/${RUN}/stats-${prj}-${FC}.txt
 done
 
 log "rm -f ${OUT_DIR}/${RUN}/copycomplete.txt"

@@ -49,9 +49,6 @@ UNALIGNED_DIR=Unaligned-${BASEMASK//,}
 log "${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir ${IN_DIR} --output-dir ${OUT_DIR}/${UNALIGNED_DIR} --use-bases-mask ${BASEMASK} --sample-sheet ${IN_DIR}/SampleSheet.csv --barcode-mismatches 1"
 ${BCL2FASTQ_BIN} --loading-threads 3 --processing-threads 15 --writing-threads 3 --runfolder-dir "${IN_DIR}" --output-dir "${OUT_DIR}/${UNALIGNED_DIR}" --use-bases-mask ${BASEMASK} --sample-sheet "${IN_DIR}/SampleSheet.csv" --barcode-mismatches 1
 
-# add samplesheet to unaligned folder
-cp "${IN_DIR}/SampleSheet.csv" "${OUT_DIR}/${UNALIGNED_DIR}/"
-
 # Restructure the output dir!
 FC=${RUN##*_}
 FC=${FC:1}
@@ -82,15 +79,4 @@ for PROJECT_DIR in "${OUT_DIR}/${UNALIGNED_DIR}"/*; do
 
     log "mv ${PROJECT_DIR} ${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
     mv "${PROJECT_DIR}" "${OUT_DIR}/${UNALIGNED_DIR}/Project_${PROJECT}"
-done
-
-# Need to add stats code here :)
-log "cgstats add --machine iseq --unaligned ${UNALIGNED_DIR} ${OUT_DIR}"
-cgstats add --machine iseq --unaligned ${UNALIGNED_DIR} "${OUT_DIR}"
-
-PROJECTS=$(ls "${OUT_DIR}/${UNALIGNED_DIR}/" | grep Project_)
-for PROJECT_DIR in "${PROJECTS[@]}"; do
-    PROJECT=${PROJECT_DIR##*_}
-    log "cgstats select --project ${PROJECT} ${FC} &> ${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
-    cgstats select --project "${PROJECT}" "${FC}" &> "${OUT_DIR}/stats-${PROJECT}-${FC}.txt"
 done
